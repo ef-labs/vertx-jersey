@@ -13,7 +13,8 @@
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0-SNAPSHOT</version>
+
     <name>vertx-mod-jersey</name>
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <url>https://github.com/englishtown/vertx-mod-jersey</url>
