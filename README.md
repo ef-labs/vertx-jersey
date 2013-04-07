@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/englishtown/vertx-mod-jersey.png)](https://travis-ci.org/englishtown/vertx-mod-jersey)
+
 # vertx-mod-jersey
 
 Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
