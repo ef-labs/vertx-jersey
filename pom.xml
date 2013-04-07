@@ -3,12 +3,34 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
     <name>vertx-mod-jersey</name>
+    <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <url>https://github.com/englishtown/vertx-mod-jersey</url>
+    <inceptionYear>2013</inceptionYear>
+
+    <organization>
+        <name>Englishtown</name>
+        <url>http://www.englishtown.com</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://englishtown.mit-license.org/</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -34,13 +56,6 @@
         <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
         <maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
     </properties>
-
-    <repositories>
-        <repository>
-            <id>sonatype-snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -306,13 +321,23 @@
         </plugins>
     </reporting>
 
-    <scm>
-        <url>https://github.com/englishtown/vertx-mod-jersey</url>
-    </scm>
-
     <issueManagement>
         <system>Github Issues</system>
         <url>https://github.com/englishtown/vertx-mod-jersey/issues</url>
     </issueManagement>
+
+    <distributionManagement>
+        <site>
+            <id>sling.englishtown.com</id>
+            <url>dav:https://sling.englishtown.com/content/docs/${project.groupId}/${project.artifactId}/${project.version}</url>
+        </site>
+    </distributionManagement>
+
+    <scm>
+        <connection>scm:git:git@github.com:englishtown/vertx-mod-jersey.git</connection>
+        <developerConnection>scm:git:git@github.com:englishtown/vertx-mod-jersey.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/englishtown/vertx-mod-jersey</url>
+    </scm>
 
 </project>
