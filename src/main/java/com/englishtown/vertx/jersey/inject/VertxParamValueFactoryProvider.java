@@ -24,9 +24,6 @@ import javax.inject.Singleton;
 @Singleton
 public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider {
 
-    @Inject
-    private ServiceLocator locator;
-
     /**
      * {@link InjectionResolver Injection resolver} for {@link javax.ws.rs.BeanParam bean parameters}.
      */
@@ -43,10 +40,8 @@ public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider
 
     private static final class VertxParamValueFactory extends AbstractHttpContextValueFactory<Object> {
         private final Parameter parameter;
-        private final ServiceLocator locator;
 
-        private VertxParamValueFactory(ServiceLocator locator, Parameter parameter) {
-            this.locator = locator;
+        private VertxParamValueFactory(Parameter parameter) {
             this.parameter = parameter;
         }
 
@@ -85,6 +80,6 @@ public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider
 
     @Override
     public AbstractHttpContextValueFactory<?> createValueFactory(Parameter parameter) {
-        return new VertxParamValueFactory(locator, parameter);
+        return new VertxParamValueFactory(parameter);
     }
 }
