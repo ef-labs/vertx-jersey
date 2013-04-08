@@ -13,10 +13,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 3/28/13
- * Time: 11:05 AM
  * A Jersey ContainerResponseWriter to write to the vertx response
  */
 class VertxResponseWriter implements ContainerResponseWriter {

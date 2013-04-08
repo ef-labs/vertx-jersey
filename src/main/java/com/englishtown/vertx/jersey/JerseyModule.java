@@ -14,10 +14,6 @@ import org.vertx.java.core.json.JsonObject;
 import java.net.URI;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 3/28/13
- * Time: 9:41 AM
  * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
 public class JerseyModule extends BusModBase {

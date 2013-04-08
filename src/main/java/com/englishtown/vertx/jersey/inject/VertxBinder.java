@@ -9,10 +9,6 @@ import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
 import javax.inject.Singleton;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/8/13
- * Time: 12:33 PM
  * Binder to register VertxParam injections
  */
 public class VertxBinder extends AbstractBinder {

@@ -19,10 +19,6 @@ import java.security.Principal;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 3/27/13
- * Time: 4:18 PM
  * The Vertx {@link HttpServerRequest} handler that delegates handling to Jersey
  */
 public class JerseyHandler implements Handler<HttpServerRequest> {

@@ -15,10 +15,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/8/13
- * Time: 12:22 PM
  * Provides Jersey injection for {@link VertxParam} values
  */
 @Singleton
