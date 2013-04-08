@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * User: adriangonzalez
  * Date: 3/28/13
  * Time: 11:05 AM
- * To change this template use File | Settings | File Templates.
+ * A Jersey ContainerResponseWriter to write to the vertx response
  */
 class VertxResponseWriter implements ContainerResponseWriter {
 
@@ -69,6 +69,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void setSuspendTimeout(long timeOut, TimeUnit timeUnit) throws IllegalStateException {
+        // TODO: setSuspendTimeout
     }
 
     /**
@@ -88,7 +89,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void failure(Throwable error) {
-
+        // TODO: Add error handling
     }
 
     /**
@@ -96,6 +97,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean enableResponseBuffering() {
+        // TODO enableResponseBuffering?
         return false;
     }
 }

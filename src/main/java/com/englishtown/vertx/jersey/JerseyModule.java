@@ -1,8 +1,8 @@
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.inject.VertxBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.model.Resource;
 import org.vertx.java.busmods.BusModBase;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.VoidResult;
@@ -11,7 +11,6 @@ import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 
-import javax.inject.Inject;
 import java.net.URI;
 
 /**
@@ -19,7 +18,7 @@ import java.net.URI;
  * User: adriangonzalez
  * Date: 3/28/13
  * Time: 9:41 AM
- * To change this template use File | Settings | File Templates.
+ * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
 public class JerseyModule extends BusModBase {
 
@@ -27,10 +26,6 @@ public class JerseyModule extends BusModBase {
     private final String CONFIG_PORT = "port";
     private final String CONFIG_BASE_PATH = "base_path";
     private final String CONFIG_RESOURCES = "resources";
-
-    @Inject
-    public JerseyModule() {
-    }
 
     /**
      * {@inheritDoc}
@@ -48,10 +43,8 @@ public class JerseyModule extends BusModBase {
             basePath += "/";
         }
 
-        ApplicationHandler ah = new ApplicationHandler(rc);
-        URI baseUri = URI.create(basePath);
         RouteMatcher rm = new RouteMatcher();
-        rm.all(basePath + ".*", new JerseyHandler(baseUri, ah));
+        rm.all(basePath + ".*", new JerseyHandler(vertx, container, URI.create(basePath), rc));
 
         vertx.createHttpServer().requestHandler(rm).listen(port, host, new Handler<HttpServer>() {
             @Override
@@ -80,6 +73,7 @@ public class JerseyModule extends BusModBase {
 
         ResourceConfig rc = new ResourceConfig();
         rc.packages(resourceArr);
+        rc.registerInstances(new VertxBinder());
 
         return rc;
 
