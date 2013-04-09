@@ -24,7 +24,6 @@
 package com.englishtown.vertx.jersey;
 
 import com.englishtown.vertx.jersey.inject.VertxBinder;
-import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.busmods.BusModBase;
 import org.vertx.java.core.Handler;
@@ -45,6 +44,8 @@ public class JerseyModule extends BusModBase {
     private final String CONFIG_PORT = "port";
     private final String CONFIG_BASE_PATH = "base_path";
     private final String CONFIG_RESOURCES = "resources";
+    private final String CONFIG_FEATURES = "features";
+    private final String CONFIG_BINDERS = "binders";
 
     /**
      * {@inheritDoc}
@@ -78,10 +79,10 @@ public class JerseyModule extends BusModBase {
 
     ResourceConfig getResourceConfig(JsonObject config) {
 
-        JsonArray resources = config.getArray(CONFIG_RESOURCES);
+        JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
 
         if (resources == null || resources.size() == 0) {
-            throw new RuntimeException("At lease one package name must be specified in the config " +
+            throw new RuntimeException("At lease one resource package name must be specified in the config " +
                     CONFIG_RESOURCES);
         }
 
@@ -93,6 +94,36 @@ public class JerseyModule extends BusModBase {
         ResourceConfig rc = new ResourceConfig();
         rc.packages(resourceArr);
         rc.registerInstances(new VertxBinder());
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+
+        JsonArray features = config.getArray(CONFIG_FEATURES, null);
+        if (features != null && features.size() > 0) {
+            for (int i = 0; i < features.size(); i++) {
+                try {
+                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
+                    rc.register(clazz);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        JsonArray binders = config.getArray(CONFIG_BINDERS, null);
+        if (binders != null && binders.size() > 0) {
+            for (int i = 0; i < binders.size(); i++) {
+                try {
+                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
+                    rc.register(clazz.newInstance());
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (InstantiationException e) {
+                    throw new RuntimeException(e);
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
         return rc;
 

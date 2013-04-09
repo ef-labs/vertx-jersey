@@ -3,7 +3,6 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
@@ -66,16 +65,12 @@
             <version>${jersey.version}</version>
             <exclusions>
                 <exclusion>
-                    <groupId>org.glassfish.hk2.external</groupId>
-                    <artifactId>javax.inject</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>hk2-locator</artifactId>
                 </exclusion>
                 <exclusion>
-                    <groupId>javax.inject</groupId>
-                    <artifactId>javax.inject</artifactId>
+                    <groupId>org.glassfish.hk2</groupId>
+                    <artifactId>hk2-api</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -86,16 +81,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>javax.inject</groupId>
-            <artifactId>javax.inject</artifactId>
-            <version>${javax.inject.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-hk2</artifactId>
             <version>1.0.0-SNAPSHOT</version>
-            <scope>test</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!--Vertx provided dependencies-->
@@ -222,12 +211,12 @@
                 <artifactId>vertx-maven-plugin</artifactId>
                 <version>${maven.vertx.plugin.version}</version>
                 <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>pullindeps</goal>
-                        </goals>
-                    </execution>
+                    <!--<execution>-->
+                        <!--<phase>process-classes</phase>-->
+                        <!--<goals>-->
+                            <!--<goal>pullindeps</goal>-->
+                        <!--</goals>-->
+                    <!--</execution>-->
                 </executions>
                 <configuration>
                     <configFile>src/test/resources/config.json</configFile>
