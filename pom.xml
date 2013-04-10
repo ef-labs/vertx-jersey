@@ -211,12 +211,12 @@
                 <artifactId>vertx-maven-plugin</artifactId>
                 <version>${maven.vertx.plugin.version}</version>
                 <executions>
-                    <!--<execution>-->
-                        <!--<phase>process-classes</phase>-->
-                        <!--<goals>-->
-                            <!--<goal>pullindeps</goal>-->
-                        <!--</goals>-->
-                    <!--</execution>-->
+                    <execution>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>pullindeps</goal>
+                        </goals>
+                    </execution>
                 </executions>
                 <configuration>
                     <configFile>src/test/resources/config.json</configFile>

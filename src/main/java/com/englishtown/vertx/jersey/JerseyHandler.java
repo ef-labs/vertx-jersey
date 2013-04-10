@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.security.SecurityContextProvider;
 import com.hazelcast.nio.FastByteArrayInputStream;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.server.ApplicationHandler;
@@ -38,7 +39,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.InputStream;
 import java.net.URI;
-import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -52,14 +52,16 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
 
     private final Vertx vertx;
     private final Container container;
-    private ApplicationHandler application;
+    private final ApplicationHandler application;
     private final URI baseUri;
+    private final SecurityContextProvider securityContextProvider;
 
     public JerseyHandler(Vertx vertx, Container container, URI baseUri, ResourceConfig rc) {
         this.vertx = vertx;
         this.container = container;
         this.baseUri = baseUri;
         this.application = new ApplicationHandler(rc);
+        this.securityContextProvider = this.application.getServiceLocator().getService(SecurityContextProvider.class);
     }
 
     /**
@@ -68,6 +70,18 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
     @Override
     public void handle(final HttpServerRequest vertxRequest) {
 
+        // Get the security context
+        securityContextProvider.getSecurityContext(vertxRequest, new Handler<SecurityContext>() {
+            @Override
+            public void handle(final SecurityContext securityContext) {
+                JerseyHandler.this.handle(vertxRequest, securityContext);
+            }
+        });
+
+    }
+
+    void handle(final HttpServerRequest vertxRequest, final SecurityContext securityContext) {
+
         // If this is a form post, we need to wait for the body for jersey to handle form params
         if (isFormPost(vertxRequest)) {
             vertxRequest.bodyHandler(new Handler<Buffer>() {
@@ -75,16 +89,16 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
                 public void handle(Buffer body) {
                     // TODO: Use dataHandler instead and limit body size to something reasonable
                     InputStream inputStream = new FastByteArrayInputStream(body.getBytes());
-                    JerseyHandler.this.handle(vertxRequest, inputStream);
+                    JerseyHandler.this.handle(vertxRequest, securityContext, inputStream);
                 }
             });
         } else {
-            handle(vertxRequest, null);
+            JerseyHandler.this.handle(vertxRequest, securityContext, null);
         }
 
     }
 
-    void handle(final HttpServerRequest vertxRequest, InputStream inputStream) {
+    void handle(final HttpServerRequest vertxRequest, SecurityContext securityContext, InputStream inputStream) {
 
         // Stick the vertx params in the properties bag
         MapPropertiesDelegate properties = new MapPropertiesDelegate();
@@ -97,7 +111,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
                 baseUri,
                 vertxRequest.getAbsoluteURI(),
                 vertxRequest.method,
-                getSecurityContext(vertxRequest),
+                securityContext,
                 properties);
 
         // Provide the vertx response writer
@@ -122,29 +136,4 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
                 && MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(vertxRequest.headers().get("Content-Type"));
     }
 
-    // TODO: Need to be able inject SecurityContext provider
-    SecurityContext getSecurityContext(final HttpServerRequest request) {
-        return new SecurityContext() {
-
-            @Override
-            public boolean isUserInRole(String role) {
-                return false;
-            }
-
-            @Override
-            public boolean isSecure() {
-                return request.getAbsoluteURI().getScheme().equalsIgnoreCase("https");
-            }
-
-            @Override
-            public Principal getUserPrincipal() {
-                return null;
-            }
-
-            @Override
-            public String getAuthenticationScheme() {
-                return null;
-            }
-        };
-    }
 }

@@ -113,7 +113,7 @@ public class JerseyModule extends BusModBase {
         if (binders != null && binders.size() > 0) {
             for (int i = 0; i < binders.size(); i++) {
                 try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
+                    Class<?> clazz = cl.loadClass(String.valueOf(binders.get(i)));
                     rc.register(clazz.newInstance());
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
