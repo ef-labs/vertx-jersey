@@ -21,33 +21,46 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey.inject;
+package com.englishtown.vertx.jersey.security;
 
-import com.englishtown.vertx.jersey.VertxParam;
-import com.englishtown.vertx.jersey.security.DefaultSecurityContextProvider;
-import com.englishtown.vertx.jersey.security.SecurityContextProvider;
-import org.glassfish.hk2.api.InjectionResolver;
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.http.HttpServerRequest;
 
-import javax.inject.Singleton;
+import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
 
 /**
- * Binder to register VertxParam injections
+ * Default implementation of {@link SecurityContextProvider}
  */
-public class VertxBinder extends AbstractBinder {
+public class DefaultSecurityContextProvider implements SecurityContextProvider {
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    protected void configure() {
+    public void getSecurityContext(HttpServerRequest request, Handler<SecurityContext> done) {
 
-        bind(VertxParamValueFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
+        final boolean isSecure = "https".equalsIgnoreCase(request.getAbsoluteURI().getScheme());
 
-        bind(VertxParamValueFactoryProvider.InjectionResolver.class).to(new TypeLiteral<InjectionResolver<VertxParam>>
-                () {
-        }).in(Singleton.class);
+        done.handle(new SecurityContext() {
+            @Override
+            public Principal getUserPrincipal() {
+                return null;
+            }
 
-        // Replace the DefaultSecurityContextProvider by binding one with a higher rank
-        bind(DefaultSecurityContextProvider.class).to(SecurityContextProvider.class);
+            @Override
+            public boolean isUserInRole(String role) {
+                return false;
+            }
 
+            @Override
+            public boolean isSecure() {
+                return isSecure;
+            }
+
+            @Override
+            public String getAuthenticationScheme() {
+                return null;
+            }
+        });
     }
 }
