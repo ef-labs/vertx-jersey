@@ -40,12 +40,12 @@ import java.net.URI;
  */
 public class JerseyModule extends BusModBase {
 
-    private final String CONFIG_HOST = "host";
-    private final String CONFIG_PORT = "port";
-    private final String CONFIG_BASE_PATH = "base_path";
-    private final String CONFIG_RESOURCES = "resources";
-    private final String CONFIG_FEATURES = "features";
-    private final String CONFIG_BINDERS = "binders";
+    private final static String CONFIG_HOST = "host";
+    private final static String CONFIG_PORT = "port";
+    private final static String CONFIG_BASE_PATH = "base_path";
+    private final static String CONFIG_RESOURCES = "resources";
+    private final static String CONFIG_FEATURES = "features";
+    private final static String CONFIG_BINDERS = "binders";
 
     /**
      * {@inheritDoc}
