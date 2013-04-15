@@ -23,8 +23,10 @@
 
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.inject.VertxRequestHandler;
 import com.englishtown.vertx.jersey.security.SecurityContextProvider;
 import com.hazelcast.nio.FastByteArrayInputStream;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -39,6 +41,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,13 +59,17 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
     private final ApplicationHandler application;
     private final URI baseUri;
     private final SecurityContextProvider securityContextProvider;
+    private final List<VertxRequestHandler> vertxHandlers;
 
     public JerseyHandler(Vertx vertx, Container container, URI baseUri, ResourceConfig rc) {
         this.vertx = vertx;
         this.container = container;
         this.baseUri = baseUri;
         this.application = new ApplicationHandler(rc);
-        this.securityContextProvider = this.application.getServiceLocator().getService(SecurityContextProvider.class);
+
+        ServiceLocator locator = this.application.getServiceLocator();
+        this.securityContextProvider = locator.getService(SecurityContextProvider.class);
+        this.vertxHandlers = locator.getAllServices(VertxRequestHandler.class);
     }
 
     /**
@@ -98,13 +106,65 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
 
     }
 
-    void handle(final HttpServerRequest vertxRequest, SecurityContext securityContext, InputStream inputStream) {
+    void handle(
+            final HttpServerRequest vertxRequest,
+            final SecurityContext securityContext,
+            final InputStream inputStream
+    ) {
 
         // Stick the vertx params in the properties bag
-        MapPropertiesDelegate properties = new MapPropertiesDelegate();
-        properties.setProperty(PROPERTY_NAME_VERTX, vertx);
-        properties.setProperty(PROPERTY_NAME_CONTAINER, container);
-        properties.setProperty(PROPERTY_NAME_REQUEST, vertxRequest);
+        final Map<String, Object> properties = new HashMap<>();
+        properties.put(PROPERTY_NAME_VERTX, vertx);
+        properties.put(PROPERTY_NAME_CONTAINER, container);
+        properties.put(PROPERTY_NAME_REQUEST, vertxRequest);
+
+        if (vertxHandlers != null && vertxHandlers.size() > 0) {
+            callVertxHandler(0, vertxRequest, securityContext, inputStream, properties, new Handler<Void>() {
+                @Override
+                public void handle(Void aVoid) {
+                    JerseyHandler.this.handle(vertxRequest, securityContext, inputStream, properties);
+                }
+            });
+        } else {
+            handle(vertxRequest, securityContext, inputStream, properties);
+        }
+
+    }
+
+    void callVertxHandler(
+            int index,
+            final HttpServerRequest vertxRequest,
+            final SecurityContext securityContext,
+            final InputStream inputStream,
+            final Map<String, Object> properties,
+            final Handler<Void> done
+    ) {
+
+        if (index >= vertxHandlers.size()) {
+            done.handle(null);
+        }
+
+        VertxRequestHandler handler = vertxHandlers.get(index);
+        final int next = index + 1;
+
+        handler.handle(vertxRequest, properties, new Handler<Void>() {
+            @Override
+            public void handle(Void aVoid) {
+                if (next >= vertxHandlers.size()) {
+                    done.handle(null);
+                } else {
+                    callVertxHandler(next, vertxRequest, securityContext, inputStream, properties, done);
+                }
+            }
+        });
+
+    }
+
+    void handle(
+            final HttpServerRequest vertxRequest,
+            SecurityContext securityContext,
+            InputStream inputStream,
+            Map<String, Object> properties) {
 
         // Create the jersey request
         ContainerRequest jerseyRequest = new ContainerRequest(
@@ -112,7 +172,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
                 vertxRequest.getAbsoluteURI(),
                 vertxRequest.method,
                 securityContext,
-                properties);
+                new MapPropertiesDelegate(properties));
 
         // Provide the vertx response writer
         jerseyRequest.setWriter(new VertxResponseWriter(vertxRequest, container.getLogger()));
