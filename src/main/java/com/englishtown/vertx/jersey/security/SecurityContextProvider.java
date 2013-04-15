@@ -24,7 +24,6 @@
 package com.englishtown.vertx.jersey.security;
 
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.ws.rs.core.SecurityContext;
@@ -36,8 +35,9 @@ public interface SecurityContextProvider {
 
     /**
      * Creates the {@link SecurityContext} for the current request
+     *
      * @param request the vert.x request
-     * @param done the handler to call with the constructed {@link SecurityContext}
+     * @param done    the handler to call with the constructed {@link SecurityContext}
      */
     public void getSecurityContext(HttpServerRequest request, Handler<SecurityContext> done);
 
