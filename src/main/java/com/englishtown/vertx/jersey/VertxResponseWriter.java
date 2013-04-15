@@ -23,14 +23,19 @@
 
 package com.englishtown.vertx.jersey;
 
-import com.hazelcast.nio.FastByteArrayOutputStream;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.logging.Logger;
 
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -40,12 +45,111 @@ import java.util.concurrent.TimeUnit;
  */
 class VertxResponseWriter implements ContainerResponseWriter {
 
-    private final HttpServerRequest vertxRequest;
-    private final FastByteArrayOutputStream outputStream;
+    private static class VertxOutputStream extends OutputStream {
 
-    public VertxResponseWriter(HttpServerRequest vertxRequest) {
+        private final HttpServerResponse response;
+        private Buffer buffer = new Buffer();
+
+        private VertxOutputStream(HttpServerResponse response) {
+            this.response = response;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(int b) throws IOException {
+            buffer.appendInt(b);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b) throws IOException {
+            buffer.appendBytes(b);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            if (off == 0 && len == b.length) {
+                buffer.appendBytes(b);
+            } else {
+                buffer.appendBytes(Arrays.copyOfRange(b, off, off + len));
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void flush() throws IOException {
+            if (buffer != null && buffer.length() > 0) {
+                if (!response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
+                    response.headers().put(HttpHeaders.CONTENT_LENGTH, buffer.length());
+                }
+                response.write(buffer);
+                buffer = null;
+            }
+        }
+
+    }
+
+    private static class VertxChunkedOutputStream extends OutputStream {
+
+        private final HttpServerResponse response;
+
+        private VertxChunkedOutputStream(HttpServerResponse response) {
+            this.response = response;
+            response.setChunked(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(int b) throws IOException {
+            Buffer buffer = new Buffer(1).appendInt(b);
+            response.write(buffer);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b) throws IOException {
+            Buffer buffer = new Buffer(b);
+            response.write(buffer);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            Buffer buffer;
+
+            if (off == 0 && len == b.length) {
+                buffer = new Buffer(b);
+            } else {
+                buffer = new Buffer(Arrays.copyOfRange(b, off, off + len));
+            }
+
+            response.write(buffer);
+        }
+
+    }
+
+    private final HttpServerRequest vertxRequest;
+    private final Logger logger;
+    private OutputStream outputStream;
+
+    public VertxResponseWriter(HttpServerRequest vertxRequest, Logger logger) {
         this.vertxRequest = vertxRequest;
-        this.outputStream = new FastByteArrayOutputStream();
+        this.logger = logger;
     }
 
     /**
@@ -53,22 +157,27 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse responseContext) throws ContainerException {
+        HttpServerResponse response = vertxRequest.response;
 
         // Write the status
-        vertxRequest.response.statusCode = responseContext.getStatus();
-        vertxRequest.response.statusMessage = responseContext.getStatusInfo().getReasonPhrase();
+        response.statusCode = responseContext.getStatus();
+        response.statusMessage = responseContext.getStatusInfo().getReasonPhrase();
 
         // Set the content length header
-        if (contentLength != -1 && contentLength < Integer.MAX_VALUE) {
-            vertxRequest.response.putHeader("Content-Length", contentLength);
+        if (contentLength != -1) {
+            response.putHeader(HttpHeaders.CONTENT_LENGTH, contentLength);
         }
+
+        // Set chunked if response entity is ChunkedOutput<T>
+        outputStream = responseContext.isChunked() ? new VertxChunkedOutputStream(response)
+                : new VertxOutputStream(response);
 
         // TODO: Set keep alive?
         //vertxRequest.response.putHeader("Connection", "keep-alive");
 
         for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
             for (final Object value : e.getValue()) {
-                vertxRequest.response.putHeader(e.getKey(), value);
+                response.putHeader(e.getKey(), value);
             }
         }
 
@@ -96,11 +205,12 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void commit() {
-        if (this.outputStream.size() > 0) {
-            vertxRequest.response.end(new Buffer(this.outputStream.toByteArray()));
-        } else {
-            vertxRequest.response.end();
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+        vertxRequest.response.end();
     }
 
     /**
@@ -108,7 +218,16 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void failure(Throwable error) {
-        // TODO: Add error handling
+
+        logger.error(error.getMessage(), error);
+        HttpServerResponse response = vertxRequest.response;
+
+        // Set error status and end
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        response.statusCode = status.getStatusCode();
+        response.statusMessage = status.getReasonPhrase();
+        response.end();
+
     }
 
     /**
@@ -116,7 +235,6 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean enableResponseBuffering() {
-        // TODO enableResponseBuffering?
         return false;
     }
 }
