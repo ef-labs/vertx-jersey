@@ -43,6 +43,8 @@ The vertx-mod-jersey module configuration is as follows:
 {
     "host": <host>,
     "port": <port>,
+    "receive_buffer_size": <receive_buffer_size>,
+    "max_body_size": <max_body_size>,
     "base_path": <base_path>,
     "resources": [<resources>],
     "features": [<features>],
@@ -53,6 +55,8 @@ The vertx-mod-jersey module configuration is as follows:
 * `host` - The host or ip address to listen at for connections. `0.0.0.0` means listen at all available addresses.
 Default is `0.0.0.0`
 * `port` -  The port to listen at for connections. Default is `80`.
+* `receive_buffer_size` - The int receive buffer size.  The value is optional.
+* `max_body_size` - The int max body size allowed.  The default value is 1MB.
 * `base_path` - The base path jersey responds to.  Default is `/`.
 * `resources` - An array of package names to inspect for resources.
 * `features` - An array of feature classes to inject.  For example: `"org.glassfish.jersey.jackson.JacksonFeature"`

@@ -37,6 +37,8 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.platform.Container;
 
+import javax.ws.rs.HttpMethod;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.InputStream;
@@ -53,6 +55,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
     public static final String PROPERTY_NAME_VERTX = "vertx.vertx";
     public static final String PROPERTY_NAME_CONTAINER = "vertx.container";
     public static final String PROPERTY_NAME_REQUEST = "vertx.request";
+    public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
     private final Vertx vertx;
     private final Container container;
@@ -60,6 +63,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
     private final URI baseUri;
     private final SecurityContextProvider securityContextProvider;
     private final List<VertxRequestHandler> vertxHandlers;
+    private final int maxBodySize;
 
     public JerseyHandler(Vertx vertx, Container container, URI baseUri, ResourceConfig rc) {
         this.vertx = vertx;
@@ -70,6 +74,8 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
         ServiceLocator locator = this.application.getServiceLocator();
         this.securityContextProvider = locator.getService(SecurityContextProvider.class);
         this.vertxHandlers = locator.getAllServices(VertxRequestHandler.class);
+
+        this.maxBodySize = container.getConfig().getNumber(JerseyModule.CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
     }
 
     /**
@@ -90,16 +96,27 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
 
     void handle(final HttpServerRequest vertxRequest, final SecurityContext securityContext) {
 
-        // If this is a form post, we need to wait for the body for jersey to handle form params
-        if (isFormPost(vertxRequest)) {
-            vertxRequest.bodyHandler(new Handler<Buffer>() {
+        // Wait for the body for jersey to handle form/json/xml params
+        if (shouldReadData(vertxRequest)) {
+            final Buffer body = new Buffer();
+
+            vertxRequest.dataHandler(new Handler<Buffer>() {
+                public void handle(Buffer buff) {
+                    body.appendBuffer(buff);
+                    if (body.length() > maxBodySize) {
+                        throw new RuntimeException("The input stream has exceeded the max allowed body size "
+                                + maxBodySize + ".");
+                    }
+                }
+            });
+            vertxRequest.endHandler(new Handler<Void>() {
                 @Override
-                public void handle(Buffer body) {
-                    // TODO: Use dataHandler instead and limit body size to something reasonable
+                public void handle(Void event) {
                     InputStream inputStream = new FastByteArrayInputStream(body.getBytes());
                     JerseyHandler.this.handle(vertxRequest, securityContext, inputStream);
                 }
             });
+
         } else {
             JerseyHandler.this.handle(vertxRequest, securityContext, null);
         }
@@ -191,9 +208,21 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
 
     }
 
-    boolean isFormPost(HttpServerRequest vertxRequest) {
-        return "POST".equalsIgnoreCase(vertxRequest.method)
-                && MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(vertxRequest.headers().get("Content-Type"));
+    boolean shouldReadData(HttpServerRequest vertxRequest) {
+
+        String method = vertxRequest.method;
+
+        // Only read input stream data for post/put methods
+        if (!(HttpMethod.POST.equalsIgnoreCase(method) || HttpMethod.PUT.equalsIgnoreCase(method))) {
+            return false;
+        }
+
+        String contentType = vertxRequest.headers().get(HttpHeaders.CONTENT_TYPE);
+
+        // Only read input stream data for content types form/json/xml
+        return MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(contentType)
+                || MediaType.APPLICATION_JSON.equalsIgnoreCase(contentType)
+                || MediaType.APPLICATION_XML.equalsIgnoreCase(contentType);
     }
 
 }

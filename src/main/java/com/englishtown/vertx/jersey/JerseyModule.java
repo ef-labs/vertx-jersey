@@ -46,6 +46,8 @@ public class JerseyModule extends BusModBase {
     private final static String CONFIG_RESOURCES = "resources";
     private final static String CONFIG_FEATURES = "features";
     private final static String CONFIG_BINDERS = "binders";
+    private final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
+    final static String CONFIG_MAX_BODY_SIZE = "max_body_size";
 
     /**
      * {@inheritDoc}
@@ -56,6 +58,7 @@ public class JerseyModule extends BusModBase {
 
         String host = getOptionalStringConfig(CONFIG_HOST, "0.0.0.0");
         int port = getOptionalIntConfig(CONFIG_PORT, 80);
+        int receiveBufferSize = getOptionalIntConfig(CONFIG_RECEIVE_BUFFER_SIZE, 0);
         String basePath = getOptionalStringConfig(CONFIG_BASE_PATH, "/");
         ResourceConfig rc = getResourceConfig(config);
 
@@ -66,13 +69,19 @@ public class JerseyModule extends BusModBase {
         RouteMatcher rm = new RouteMatcher();
         rm.all(basePath + ".*", new JerseyHandler(vertx, container, URI.create(basePath), rc));
 
-        vertx.createHttpServer().requestHandler(rm).listen(port, host, new Handler<HttpServer>() {
+        HttpServer server = vertx.createHttpServer().requestHandler(rm);
+
+        if (receiveBufferSize > 0) {
+            // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
+            server.setReceiveBufferSize(receiveBufferSize);
+        }
+
+        server.listen(port, host, new Handler<HttpServer>() {
             @Override
             public void handle(HttpServer event) {
                 startedResult.setResult();
             }
         });
-
         container.getLogger().info("Http server listening for http://" + host + ":" + port + basePath);
 
     }
