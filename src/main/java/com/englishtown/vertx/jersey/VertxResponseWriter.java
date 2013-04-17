@@ -59,7 +59,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void write(int b) throws IOException {
-            buffer.appendInt(b);
+            buffer.appendByte((byte)b);
         }
 
         /**
@@ -87,15 +87,29 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void flush() throws IOException {
+            // Only flush to underlying very.x response if the content-length has been set
+            if (buffer.length() > 0 && response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
+                response.write(buffer);
+                buffer = new Buffer();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void close() throws IOException {
+            // Write any remaining buffer to the vert.x response
+            // Set content-length if not set yet
             if (buffer != null && buffer.length() > 0) {
                 if (!response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
                     response.headers().put(HttpHeaders.CONTENT_LENGTH, buffer.length());
                 }
                 response.write(buffer);
-                buffer = null;
             }
+            buffer = null;
+            // TODO: Add checks if the stream is closed and throw run time exceptions if trying to write or flush
         }
-
     }
 
     private static class VertxChunkedOutputStream extends OutputStream {
@@ -171,9 +185,6 @@ class VertxResponseWriter implements ContainerResponseWriter {
         // Set chunked if response entity is ChunkedOutput<T>
         outputStream = responseContext.isChunked() ? new VertxChunkedOutputStream(response)
                 : new VertxOutputStream(response);
-
-        // TODO: Set keep alive?
-        //vertxRequest.response.putHeader("Connection", "keep-alive");
 
         for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
             for (final Object value : e.getValue()) {
