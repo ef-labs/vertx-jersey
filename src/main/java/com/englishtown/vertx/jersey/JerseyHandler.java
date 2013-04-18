@@ -26,17 +26,16 @@ package com.englishtown.vertx.jersey;
 import com.englishtown.vertx.jersey.inject.VertxRequestHandler;
 import com.englishtown.vertx.jersey.security.SecurityContextProvider;
 import com.hazelcast.nio.FastByteArrayInputStream;
-import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.platform.Container;
 
+import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -65,16 +64,26 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
     private final List<VertxRequestHandler> vertxHandlers;
     private final int maxBodySize;
 
-    public JerseyHandler(Vertx vertx, Container container, URI baseUri, ResourceConfig rc) {
+    public JerseyHandler(Vertx vertx, Container container, URI baseUri, ApplicationHandler application) {
+        this(vertx, container, baseUri, application,
+                application.getServiceLocator().getService(SecurityContextProvider.class),
+                application.getServiceLocator().getAllServices(VertxRequestHandler.class));
+    }
+
+    @Inject
+    public JerseyHandler(
+            Vertx vertx,
+            Container container,
+            URI baseUri,
+            ApplicationHandler application,
+            SecurityContextProvider securityContextProvider,
+            List<VertxRequestHandler> vertxHandlers) {
         this.vertx = vertx;
         this.container = container;
         this.baseUri = baseUri;
-        this.application = new ApplicationHandler(rc);
-
-        ServiceLocator locator = this.application.getServiceLocator();
-        this.securityContextProvider = locator.getService(SecurityContextProvider.class);
-        this.vertxHandlers = locator.getAllServices(VertxRequestHandler.class);
-
+        this.application = application;
+        this.securityContextProvider = securityContextProvider;
+        this.vertxHandlers = vertxHandlers;
         this.maxBodySize = container.config().getNumber(JerseyModule.CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
     }
 

@@ -24,6 +24,7 @@
 package com.englishtown.vertx.jersey;
 
 import com.englishtown.vertx.jersey.inject.VertxBinder;
+import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.busmods.BusModBase;
 import org.vertx.java.core.Future;
@@ -40,13 +41,13 @@ import java.net.URI;
  */
 public class JerseyModule extends BusModBase {
 
-    private final static String CONFIG_HOST = "host";
-    private final static String CONFIG_PORT = "port";
-    private final static String CONFIG_BASE_PATH = "base_path";
-    private final static String CONFIG_RESOURCES = "resources";
-    private final static String CONFIG_FEATURES = "features";
-    private final static String CONFIG_BINDERS = "binders";
-    private final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
+    final static String CONFIG_HOST = "host";
+    final static String CONFIG_PORT = "port";
+    final static String CONFIG_BASE_PATH = "base_path";
+    final static String CONFIG_RESOURCES = "resources";
+    final static String CONFIG_FEATURES = "features";
+    final static String CONFIG_BINDERS = "binders";
+    final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_MAX_BODY_SIZE = "max_body_size";
 
     /**
@@ -67,7 +68,7 @@ public class JerseyModule extends BusModBase {
         }
 
         RouteMatcher rm = new RouteMatcher();
-        rm.all(basePath + ".*", new JerseyHandler(vertx, container, URI.create(basePath), rc));
+        rm.all(basePath + ".*", new JerseyHandler(vertx, container, URI.create(basePath), new ApplicationHandler(rc)));
 
         HttpServer server = vertx.createHttpServer().requestHandler(rm);
 
