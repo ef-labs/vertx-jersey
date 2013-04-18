@@ -47,8 +47,9 @@ class VertxResponseWriter implements ContainerResponseWriter {
 
     private static class VertxOutputStream extends OutputStream {
 
-        private final HttpServerResponse response;
-        private Buffer buffer = new Buffer();
+        protected final HttpServerResponse response;
+        protected Buffer buffer = new Buffer();
+        protected boolean isClosed;
 
         private VertxOutputStream(HttpServerResponse response) {
             this.response = response;
@@ -59,7 +60,8 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void write(int b) throws IOException {
-            buffer.appendByte((byte)b);
+            checkState();
+            buffer.appendByte((byte) b);
         }
 
         /**
@@ -67,6 +69,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void write(byte[] b) throws IOException {
+            checkState();
             buffer.appendBytes(b);
         }
 
@@ -75,6 +78,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
+            checkState();
             if (off == 0 && len == b.length) {
                 buffer.appendBytes(b);
             } else {
@@ -87,6 +91,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
          */
         @Override
         public void flush() throws IOException {
+            checkState();
             // Only flush to underlying very.x response if the content-length has been set
             if (buffer.length() > 0 && response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
                 response.write(buffer);
@@ -108,16 +113,20 @@ class VertxResponseWriter implements ContainerResponseWriter {
                 response.write(buffer);
             }
             buffer = null;
-            // TODO: Add checks if the stream is closed and throw run time exceptions if trying to write or flush
+            isClosed = true;
+        }
+
+        protected void checkState() {
+            if (isClosed) {
+                throw new RuntimeException("Stream closed");
+            }
         }
     }
 
-    private static class VertxChunkedOutputStream extends OutputStream {
-
-        private final HttpServerResponse response;
+    private static class VertxChunkedOutputStream extends VertxOutputStream {
 
         private VertxChunkedOutputStream(HttpServerResponse response) {
-            this.response = response;
+            super(response);
             response.setChunked(true);
         }
 
@@ -125,36 +134,26 @@ class VertxResponseWriter implements ContainerResponseWriter {
          * {@inheritDoc}
          */
         @Override
-        public void write(int b) throws IOException {
-            Buffer buffer = new Buffer(1).appendInt(b);
-            response.write(buffer);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void write(byte[] b) throws IOException {
-            Buffer buffer = new Buffer(b);
-            response.write(buffer);
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void write(byte[] b, int off, int len) throws IOException {
-            Buffer buffer;
-
-            if (off == 0 && len == b.length) {
-                buffer = new Buffer(b);
-            } else {
-                buffer = new Buffer(Arrays.copyOfRange(b, off, off + len));
+        public void flush() throws IOException {
+            checkState();
+            if (buffer.length() > 0) {
+                response.write(buffer);
+                buffer = new Buffer();
             }
-
-            response.write(buffer);
         }
 
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void close() throws IOException {
+            // Write any remaining buffer to the vert.x response
+            if (buffer != null && buffer.length() > 0) {
+                response.write(buffer);
+            }
+            buffer = null;
+            isClosed = true;
+        }
     }
 
     private final HttpServerRequest vertxRequest;
@@ -216,11 +215,6 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void commit() {
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         vertxRequest.response().end();
     }
 
