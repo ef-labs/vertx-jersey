@@ -26,8 +26,8 @@ package com.englishtown.vertx.jersey;
 import com.englishtown.vertx.jersey.inject.VertxBinder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.busmods.BusModBase;
+import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.VoidResult;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonArray;
@@ -53,7 +53,7 @@ public class JerseyModule extends BusModBase {
      * {@inheritDoc}
      */
     @Override
-    public void start(final VoidResult startedResult) throws Exception {
+    public void start(final Future<Void> startedResult) {
         this.start();
 
         String host = getOptionalStringConfig(CONFIG_HOST, "0.0.0.0");
@@ -79,10 +79,10 @@ public class JerseyModule extends BusModBase {
         server.listen(port, host, new Handler<HttpServer>() {
             @Override
             public void handle(HttpServer event) {
-                startedResult.setResult();
+                startedResult.setResult(null);
             }
         });
-        container.getLogger().info("Http server listening for http://" + host + ":" + port + basePath);
+        container.logger().info("Http server listening for http://" + host + ":" + port + basePath);
 
     }
 

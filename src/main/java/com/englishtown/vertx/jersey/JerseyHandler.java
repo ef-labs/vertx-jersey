@@ -75,7 +75,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
         this.securityContextProvider = locator.getService(SecurityContextProvider.class);
         this.vertxHandlers = locator.getAllServices(VertxRequestHandler.class);
 
-        this.maxBodySize = container.getConfig().getNumber(JerseyModule.CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
+        this.maxBodySize = container.config().getNumber(JerseyModule.CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
     }
 
     /**
@@ -186,13 +186,13 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
         // Create the jersey request
         ContainerRequest jerseyRequest = new ContainerRequest(
                 baseUri,
-                vertxRequest.getAbsoluteURI(),
-                vertxRequest.method,
+                vertxRequest.absoluteURI(),
+                vertxRequest.method(),
                 securityContext,
                 new MapPropertiesDelegate(properties));
 
         // Provide the vertx response writer
-        jerseyRequest.setWriter(new VertxResponseWriter(vertxRequest, container.getLogger()));
+        jerseyRequest.setWriter(new VertxResponseWriter(vertxRequest, container.logger()));
 
         // Set entity stream if provided (form posts)
         if (inputStream != null) {
@@ -210,7 +210,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
 
     boolean shouldReadData(HttpServerRequest vertxRequest) {
 
-        String method = vertxRequest.method;
+        String method = vertxRequest.method();
 
         // Only read input stream data for post/put methods
         if (!(HttpMethod.POST.equalsIgnoreCase(method) || HttpMethod.PUT.equalsIgnoreCase(method))) {

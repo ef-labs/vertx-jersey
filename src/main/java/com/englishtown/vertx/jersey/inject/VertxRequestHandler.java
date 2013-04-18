@@ -32,6 +32,9 @@ import java.util.Map;
  * Injectable interface to provide additional vert.x request processing before handing over to Jersey
  */
 public interface VertxRequestHandler {
+// TODO: Change to VertxRequestProcessor?
+// TODO: Take the ContainerRequest instead of the properties map?
+// TODO: How to differentiate with an injected end request handler?
 
     /**
      * Provide additional vert.x request processing before Jersey

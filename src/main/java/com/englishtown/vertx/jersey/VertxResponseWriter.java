@@ -171,11 +171,11 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse responseContext) throws ContainerException {
-        HttpServerResponse response = vertxRequest.response;
+        HttpServerResponse response = vertxRequest.response();
 
         // Write the status
-        response.statusCode = responseContext.getStatus();
-        response.statusMessage = responseContext.getStatusInfo().getReasonPhrase();
+        response.setStatusCode(responseContext.getStatus());
+        response.setStatusMessage(responseContext.getStatusInfo().getReasonPhrase());
 
         // Set the content length header
         if (contentLength != -1) {
@@ -221,7 +221,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        vertxRequest.response.end();
+        vertxRequest.response().end();
     }
 
     /**
@@ -231,12 +231,12 @@ class VertxResponseWriter implements ContainerResponseWriter {
     public void failure(Throwable error) {
 
         logger.error(error.getMessage(), error);
-        HttpServerResponse response = vertxRequest.response;
+        HttpServerResponse response = vertxRequest.response();
 
         // Set error status and end
         Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
-        response.statusCode = status.getStatusCode();
-        response.statusMessage = status.getReasonPhrase();
+        response.setStatusCode(status.getStatusCode());
+        response.setStatusMessage(status.getReasonPhrase());
         response.end();
 
     }

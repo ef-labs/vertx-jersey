@@ -12,7 +12,6 @@ constructor, field, or method parameter.  Supported vert.x objects include
 * org.vertx.java.core.Vertx
 * org.vertx.java.platform.Container
 * org.vertx.java.core.http.HttpServerRequest
-* org.vertx.java.core.http.impl.HttpReadStreamBase
 * org.vertx.java.core.streams.ReadStream
 
 ### Example Resource Method

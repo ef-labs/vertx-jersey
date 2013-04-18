@@ -39,7 +39,7 @@ public class DefaultSecurityContextProvider implements SecurityContextProvider {
     @Override
     public void getSecurityContext(HttpServerRequest request, Handler<SecurityContext> done) {
 
-        final boolean isSecure = "https".equalsIgnoreCase(request.getAbsoluteURI().getScheme());
+        final boolean isSecure = "https".equalsIgnoreCase(request.absoluteURI().getScheme());
 
         done.handle(new SecurityContext() {
             @Override
