@@ -201,7 +201,7 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
                 new MapPropertiesDelegate(properties));
 
         // Provide the vertx response writer
-        jerseyRequest.setWriter(new VertxResponseWriter(vertxRequest, container.logger()));
+        jerseyRequest.setWriter(new VertxResponseWriter(vertxRequest, vertx, container.logger()));
 
         // Set entity stream if provided (form posts)
         if (inputStream != null) {

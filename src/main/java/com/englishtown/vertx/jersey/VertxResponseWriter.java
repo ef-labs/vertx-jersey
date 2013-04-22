@@ -26,6 +26,8 @@ package com.englishtown.vertx.jersey;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
@@ -157,11 +159,16 @@ class VertxResponseWriter implements ContainerResponseWriter {
     }
 
     private final HttpServerRequest vertxRequest;
+    private final Vertx vertx;
     private final Logger logger;
     private OutputStream outputStream;
 
-    public VertxResponseWriter(HttpServerRequest vertxRequest, Logger logger) {
+    private long suspendTimerId;
+    private TimeoutHandler timeoutHandler;
+
+    public VertxResponseWriter(HttpServerRequest vertxRequest, Vertx vertx, Logger logger) {
         this.vertxRequest = vertxRequest;
+        this.vertx = vertx;
         this.logger = logger;
     }
 
@@ -199,7 +206,36 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean suspend(long timeOut, TimeUnit timeUnit, TimeoutHandler timeoutHandler) {
+
+        // Store the timeout handler
+        this.timeoutHandler = timeoutHandler;
+
+        // Cancel any existing timer
+        if (suspendTimerId != 0) {
+            vertx.cancelTimer(suspendTimerId);
+            suspendTimerId = 0;
+        }
+
+        // If timeout <= 0, then it suspends indefinitely
+        if (timeOut <= 0) {
+            return true;
+        }
+
+        // Get milliseconds
+        long ms = timeUnit.toMillis(timeOut);
+
+        // Schedule timeout on the event loop
+        this.suspendTimerId = vertx.setTimer(ms, new Handler<Long>() {
+            @Override
+            public void handle(Long id) {
+                if (id == suspendTimerId) {
+                    VertxResponseWriter.this.timeoutHandler.onTimeout(VertxResponseWriter.this);
+                }
+            }
+        });
+
         return true;
+
     }
 
     /**
@@ -207,7 +243,13 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void setSuspendTimeout(long timeOut, TimeUnit timeUnit) throws IllegalStateException {
-        // TODO: setSuspendTimeout
+
+        if (timeoutHandler == null) {
+            throw new IllegalStateException("The timeoutHandler is null");
+        }
+
+        suspend(timeOut, timeUnit, timeoutHandler);
+
     }
 
     /**
