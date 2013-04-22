@@ -27,6 +27,7 @@ import com.englishtown.vertx.jersey.inject.VertxBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.busmods.BusModBase;
+import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
@@ -77,10 +78,14 @@ public class JerseyModule extends BusModBase {
             server.setReceiveBufferSize(receiveBufferSize);
         }
 
-        server.listen(port, host, new Handler<HttpServer>() {
+        server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
             @Override
-            public void handle(HttpServer event) {
-                startedResult.setResult(null);
+            public void handle(AsyncResult<HttpServer> result) {
+                if (result.failed()) {
+                    startedResult.setResult(null);
+                } else {
+                    startedResult.setFailure(result.cause());
+                }
             }
         });
         container.logger().info("Http server listening for http://" + host + ":" + port + basePath);
