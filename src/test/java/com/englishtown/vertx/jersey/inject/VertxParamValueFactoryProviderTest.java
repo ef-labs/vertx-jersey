@@ -20,7 +20,7 @@ import org.vertx.java.platform.Verticle;
 import javax.inject.Provider;
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.*;
 
@@ -41,7 +41,7 @@ public class VertxParamValueFactoryProviderTest {
 
         Factory<?> factory = provider.getValueFactory(parameter);
         Object o = factory.provide();
-        assert(o instanceof HttpServerRequest);
+        assert (o instanceof HttpServerRequest);
 
     }
 
@@ -53,7 +53,7 @@ public class VertxParamValueFactoryProviderTest {
 
         Factory<?> factory = provider.getValueFactory(parameter);
         Object o = factory.provide();
-        assert(o instanceof ReadStream);
+        assert (o instanceof ReadStream);
 
     }
 
@@ -65,7 +65,7 @@ public class VertxParamValueFactoryProviderTest {
 
         Factory<?> factory = provider.getValueFactory(parameter);
         Object o = factory.provide();
-        assert(o instanceof Container);
+        assert (o instanceof Container);
 
     }
 
@@ -77,7 +77,7 @@ public class VertxParamValueFactoryProviderTest {
 
         Factory<?> factory = provider.getValueFactory(parameter);
         Object o = factory.provide();
-        assert(o instanceof Vertx);
+        assert (o instanceof Vertx);
 
     }
 

@@ -213,8 +213,11 @@ public class JerseyHandler implements Handler<HttpServerRequest> {
             jerseyRequest.getHeaders().add(header.getKey(), header.getValue());
         }
 
-        application.handle(jerseyRequest);
+        handle(jerseyRequest);
+    }
 
+    void handle(ContainerRequest jerseyRequest) {
+        application.handle(jerseyRequest);
     }
 
     boolean shouldReadData(HttpServerRequest vertxRequest) {
