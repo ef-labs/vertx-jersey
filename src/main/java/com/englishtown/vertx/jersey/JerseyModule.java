@@ -78,17 +78,19 @@ public class JerseyModule extends BusModBase {
             server.setReceiveBufferSize(receiveBufferSize);
         }
 
+        final String descr = "http://" + host + ":" + port + basePath;
         server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
-                if (result.failed()) {
+                if (result.succeeded()) {
+                    container.logger().info("Http server listening for " + descr);
                     startedResult.setResult(null);
                 } else {
+                    container.logger().error("Failed to start http server listening for " + descr, result.cause());
                     startedResult.setFailure(result.cause());
                 }
             }
         });
-        container.logger().info("Http server listening for http://" + host + ":" + port + basePath);
 
     }
 
