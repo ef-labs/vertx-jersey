@@ -23,14 +23,13 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.VertxParam;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.internal.inject.*;
 import org.glassfish.jersey.server.model.Parameter;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.impl.HttpReadStreamBase;
 import org.vertx.java.core.streams.ReadStream;
 import org.vertx.java.platform.Container;
 
@@ -44,7 +43,7 @@ import javax.inject.Singleton;
 public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider {
 
     /**
-     * {@link InjectionResolver Injection resolver} for {@link javax.ws.rs.BeanParam bean parameters}.
+     * Injection resolver for {@link VertxParam} annotation.
      */
     @Singleton
     static final class InjectionResolver extends ParamInjectionResolver<VertxParam> {
@@ -70,15 +69,14 @@ public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider
             Class<?> rawType = parameter.getRawType();
 
             if (HttpServerRequest.class.isAssignableFrom(rawType)
-                    || HttpReadStreamBase.class.isAssignableFrom(rawType)
                     || ReadStream.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_REQUEST);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_REQUEST);
             }
             if (Vertx.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_VERTX);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_VERTX);
             }
             if (Container.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_CONTAINER);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_CONTAINER);
             }
 
             return null;
