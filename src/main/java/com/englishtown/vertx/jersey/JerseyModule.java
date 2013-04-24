@@ -23,19 +23,14 @@
 
 package com.englishtown.vertx.jersey;
 
-import com.englishtown.vertx.jersey.inject.VertxBinder;
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.busmods.BusModBase;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
 
-import java.net.URI;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * The Vertx Module to enable Jersey to handle JAX-RS resources
@@ -44,12 +39,14 @@ public class JerseyModule extends BusModBase {
 
     final static String CONFIG_HOST = "host";
     final static String CONFIG_PORT = "port";
-    final static String CONFIG_BASE_PATH = "base_path";
-    final static String CONFIG_RESOURCES = "resources";
-    final static String CONFIG_FEATURES = "features";
-    final static String CONFIG_BINDERS = "binders";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
-    final static String CONFIG_MAX_BODY_SIZE = "max_body_size";
+
+    private final Provider<JerseyHandler> jerseyHandlerProvider;
+
+    @Inject
+    public JerseyModule(Provider<JerseyHandler> jerseyHandlerProvider) {
+        this.jerseyHandlerProvider = jerseyHandlerProvider;
+    }
 
     /**
      * {@inheritDoc}
@@ -58,91 +55,41 @@ public class JerseyModule extends BusModBase {
     public void start(final Future<Void> startedResult) {
         this.start();
 
-        String host = getOptionalStringConfig(CONFIG_HOST, "0.0.0.0");
-        int port = getOptionalIntConfig(CONFIG_PORT, 80);
+        // Get http server config values
+        final String host = getOptionalStringConfig(CONFIG_HOST, "0.0.0.0");
+        final int port = getOptionalIntConfig(CONFIG_PORT, 80);
         int receiveBufferSize = getOptionalIntConfig(CONFIG_RECEIVE_BUFFER_SIZE, 0);
-        String basePath = getOptionalStringConfig(CONFIG_BASE_PATH, "/");
-        ResourceConfig rc = getResourceConfig(config);
 
-        if (!basePath.endsWith("/")) {
-            basePath += "/";
+        // Create http server
+        HttpServer server = vertx.createHttpServer();
+
+        // Create jersey handler and set as request handler
+        JerseyHandler handler = jerseyHandlerProvider.get();
+        if (handler == null) {
+            throw new IllegalStateException("A JerseyHandlerProvider has not been configured");
         }
-
-        RouteMatcher rm = new RouteMatcher();
-        rm.all(basePath + ".*", new JerseyHandler(vertx, container, URI.create(basePath), new ApplicationHandler(rc)));
-
-        HttpServer server = vertx.createHttpServer().requestHandler(rm);
+        handler.init(vertx, container);
+        server.requestHandler(handler);
 
         if (receiveBufferSize > 0) {
             // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
             server.setReceiveBufferSize(receiveBufferSize);
         }
 
-        final String descr = "http://" + host + ":" + port + basePath;
+        // Start listening and log success/failure
         server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
+                final String listenPath = "http://" + host + ":" + port;
                 if (result.succeeded()) {
-                    container.logger().info("Http server listening for " + descr);
+                    container.logger().info("Http server listening for " + listenPath);
                     startedResult.setResult(null);
                 } else {
-                    container.logger().error("Failed to start http server listening for " + descr, result.cause());
+                    container.logger().error("Failed to start http server listening for " + listenPath, result.cause());
                     startedResult.setFailure(result.cause());
                 }
             }
         });
-
-    }
-
-    ResourceConfig getResourceConfig(JsonObject config) {
-
-        JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
-
-        if (resources == null || resources.size() == 0) {
-            throw new RuntimeException("At lease one resource package name must be specified in the config " +
-                    CONFIG_RESOURCES);
-        }
-
-        String[] resourceArr = new String[resources.size()];
-        for (int i = 0; i < resources.size(); i++) {
-            resourceArr[i] = String.valueOf(resources.get(i));
-        }
-
-        ResourceConfig rc = new ResourceConfig();
-        rc.packages(resourceArr);
-        rc.registerInstances(new VertxBinder());
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        JsonArray features = config.getArray(CONFIG_FEATURES, null);
-        if (features != null && features.size() > 0) {
-            for (int i = 0; i < features.size(); i++) {
-                try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
-                    rc.register(clazz);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        JsonArray binders = config.getArray(CONFIG_BINDERS, null);
-        if (binders != null && binders.size() > 0) {
-            for (int i = 0; i < binders.size(); i++) {
-                try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(binders.get(i)));
-                    rc.register(clazz.newInstance());
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                } catch (InstantiationException e) {
-                    throw new RuntimeException(e);
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        return rc;
 
     }
 

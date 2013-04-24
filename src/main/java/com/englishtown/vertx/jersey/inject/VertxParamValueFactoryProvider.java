@@ -23,7 +23,7 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.VertxParam;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.internal.inject.*;
@@ -70,13 +70,13 @@ public class VertxParamValueFactoryProvider extends AbstractValueFactoryProvider
 
             if (HttpServerRequest.class.isAssignableFrom(rawType)
                     || ReadStream.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_REQUEST);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_REQUEST);
             }
             if (Vertx.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_VERTX);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_VERTX);
             }
             if (Container.class.isAssignableFrom(rawType)) {
-                return context.getRequestContext().getProperty(JerseyHandler.PROPERTY_NAME_CONTAINER);
+                return context.getRequestContext().getProperty(DefaultJerseyHandler.PROPERTY_NAME_CONTAINER);
             }
 
             return null;

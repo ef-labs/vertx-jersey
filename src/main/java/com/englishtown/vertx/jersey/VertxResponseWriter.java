@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
@@ -33,6 +34,7 @@ import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.logging.Logger;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
@@ -45,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * A Jersey ContainerResponseWriter to write to the vertx response
  */
-class VertxResponseWriter implements ContainerResponseWriter {
+public class VertxResponseWriter implements ContainerResponseWriter {
 
     private static class VertxOutputStream extends OutputStream {
 
@@ -161,15 +163,21 @@ class VertxResponseWriter implements ContainerResponseWriter {
     private final HttpServerRequest vertxRequest;
     private final Vertx vertx;
     private final Logger logger;
-    private OutputStream outputStream;
+    private final List<VertxResponseProcessor> responseProcessors;
 
     private long suspendTimerId;
     private TimeoutHandler timeoutHandler;
 
-    public VertxResponseWriter(HttpServerRequest vertxRequest, Vertx vertx, Logger logger) {
+    @Inject
+    public VertxResponseWriter(
+            HttpServerRequest vertxRequest,
+            Vertx vertx,
+            Logger logger,
+            List<VertxResponseProcessor> responseProcessors) {
         this.vertxRequest = vertxRequest;
         this.vertx = vertx;
         this.logger = logger;
+        this.responseProcessors = responseProcessors;
     }
 
     /**
@@ -188,17 +196,20 @@ class VertxResponseWriter implements ContainerResponseWriter {
             response.putHeader(HttpHeaders.CONTENT_LENGTH, contentLength);
         }
 
-        // Set chunked if response entity is ChunkedOutput<T>
-        outputStream = responseContext.isChunked() ? new VertxChunkedOutputStream(response)
-                : new VertxOutputStream(response);
-
         for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
             for (final Object value : e.getValue()) {
                 response.putHeader(e.getKey(), value);
             }
         }
 
-        return this.outputStream;
+        // Run any response processors
+        for (VertxResponseProcessor processor : responseProcessors) {
+            processor.handle(response, responseContext);
+        }
+
+        // Return output stream based on whether entity is chunked
+        return responseContext.isChunked() ? new VertxChunkedOutputStream(response)
+                : new VertxOutputStream(response);
     }
 
     /**
@@ -206,7 +217,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean suspend(long timeOut, TimeUnit timeUnit, TimeoutHandler timeoutHandler) {
-
+        // TODO: If already suspended should return false according to documentation
         // Store the timeout handler
         this.timeoutHandler = timeoutHandler;
 

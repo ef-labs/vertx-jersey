@@ -1,6 +1,6 @@
 package com.englishtown.vertx.jersey.inject;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.DefaultJerseyHandler;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ContainerRequest;
@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
  * Time: 3:37 PM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("unchecked")
 public class VertxParamValueFactoryProviderTest {
     @Test
     public void testCreateValueFactory_HttpServerRequest() throws Exception {
@@ -102,11 +103,11 @@ public class VertxParamValueFactoryProviderTest {
         ContainerRequest containerRequest = mock(ContainerRequest.class);
         when(requestProvider.get()).thenReturn(containerRequest);
 
-        when(containerRequest.getProperty(eq(JerseyHandler.PROPERTY_NAME_CONTAINER)))
+        when(containerRequest.getProperty(eq(DefaultJerseyHandler.PROPERTY_NAME_CONTAINER)))
                 .thenReturn(mock(Container.class));
-        when(containerRequest.getProperty(eq(JerseyHandler.PROPERTY_NAME_REQUEST)))
+        when(containerRequest.getProperty(eq(DefaultJerseyHandler.PROPERTY_NAME_REQUEST)))
                 .thenReturn(mock(HttpServerRequest.class));
-        when(containerRequest.getProperty(eq(JerseyHandler.PROPERTY_NAME_VERTX)))
+        when(containerRequest.getProperty(eq(DefaultJerseyHandler.PROPERTY_NAME_VERTX)))
                 .thenReturn(mock(Vertx.class));
 
         doAnswer(new Answer<Void>() {
@@ -121,9 +122,7 @@ public class VertxParamValueFactoryProviderTest {
             }
         }).when(locator).inject(anyObject());
 
-        VertxParamValueFactoryProvider provider = new VertxParamValueFactoryProvider(mpep, locator);
-        return provider;
-
+        return new VertxParamValueFactoryProvider(mpep, locator);
     }
 
     private Parameter createParameter(Class<?> rawType) {

@@ -1,5 +1,6 @@
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Test;
@@ -15,7 +16,9 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -29,6 +32,7 @@ import static org.mockito.Mockito.*;
  * Time: 11:46 AM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("unchecked")
 public class VertxResponseWriterTest {
 
     @Test
@@ -153,7 +157,20 @@ public class VertxResponseWriterTest {
         long id = 10;
         when(vertxMock.setTimer(anyLong(), any(Handler.class))).thenReturn(id);
 
-        return new VertxResponseWriter(request, vertxMock, mock(Logger.class));
+        List<VertxResponseProcessor> responseProcessors = Arrays.asList(
+                new VertxResponseProcessor() {
+                    @Override
+                    public void handle(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
+                    }
+                },
+                new VertxResponseProcessor() {
+                    @Override
+                    public void handle(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
+                    }
+                }
+        );
+
+        return new VertxResponseWriter(request, vertxMock, mock(Logger.class), responseProcessors);
 
     }
 
