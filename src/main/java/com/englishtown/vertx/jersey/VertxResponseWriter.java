@@ -23,14 +23,23 @@
 
 package com.englishtown.vertx.jersey;
 
-import com.hazelcast.nio.FastByteArrayOutputStream;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
+import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.logging.Logger;
 
+import javax.inject.Inject;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -38,14 +47,137 @@ import java.util.concurrent.TimeUnit;
 /**
  * A Jersey ContainerResponseWriter to write to the vertx response
  */
-class VertxResponseWriter implements ContainerResponseWriter {
+public class VertxResponseWriter implements ContainerResponseWriter {
+
+    private static class VertxOutputStream extends OutputStream {
+
+        protected final HttpServerResponse response;
+        protected Buffer buffer = new Buffer();
+        protected boolean isClosed;
+
+        private VertxOutputStream(HttpServerResponse response) {
+            this.response = response;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(int b) throws IOException {
+            checkState();
+            buffer.appendByte((byte) b);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b) throws IOException {
+            checkState();
+            buffer.appendBytes(b);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            checkState();
+            if (off == 0 && len == b.length) {
+                buffer.appendBytes(b);
+            } else {
+                buffer.appendBytes(Arrays.copyOfRange(b, off, off + len));
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void flush() throws IOException {
+            checkState();
+            // Only flush to underlying very.x response if the content-length has been set
+            if (buffer.length() > 0 && response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
+                response.write(buffer);
+                buffer = new Buffer();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void close() throws IOException {
+            // Write any remaining buffer to the vert.x response
+            // Set content-length if not set yet
+            if (buffer != null && buffer.length() > 0) {
+                if (!response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
+                    response.headers().put(HttpHeaders.CONTENT_LENGTH, buffer.length());
+                }
+                response.write(buffer);
+            }
+            buffer = null;
+            isClosed = true;
+        }
+
+        protected void checkState() {
+            if (isClosed) {
+                throw new RuntimeException("Stream closed");
+            }
+        }
+    }
+
+    private static class VertxChunkedOutputStream extends VertxOutputStream {
+
+        private VertxChunkedOutputStream(HttpServerResponse response) {
+            super(response);
+            response.setChunked(true);
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void flush() throws IOException {
+            checkState();
+            if (buffer.length() > 0) {
+                response.write(buffer);
+                buffer = new Buffer();
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void close() throws IOException {
+            // Write any remaining buffer to the vert.x response
+            if (buffer != null && buffer.length() > 0) {
+                response.write(buffer);
+            }
+            buffer = null;
+            isClosed = true;
+        }
+    }
 
     private final HttpServerRequest vertxRequest;
-    private final FastByteArrayOutputStream outputStream;
+    private final Vertx vertx;
+    private final Logger logger;
+    private final List<VertxResponseProcessor> responseProcessors;
 
-    public VertxResponseWriter(HttpServerRequest vertxRequest) {
+    private long suspendTimerId;
+    private TimeoutHandler timeoutHandler;
+
+    @Inject
+    public VertxResponseWriter(
+            HttpServerRequest vertxRequest,
+            Vertx vertx,
+            Logger logger,
+            List<VertxResponseProcessor> responseProcessors) {
         this.vertxRequest = vertxRequest;
-        this.outputStream = new FastByteArrayOutputStream();
+        this.vertx = vertx;
+        this.logger = logger;
+        this.responseProcessors = responseProcessors;
     }
 
     /**
@@ -53,26 +185,31 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse responseContext) throws ContainerException {
+        HttpServerResponse response = vertxRequest.response();
 
         // Write the status
-        vertxRequest.response.statusCode = responseContext.getStatus();
-        vertxRequest.response.statusMessage = responseContext.getStatusInfo().getReasonPhrase();
+        response.setStatusCode(responseContext.getStatus());
+        response.setStatusMessage(responseContext.getStatusInfo().getReasonPhrase());
 
         // Set the content length header
-        if (contentLength != -1 && contentLength < Integer.MAX_VALUE) {
-            vertxRequest.response.putHeader("Content-Length", contentLength);
+        if (contentLength != -1) {
+            response.putHeader(HttpHeaders.CONTENT_LENGTH, contentLength);
         }
-
-        // TODO: Set keep alive?
-        //vertxRequest.response.putHeader("Connection", "keep-alive");
 
         for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
             for (final Object value : e.getValue()) {
-                vertxRequest.response.putHeader(e.getKey(), value);
+                response.putHeader(e.getKey(), value);
             }
         }
 
-        return this.outputStream;
+        // Run any response processors
+        for (VertxResponseProcessor processor : responseProcessors) {
+            processor.handle(response, responseContext);
+        }
+
+        // Return output stream based on whether entity is chunked
+        return responseContext.isChunked() ? new VertxChunkedOutputStream(response)
+                : new VertxOutputStream(response);
     }
 
     /**
@@ -80,7 +217,36 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean suspend(long timeOut, TimeUnit timeUnit, TimeoutHandler timeoutHandler) {
+        // TODO: If already suspended should return false according to documentation
+        // Store the timeout handler
+        this.timeoutHandler = timeoutHandler;
+
+        // Cancel any existing timer
+        if (suspendTimerId != 0) {
+            vertx.cancelTimer(suspendTimerId);
+            suspendTimerId = 0;
+        }
+
+        // If timeout <= 0, then it suspends indefinitely
+        if (timeOut <= 0) {
+            return true;
+        }
+
+        // Get milliseconds
+        long ms = timeUnit.toMillis(timeOut);
+
+        // Schedule timeout on the event loop
+        this.suspendTimerId = vertx.setTimer(ms, new Handler<Long>() {
+            @Override
+            public void handle(Long id) {
+                if (id == suspendTimerId) {
+                    VertxResponseWriter.this.timeoutHandler.onTimeout(VertxResponseWriter.this);
+                }
+            }
+        });
+
         return true;
+
     }
 
     /**
@@ -88,7 +254,13 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void setSuspendTimeout(long timeOut, TimeUnit timeUnit) throws IllegalStateException {
-        // TODO: setSuspendTimeout
+
+        if (timeoutHandler == null) {
+            throw new IllegalStateException("The timeoutHandler is null");
+        }
+
+        suspend(timeOut, timeUnit, timeoutHandler);
+
     }
 
     /**
@@ -96,11 +268,7 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void commit() {
-        if (this.outputStream.size() > 0) {
-            vertxRequest.response.end(new Buffer(this.outputStream.toByteArray()));
-        } else {
-            vertxRequest.response.end();
-        }
+        vertxRequest.response().end();
     }
 
     /**
@@ -108,7 +276,16 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void failure(Throwable error) {
-        // TODO: Add error handling
+
+        logger.error(error.getMessage(), error);
+        HttpServerResponse response = vertxRequest.response();
+
+        // Set error status and end
+        Response.Status status = Response.Status.INTERNAL_SERVER_ERROR;
+        response.setStatusCode(status.getStatusCode());
+        response.setStatusMessage(status.getReasonPhrase());
+        response.end();
+
     }
 
     /**
@@ -116,7 +293,6 @@ class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public boolean enableResponseBuffering() {
-        // TODO enableResponseBuffering?
         return false;
     }
 }

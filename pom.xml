@@ -45,6 +45,7 @@
         <vertx.version>2.0.0-SNAPSHOT</vertx.version>
         <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
         <junit.version>4.11</junit.version>
+        <mockito.version>1.9.5</mockito.version>
 
         <!--Plugin versions-->
         <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
@@ -111,6 +112,12 @@
             <groupId>io.vertx</groupId>
             <artifactId>testtools</artifactId>
             <version>${vertx.testtools.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

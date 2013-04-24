@@ -21,24 +21,28 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey.security;
+package com.englishtown.vertx.jersey.inject;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
+import com.englishtown.vertx.jersey.VertxParam;
+import org.glassfish.hk2.api.InjectionResolver;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.server.spi.internal.ValueFactoryProvider;
 
-import javax.ws.rs.core.SecurityContext;
+import javax.inject.Singleton;
 
 /**
- * Provides a jax-rs SecurityContext for a vert.x request
+ * Binder to register VertxParam injections
  */
-public interface SecurityContextProvider {
+public class VertxParamBinder extends AbstractBinder {
+    @Override
+    protected void configure() {
 
-    /**
-     * Creates the {@link SecurityContext} for the current request
-     * @param request the vert.x request
-     * @param done the handler to call with the constructed {@link SecurityContext}
-     */
-    public void getSecurityContext(HttpServerRequest request, Handler<SecurityContext> done);
+        bind(VertxParamValueFactoryProvider.class).to(ValueFactoryProvider.class).in(Singleton.class);
 
+        bind(VertxParamValueFactoryProvider.InjectionResolver.class).to(new TypeLiteral<InjectionResolver<VertxParam>>
+                () {
+        }).in(Singleton.class);
+
+    }
 }
