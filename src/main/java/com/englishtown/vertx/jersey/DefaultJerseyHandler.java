@@ -257,10 +257,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
             done.handle(null);
         }
 
-        VertxRequestProcessor handler = requestProcessors.get(index);
+        VertxRequestProcessor processor = requestProcessors.get(index);
         final int next = index + 1;
 
-        handler.handle(vertxRequest, jerseyRequest, new Handler<Void>() {
+        processor.process(vertxRequest, jerseyRequest, new Handler<Void>() {
             @Override
             public void handle(Void aVoid) {
                 if (next >= requestProcessors.size()) {

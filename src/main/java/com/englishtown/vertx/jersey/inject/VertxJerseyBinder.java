@@ -17,7 +17,7 @@ import java.util.List;
  */
 public class VertxJerseyBinder extends AbstractBinder {
 
-    private static class VertxResponseProcessorFactory implements Factory<List<VertxResponseProcessor>> {
+    static class VertxResponseProcessorFactory implements Factory<List<VertxResponseProcessor>> {
 
         private final List<VertxResponseProcessor> processors = new ArrayList<>();
 
@@ -44,12 +44,12 @@ public class VertxJerseyBinder extends AbstractBinder {
         }
     }
 
-    private static class VertxRequestProcessorProvider implements Factory<List<VertxRequestProcessor>> {
+    static class VertxRequestProcessorFactory implements Factory<List<VertxRequestProcessor>> {
 
         private final List<VertxRequestProcessor> processors = new ArrayList<>();
 
         @Inject
-        public VertxRequestProcessorProvider(IterableProvider<VertxRequestProcessor> providers) {
+        public VertxRequestProcessorFactory(IterableProvider<VertxRequestProcessor> providers) {
             for (VertxRequestProcessor processor : providers) {
                 processors.add(processor);
             }
@@ -82,7 +82,7 @@ public class VertxJerseyBinder extends AbstractBinder {
 
         bindFactory(VertxResponseProcessorFactory.class).to(new TypeLiteral<List<VertxResponseProcessor>>() {
         });
-        bindFactory(VertxRequestProcessorProvider.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
+        bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
         });
 
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);

@@ -31,7 +31,7 @@ public class VertxResponseWriterProvider implements ContainerResponseWriterProvi
 
     @Override
     public ContainerResponseWriter get(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest) {
-        return new VertxResponseWriter(vertxRequest, vertx, container.logger(), responseProcessors);
+        return new VertxResponseWriter(vertxRequest, vertx, container, responseProcessors);
     }
 
 }

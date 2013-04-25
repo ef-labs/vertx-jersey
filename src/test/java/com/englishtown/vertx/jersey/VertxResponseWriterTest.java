@@ -10,6 +10,7 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Container;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -160,17 +161,21 @@ public class VertxResponseWriterTest {
         List<VertxResponseProcessor> responseProcessors = Arrays.asList(
                 new VertxResponseProcessor() {
                     @Override
-                    public void handle(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
+                    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
                     }
                 },
                 new VertxResponseProcessor() {
                     @Override
-                    public void handle(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
+                    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
                     }
                 }
         );
 
-        return new VertxResponseWriter(request, vertxMock, mock(Logger.class), responseProcessors);
+        Container container = mock(Container.class);
+        Logger logger = mock(Logger.class);
+        when(container.logger()).thenReturn(logger);
+
+        return new VertxResponseWriter(request, vertxMock, container, responseProcessors);
 
     }
 

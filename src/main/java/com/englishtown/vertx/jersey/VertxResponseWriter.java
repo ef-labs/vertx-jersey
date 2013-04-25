@@ -32,7 +32,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
@@ -162,7 +162,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
     private final HttpServerRequest vertxRequest;
     private final Vertx vertx;
-    private final Logger logger;
+    private final Container container;
     private final List<VertxResponseProcessor> responseProcessors;
 
     private long suspendTimerId;
@@ -172,11 +172,11 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     public VertxResponseWriter(
             HttpServerRequest vertxRequest,
             Vertx vertx,
-            Logger logger,
+            Container container,
             List<VertxResponseProcessor> responseProcessors) {
         this.vertxRequest = vertxRequest;
         this.vertx = vertx;
-        this.logger = logger;
+        this.container = container;
         this.responseProcessors = responseProcessors;
     }
 
@@ -204,7 +204,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
         // Run any response processors
         for (VertxResponseProcessor processor : responseProcessors) {
-            processor.handle(response, responseContext);
+            processor.process(response, responseContext);
         }
 
         // Return output stream based on whether entity is chunked
@@ -277,7 +277,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     @Override
     public void failure(Throwable error) {
 
-        logger.error(error.getMessage(), error);
+        container.logger().error(error.getMessage(), error);
         HttpServerResponse response = vertxRequest.response();
 
         // Set error status and end

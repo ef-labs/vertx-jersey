@@ -256,13 +256,13 @@ public class DefaultJerseyHandlerTest {
         TestDefaultJerseyHandler handler = createInstance(
                 new VertxRequestProcessor() {
                     @Override
-                    public void handle(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
+                    public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
                         done.handle(null);
                     }
                 },
                 new VertxRequestProcessor() {
                     @Override
-                    public void handle(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
+                    public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
                         done.handle(null);
                     }
                 }
