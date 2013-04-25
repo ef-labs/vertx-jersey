@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
  * Time: 10:32 AM
  * To change this template use File | Settings | File Templates.
  */
+@SuppressWarnings("unchecked")
 public class VertxJerseyBinderTest {
 
     @Test
