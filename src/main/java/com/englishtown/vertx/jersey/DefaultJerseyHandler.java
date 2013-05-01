@@ -228,7 +228,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
         }
 
         // Copy headers
-        for (Map.Entry<String, String> header : vertxRequest.headers().entrySet()) {
+        for (Map.Entry<String, String> header : vertxRequest.headers().entries()) {
             jerseyRequest.getHeaders().add(header.getKey(), header.getValue());
         }
 

@@ -2,6 +2,7 @@ package com.englishtown.vertx.jersey;
 
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
@@ -9,10 +10,12 @@ import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.http.impl.HttpHeadersAdapter;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
@@ -24,9 +27,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -174,6 +175,7 @@ public class DefaultJerseyHandlerTest {
         when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
         when(request.method()).thenReturn(HttpMethod.GET);
         when(request.response()).thenReturn(response);
+        when(request.headers()).thenReturn(mock(MultiMap.class));
 
         handler.handle(request);
         assertTrue(handler.done);
@@ -215,10 +217,10 @@ public class DefaultJerseyHandlerTest {
         TestDefaultJerseyHandler handler = createInstance();
         final HttpServerRequest request = mock(HttpServerRequest.class);
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        DefaultHttpHeaders headers = new DefaultHttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         when(request.method()).thenReturn(HttpMethod.POST);
-        when(request.headers()).thenReturn(headers);
+        when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
 
         final Handler<Buffer>[] dataHandler = new Handler[1];
         when(request.dataHandler(any(Handler.class))).thenAnswer(new Answer<HttpServerRequest>() {
@@ -269,6 +271,7 @@ public class DefaultJerseyHandlerTest {
         );
 
         HttpServerRequest request = mock(HttpServerRequest.class);
+        when(request.headers()).thenReturn(mock(MultiMap.class));
         InputStream inputStream = null;
 
         handler.handle(request, inputStream);
@@ -283,11 +286,11 @@ public class DefaultJerseyHandlerTest {
         HttpServerRequest request = mock(HttpServerRequest.class);
         boolean result;
 
-        Map<String, String> headers = new HashMap<>();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+        DefaultHttpHeaders headers = new DefaultHttpHeaders();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
 
         when(request.method()).thenReturn(HttpMethod.GET).thenReturn(HttpMethod.PUT);
-        when(request.headers()).thenReturn(headers);
+        when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
 
         result = handler.shouldReadData(request);
         assertFalse(result);
@@ -296,20 +299,20 @@ public class DefaultJerseyHandlerTest {
         assertFalse(result);
 
         headers.clear();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
         result = handler.shouldReadData(request);
         assertTrue(result);
 
         headers.clear();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
         when(request.method()).thenReturn(HttpMethod.POST);
 
         result = handler.shouldReadData(request);
         assertTrue(result);
 
         headers.clear();
-        headers.put(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
 
         result = handler.shouldReadData(request);
         assertTrue(result);

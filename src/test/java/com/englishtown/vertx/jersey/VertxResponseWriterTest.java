@@ -1,14 +1,17 @@
 package com.englishtown.vertx.jersey;
 
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+import io.netty.handler.codec.http.DefaultHttpHeaders;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Test;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.http.impl.HttpHeadersAdapter;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
@@ -18,9 +21,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.OutputStream;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
@@ -53,10 +54,10 @@ public class VertxResponseWriterTest {
         assertNotNull(outputStream);
         verify(response, times(1)).setStatusCode(anyInt());
         verify(response, times(1)).setStatusMessage(anyString());
-        verify(response, times(2)).putHeader(anyString(), anyObject());
+        verify(response, times(2)).putHeader(anyString(), anyString());
 
         writer.writeResponseStatusAndHeaders(-1, cr);
-        verify(response, times(3)).putHeader(anyString(), anyObject());
+        verify(response, times(3)).putHeader(anyString(), anyString());
 
     }
 
@@ -71,8 +72,9 @@ public class VertxResponseWriterTest {
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
         when(cr.getHeaders()).thenReturn(headers);
 
-        Map<String, Object> vertxHeaders = new HashMap<>();
-        vertxHeaders.put(HttpHeaders.CONTENT_LENGTH, 12);
+        DefaultHttpHeaders httpHeaders = new DefaultHttpHeaders();
+        MultiMap vertxHeaders = new HttpHeadersAdapter(httpHeaders);
+        vertxHeaders.add(HttpHeaders.CONTENT_LENGTH, "12");
         when(response.headers()).thenReturn(vertxHeaders);
 
         OutputStream outputStream = writer.writeResponseStatusAndHeaders(12, cr);

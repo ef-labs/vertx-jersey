@@ -97,7 +97,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         public void flush() throws IOException {
             checkState();
             // Only flush to underlying very.x response if the content-length has been set
-            if (buffer.length() > 0 && response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
+            if (buffer.length() > 0 && response.headers().contains(HttpHeaders.CONTENT_LENGTH)) {
                 response.write(buffer);
                 buffer = new Buffer();
             }
@@ -111,8 +111,8 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             // Write any remaining buffer to the vert.x response
             // Set content-length if not set yet
             if (buffer != null && buffer.length() > 0) {
-                if (!response.headers().containsKey(HttpHeaders.CONTENT_LENGTH)) {
-                    response.headers().put(HttpHeaders.CONTENT_LENGTH, buffer.length());
+                if (!response.headers().contains(HttpHeaders.CONTENT_LENGTH)) {
+                    response.headers().add(HttpHeaders.CONTENT_LENGTH, String.valueOf(buffer.length()));
                 }
                 response.write(buffer);
             }
@@ -193,12 +193,12 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
         // Set the content length header
         if (contentLength != -1) {
-            response.putHeader(HttpHeaders.CONTENT_LENGTH, contentLength);
+            response.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength));
         }
 
         for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
             for (final Object value : e.getValue()) {
-                response.putHeader(e.getKey(), value);
+                response.putHeader(e.getKey(), String.valueOf(value));
             }
         }
 
