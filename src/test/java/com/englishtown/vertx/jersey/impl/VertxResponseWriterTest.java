@@ -1,4 +1,4 @@
-package com.englishtown.vertx.jersey;
+package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
@@ -28,11 +28,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/22/13
- * Time: 11:46 AM
- * To change this template use File | Settings | File Templates.
+ * {@link VertxResponseWriter} unit tests
  */
 @SuppressWarnings("unchecked")
 public class VertxResponseWriterTest {

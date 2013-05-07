@@ -21,22 +21,26 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
+package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import com.hazelcast.nio.FastByteArrayInputStream;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
-import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
@@ -46,7 +50,6 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -55,113 +58,36 @@ import java.util.Map;
  */
 public class DefaultJerseyHandler implements JerseyHandler {
 
-    public static final String CONFIG_BASE_PATH = "base_path";
-    public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
-    public static final String CONFIG_RESOURCES = "resources";
-    public static final String CONFIG_FEATURES = "features";
-    public static final String CONFIG_BINDERS = "binders";
-    public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
-    public static final String PROPERTY_NAME_VERTX = "vertx.vertx";
-    public static final String PROPERTY_NAME_CONTAINER = "vertx.container";
-    public static final String PROPERTY_NAME_REQUEST = "vertx.request";
-
     private Vertx vertx;
     private Container container;
-    private ApplicationHandler application;
+    private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
     private final ContainerResponseWriterProvider responseWriterProvider;
+    private final JerseyHandlerConfigurator configurator;
     private int maxBodySize;
     private final List<VertxRequestProcessor> requestProcessors;
 
     @Inject
     public DefaultJerseyHandler(
             ContainerResponseWriterProvider responseWriterProvider,
-            List<VertxRequestProcessor> requestProcessors) {
+            List<VertxRequestProcessor> requestProcessors,
+            JerseyHandlerConfigurator configurator) {
         this.responseWriterProvider = responseWriterProvider;
         this.requestProcessors = requestProcessors != null ? requestProcessors : new ArrayList<VertxRequestProcessor>();
+        this.configurator = configurator;
     }
 
     @Override
     public void init(Vertx vertx, Container container) {
 
-        JsonObject config = container.config();
-        if (config == null) {
-            throw new IllegalStateException("The vert.x container configuration is null");
-        }
-
         this.vertx = vertx;
         this.container = container;
-        this.baseUri = getBaseUri(config);
-        this.application = getApplicationHandler(config);
-        this.maxBodySize = getMaxBodySize(config);
 
-    }
+        configurator.init(vertx, container);
+        baseUri = configurator.getBaseUri();
+        applicationHandlerDelegate = configurator.getApplicationHandler();
+        maxBodySize = configurator.getMaxBodySize();
 
-    protected URI getBaseUri(JsonObject config) {
-        String basePath = config.getString(CONFIG_BASE_PATH, "/");
-
-        // TODO: Does basePath need the trailing "/"?
-//        if (!basePath.endsWith("/")) {
-//            basePath += "/";
-//        }
-
-        return URI.create(basePath);
-    }
-
-    protected ApplicationHandler getApplicationHandler(JsonObject config) {
-        ResourceConfig rc = getResourceConfig(config);
-        return new ApplicationHandler(rc);
-    }
-
-    protected ResourceConfig getResourceConfig(JsonObject config) {
-
-        JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
-
-        if (resources == null || resources.size() == 0) {
-            throw new RuntimeException("At lease one resource package name must be specified in the config " +
-                    CONFIG_RESOURCES);
-        }
-
-        String[] resourceArr = new String[resources.size()];
-        for (int i = 0; i < resources.size(); i++) {
-            resourceArr[i] = String.valueOf(resources.get(i));
-        }
-
-        ResourceConfig rc = new ResourceConfig();
-        rc.packages(resourceArr);
-
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-
-        JsonArray features = config.getArray(CONFIG_FEATURES, null);
-        if (features != null && features.size() > 0) {
-            for (int i = 0; i < features.size(); i++) {
-                try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
-                    rc.register(clazz);
-                } catch (ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        JsonArray binders = config.getArray(CONFIG_BINDERS, null);
-        if (binders != null && binders.size() > 0) {
-            for (int i = 0; i < binders.size(); i++) {
-                try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(binders.get(i)));
-                    rc.register(clazz.newInstance());
-                } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        return rc;
-
-    }
-
-    protected int getMaxBodySize(JsonObject config) {
-        return config.getNumber(CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
     }
 
     /**
@@ -202,12 +128,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
             final InputStream inputStream
     ) {
 
-        // Stick the vertx params in the properties bag
-        final Map<String, Object> properties = new HashMap<>();
-        properties.put(PROPERTY_NAME_VERTX, vertx);
-        properties.put(PROPERTY_NAME_CONTAINER, container);
-        properties.put(PROPERTY_NAME_REQUEST, vertxRequest);
-
         String scheme = vertxRequest.absoluteURI() == null ? null : vertxRequest.absoluteURI().getScheme();
         boolean isSecure = "https".equalsIgnoreCase(scheme);
 
@@ -217,7 +137,15 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 vertxRequest.absoluteURI(),
                 vertxRequest.method(),
                 new DefaultSecurityContext(isSecure),
-                new MapPropertiesDelegate(properties));
+                new MapPropertiesDelegate());
+
+        handle(vertxRequest, inputStream, jerseyRequest);
+
+    }
+
+    protected void handle(final HttpServerRequest vertxRequest,
+                          final InputStream inputStream,
+                          final ContainerRequest jerseyRequest) {
 
         // Provide the vertx response writer
         jerseyRequest.setWriter(responseWriterProvider.get(vertxRequest, jerseyRequest));
@@ -232,21 +160,36 @@ public class DefaultJerseyHandler implements JerseyHandler {
             jerseyRequest.getHeaders().add(header.getKey(), header.getValue());
         }
 
+        // Set request scoped instances
+        jerseyRequest.setRequestScopedInitializer(new RequestScopedInitializer() {
+            @Override
+            public void initialize(ServiceLocator locator) {
+                locator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
+                }).getType()).set(vertx);
+                locator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
+                }).getType()).set(container);
+                locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
+                }).getType()).set(vertxRequest);
+                locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {
+                }).getType()).set(vertxRequest.response());
+            }
+        });
+
         // Call vertx before request processors
         if (requestProcessors.size() > 0) {
             callVertxRequestProcessor(0, vertxRequest, jerseyRequest, new Handler<Void>() {
                 @Override
                 public void handle(Void aVoid) {
-                    DefaultJerseyHandler.this.handle(jerseyRequest);
+                    applicationHandlerDelegate.handle(jerseyRequest);
                 }
             });
         } else {
-            handle(jerseyRequest);
+            applicationHandlerDelegate.handle(jerseyRequest);
         }
 
     }
 
-    void callVertxRequestProcessor(
+    protected void callVertxRequestProcessor(
             int index,
             final HttpServerRequest vertxRequest,
             final ContainerRequest jerseyRequest,
@@ -271,10 +214,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
             }
         });
 
-    }
-
-    void handle(ContainerRequest jerseyRequest) {
-        application.handle(jerseyRequest);
     }
 
     protected boolean shouldReadData(HttpServerRequest vertxRequest) {

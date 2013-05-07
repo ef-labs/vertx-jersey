@@ -6,11 +6,7 @@ import org.junit.Test;
 import static org.mockito.Mockito.mock;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/25/13
- * Time: 10:47 AM
- * To change this template use File | Settings | File Templates.
+ * BootStrapBinder unit tests
  */
 public class BootstrapBinderTest {
 

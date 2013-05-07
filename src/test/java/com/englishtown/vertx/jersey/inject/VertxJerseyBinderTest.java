@@ -13,11 +13,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/25/13
- * Time: 10:32 AM
- * To change this template use File | Settings | File Templates.
+ * {@link VertxJerseyBinder} unit tests
  */
 @SuppressWarnings("unchecked")
 public class VertxJerseyBinderTest {
