@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
+package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerException;
@@ -51,9 +51,9 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
     private static class VertxOutputStream extends OutputStream {
 
-        protected final HttpServerResponse response;
-        protected Buffer buffer = new Buffer();
-        protected boolean isClosed;
+        final HttpServerResponse response;
+        Buffer buffer = new Buffer();
+        boolean isClosed;
 
         private VertxOutputStream(HttpServerResponse response) {
             this.response = response;
@@ -120,7 +120,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             isClosed = true;
         }
 
-        protected void checkState() {
+        void checkState() {
             if (isClosed) {
                 throw new RuntimeException("Stream closed");
             }

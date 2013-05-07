@@ -19,11 +19,7 @@ import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/18/13
- * Time: 4:49 PM
- * To change this template use File | Settings | File Templates.
+ * {@link JerseyModule} unit tests
  */
 @SuppressWarnings("unchecked")
 public class JerseyModuleTest {

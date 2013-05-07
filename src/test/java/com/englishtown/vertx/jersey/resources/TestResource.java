@@ -6,11 +6,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/23/13
- * Time: 1:39 PM
- * To change this template use File | Settings | File Templates.
+ * Test jersey resource
  */
 @Path("test")
 public class TestResource {

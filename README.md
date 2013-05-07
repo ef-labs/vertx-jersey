@@ -5,14 +5,15 @@
 Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
 
 
-## @VertxParam Resource Injection
+## Vertx Resource Injection
 
-The com.englishtown.vertx.jersey.VertxParam annotation is used to inject vert.x parameters into a resource 
-constructor, field, or method parameter.  Supported vert.x objects include
+The javax.ws.rs.core.Context annotation can be used to inject vert.x objects into a resource constructor, field,
+or method parameter.  Supported vert.x objects include
+* org.vertx.java.core.http.HttpServerRequest
+* org.vertx.java.core.http.HttpServerResponse
+* org.vertx.java.core.streams.ReadStream<org.vertx.java.core.http.HttpServerRequest>
 * org.vertx.java.core.Vertx
 * org.vertx.java.platform.Container
-* org.vertx.java.core.http.HttpServerRequest
-* org.vertx.java.core.streams.ReadStream
 
 ### Example Resource Method
 ```java
@@ -21,9 +22,9 @@ constructor, field, or method parameter.  Supported vert.x objects include
 public void getQuery(
         @Suspended final AsyncResponse response,
         @Context ContainerRequest jerseyRequest,
-        @VertxParam HttpServerRequest vertxRequest,
-        @VertxParam Vertx vertx,
-        @VertxParam Container container) {
+        @Context HttpServerRequest vertxRequest,
+        @Context Vertx vertx,
+        @Context Container container) {
 
     vertx.runOnLoop(new Handler<Void>() {
         @Override

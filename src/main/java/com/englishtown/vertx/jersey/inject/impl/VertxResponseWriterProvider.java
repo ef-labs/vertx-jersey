@@ -1,6 +1,8 @@
-package com.englishtown.vertx.jersey.inject;
+package com.englishtown.vertx.jersey.inject.impl;
 
-import com.englishtown.vertx.jersey.VertxResponseWriter;
+import com.englishtown.vertx.jersey.impl.VertxResponseWriter;
+import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.vertx.java.core.Vertx;
