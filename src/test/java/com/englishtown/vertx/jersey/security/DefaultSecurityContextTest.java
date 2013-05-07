@@ -5,11 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/18/13
- * Time: 4:35 PM
- * To change this template use File | Settings | File Templates.
+ * {@link DefaultSecurityContext} unit tests
  */
 public class DefaultSecurityContextTest {
 

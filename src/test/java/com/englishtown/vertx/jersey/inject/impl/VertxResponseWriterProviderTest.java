@@ -1,5 +1,6 @@
-package com.englishtown.vertx.jersey.inject;
+package com.englishtown.vertx.jersey.inject.impl;
 
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Test;
@@ -14,11 +15,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 /**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/23/13
- * Time: 3:03 PM
- * To change this template use File | Settings | File Templates.
+ * {@link VertxResponseWriterProvider} unit tests
  */
 public class VertxResponseWriterProviderTest {
     @Test
