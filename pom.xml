@@ -35,6 +35,11 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- Set pullindeps to true if you want any modules specified in the 'includes' and 'deploys' fields
+        in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
+        module won't download and install those dependencies at run-time when they're first requested. -->
+        <vertx.pullindeps>true</vertx.pullindeps>
+
         <!--Vertx module name-->
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
 
@@ -42,8 +47,8 @@
         <jersey.version>2.0-rc1</jersey.version>
         <hk2.version>2.1.79</hk2.version>
         <javax.inject.version>1</javax.inject.version>
-        <vertx.version>2.0.0-SNAPSHOT</vertx.version>
-        <vertx.testtools.version>1.0.0-SNAPSHOT</vertx.testtools.version>
+        <vertx.version>2.0.0-beta2</vertx.version>
+        <vertx.testtools.version>2.0.0-beta1</vertx.testtools.version>
         <junit.version>4.11</junit.version>
         <mockito.version>1.9.5</mockito.version>
 
@@ -124,6 +129,33 @@
 
     <build>
         <plugins>
+            <!-- The vert.x Maven plugin -->
+            <plugin>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-maven-plugin</artifactId>
+                <version>${maven.vertx.plugin.version}</version>
+                <!--
+                You can specify a configFile and number of instances to run for the runMod task here if you want
+                <configuration>
+                   <configFile>/path/to/MyVerticle.conf</configFile>
+                   <instances>1</instances>
+                </configuration>
+                -->
+                <configuration>
+                    <configFile>src/test/resources/config.json</configFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>pullindeps</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>pullindeps</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Other plugins required by the build -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -137,24 +169,6 @@
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>${maven.resources.plugin.version}</version>
                 <executions>
-                    <execution>
-                        <id>copy-mod-to-mods</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>
-                                ${basedir}/mods/${module.name}
-                            </outputDirectory>
-                            <overwrite>true</overwrite>
-                            <resources>
-                                <resource>
-                                    <directory>target/classes</directory>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
                     <execution>
                         <id>copy-mod-to-target</id>
                         <phase>process-classes</phase>
@@ -179,17 +193,6 @@
                 <version>${maven.dependency.plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>copy-mod-dependencies-to-mods</id>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/mods/${module.name}/lib</outputDirectory>
-                            <includeScope>runtime</includeScope>
-                        </configuration>
-                    </execution>
-                    <execution>
                         <id>copy-mod-dependencies-to-target</id>
                         <phase>process-classes</phase>
                         <goals>
@@ -201,33 +204,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>${maven.clean.plugin.version}</version>
-                <configuration>
-                    <filesets>
-                        <fileset>
-                            <directory>${basedir}/mods</directory>
-                        </fileset>
-                    </filesets>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <version>${maven.vertx.plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>process-classes</phase>
-                        <goals>
-                            <goal>pullindeps</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <configFile>src/test/resources/config.json</configFile>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -244,8 +220,14 @@
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven.failsafe.plugin.version}</version>
                 <configuration>
+                    <systemProperties>
+                        <property>
+                            <name>vertx.mods</name>
+                            <value>target/mods</value>
+                        </property>
+                    </systemProperties>
                     <includes>
-                        <exclude>**/integration/**</exclude>
+                        <include>**/integration/**</include>
                     </includes>
                 </configuration>
                 <executions>
