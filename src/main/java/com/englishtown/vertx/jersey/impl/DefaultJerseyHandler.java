@@ -227,10 +227,30 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         String contentType = vertxRequest.headers().get(HttpHeaders.CONTENT_TYPE);
 
-        // Only read input stream data for content types form/json/xml
-        return MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(contentType)
-                || MediaType.APPLICATION_JSON.equalsIgnoreCase(contentType)
-                || MediaType.APPLICATION_XML.equalsIgnoreCase(contentType);
+        if (contentType == null || contentType.isEmpty()) {
+            return false;
+        }
+
+        MediaType mediaType = MediaType.valueOf(contentType);
+
+        // Only media type accepted is application
+        if (!MediaType.APPLICATION_FORM_URLENCODED_TYPE.getType().equalsIgnoreCase(mediaType.getType())) {
+            return false;
+        }
+
+        // Need to do some special handling for forms:
+        // Jersey doesn't properly handle when charset is included
+        if (mediaType.getSubtype().equalsIgnoreCase(MediaType.APPLICATION_FORM_URLENCODED_TYPE.getSubtype())) {
+            if (!mediaType.getParameters().isEmpty()) {
+                vertxRequest.headers().remove(HttpHeaders.CONTENT_TYPE);
+                vertxRequest.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+            }
+            return true;
+        }
+
+        // Also accept json/xml sub types
+        return MediaType.APPLICATION_JSON_TYPE.getSubtype().equalsIgnoreCase(mediaType.getSubtype())
+                || MediaType.APPLICATION_XML_TYPE.getSubtype().equalsIgnoreCase(mediaType.getSubtype());
     }
 
 }

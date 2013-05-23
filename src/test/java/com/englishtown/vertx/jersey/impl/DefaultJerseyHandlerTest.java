@@ -210,5 +210,11 @@ public class DefaultJerseyHandlerTest {
         result = handler.shouldReadData(request);
         assertTrue(result);
 
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED + "; charset=UTF-8");
+
+        result = handler.shouldReadData(request);
+        assertTrue(result);
+
     }
 }
