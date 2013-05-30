@@ -34,8 +34,7 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
@@ -49,6 +48,10 @@ public class DefaultJerseyHandlerTest {
     JerseyHandlerConfigurator configurator;
     @Mock
     ApplicationHandlerDelegate applicationHandlerDelegate;
+    @Mock
+    HttpServerRequest request;
+    @Mock
+    HttpServerResponse response;
 
     @Before
     public void setUp() {
@@ -56,17 +59,16 @@ public class DefaultJerseyHandlerTest {
         when(configurator.getApplicationHandler()).thenReturn(applicationHandlerDelegate);
         when(configurator.getMaxBodySize()).thenReturn(1024);
 
+        when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
+        when(request.response()).thenReturn(response);
+
     }
 
     @Test
     public void testHandle() throws Exception {
 
         DefaultJerseyHandler handler = createInstance();
-        HttpServerRequest request = mock(HttpServerRequest.class);
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
         when(request.method()).thenReturn(HttpMethod.GET);
-        when(request.response()).thenReturn(response);
         when(request.headers()).thenReturn(mock(MultiMap.class));
 
         handler.handle(request);
@@ -108,7 +110,6 @@ public class DefaultJerseyHandlerTest {
     public void testHandle_JSON_POST() throws Exception {
 
         DefaultJerseyHandler handler = createInstance();
-        final HttpServerRequest request = mock(HttpServerRequest.class);
 
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
@@ -163,7 +164,6 @@ public class DefaultJerseyHandlerTest {
                 }
         );
 
-        HttpServerRequest request = mock(HttpServerRequest.class);
         when(request.headers()).thenReturn(mock(MultiMap.class));
         InputStream inputStream = null;
 
@@ -176,7 +176,6 @@ public class DefaultJerseyHandlerTest {
     public void testShouldReadData() throws Exception {
 
         DefaultJerseyHandler handler = createInstance();
-        HttpServerRequest request = mock(HttpServerRequest.class);
         boolean result;
 
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
@@ -217,4 +216,26 @@ public class DefaultJerseyHandlerTest {
         assertTrue(result);
 
     }
+
+    @Test
+    public void testGetAbsoluteURI() throws Exception {
+
+        DefaultJerseyHandler handler = createInstance();
+        URI uri;
+
+        String goodUrl = "http://test.englishtown.com/test";
+        String badUrl = "http://test.englishtown.com/test?a=b=c|d=e";
+
+        HttpServerRequest request = mock(HttpServerRequest.class);
+        when(request.absoluteURI()).thenReturn(URI.create(goodUrl)).thenThrow(new IllegalArgumentException());
+        when(request.uri()).thenReturn(badUrl);
+
+        uri = handler.getAbsoluteURI(request);
+        assertEquals("http://test.englishtown.com/test", uri.toString());
+
+        uri = handler.getAbsoluteURI(request);
+        assertEquals("http://test.englishtown.com/test?a=b%3Dc%7Cd%3De", uri.toString());
+
+    }
+
 }

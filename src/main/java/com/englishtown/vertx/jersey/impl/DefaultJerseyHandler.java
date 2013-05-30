@@ -30,6 +30,7 @@ import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import com.hazelcast.nio.FastByteArrayInputStream;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
@@ -49,6 +50,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,18 +130,51 @@ public class DefaultJerseyHandler implements JerseyHandler {
             final InputStream inputStream
     ) {
 
-        String scheme = vertxRequest.absoluteURI() == null ? null : vertxRequest.absoluteURI().getScheme();
-        boolean isSecure = "https".equalsIgnoreCase(scheme);
+        URI uri = getAbsoluteURI(vertxRequest);
+        boolean isSecure = "https".equalsIgnoreCase(uri.getScheme());
 
         // Create the jersey request
         final ContainerRequest jerseyRequest = new ContainerRequest(
                 baseUri,
-                vertxRequest.absoluteURI(),
+                uri,
                 vertxRequest.method(),
                 new DefaultSecurityContext(isSecure),
                 new MapPropertiesDelegate());
 
         handle(vertxRequest, inputStream, jerseyRequest);
+
+    }
+
+    protected URI getAbsoluteURI(HttpServerRequest vertxRequest) {
+
+        try {
+            return vertxRequest.absoluteURI();
+        } catch (IllegalArgumentException e) {
+            String uri = vertxRequest.uri();
+
+            if (!uri.contains("?")) {
+                throw e;
+            }
+
+            try {
+                container.logger().warn("Invalid URI: " + uri + ".  Attempting to parse query string.", e);
+                QueryStringDecoder decoder = new QueryStringDecoder(uri);
+
+                StringBuilder sb = new StringBuilder(decoder.path() + "?");
+
+                for (Map.Entry<String, List<String>> p : decoder.parameters().entrySet()) {
+                    for (String value : p.getValue()) {
+                        sb.append(p.getKey() + "=" + URLEncoder.encode(value, "UTF-8"));
+                    }
+                }
+
+                return URI.create(sb.toString());
+
+            } catch (Exception e1) {
+                throw new RuntimeException(e1);
+            }
+
+        }
 
     }
 
