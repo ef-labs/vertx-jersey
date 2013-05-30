@@ -12,7 +12,7 @@
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-beta1</version>
+    <version>1.0.0-beta2</version>
 
     <name>vertx-mod-jersey</name>
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
@@ -44,10 +44,10 @@
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
 
         <!--Dependency versions-->
-        <jersey.version>2.0-rc1</jersey.version>
-        <hk2.version>2.1.79</hk2.version>
+        <jersey.version>2.0</jersey.version>
+        <hk2.version>2.1.96</hk2.version>
         <javax.inject.version>1</javax.inject.version>
-        <vertx.version>2.0.0-beta2</vertx.version>
+        <vertx.version>2.0.0-beta3</vertx.version>
         <vertx.testtools.version>2.0.0-beta1</vertx.testtools.version>
         <junit.version>4.11</junit.version>
         <mockito.version>1.9.5</mockito.version>
@@ -56,13 +56,22 @@
         <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
         <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
         <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
-        <maven.vertx.plugin.version>2.0.0-SNAPSHOT</maven.vertx.plugin.version>
+        <maven.vertx.plugin.version>1.0.0-beta1</maven.vertx.plugin.version>
         <maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
         <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
         <maven.surefire.report.plugin.version>2.14</maven.surefire.report.plugin.version>
         <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
         <maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>release.maven.java.net</id>
+            <name>java.net Maven Release Repository</name>
+            <url>https://maven.java.net/content/groups/staging</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -78,6 +87,10 @@
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>hk2-api</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.hk2</groupId>
+                    <artifactId>osgi-resource-locator</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -89,7 +102,7 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-hk2</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>1.0.0-beta2</version>
             <scope>provided</scope>
         </dependency>
 
