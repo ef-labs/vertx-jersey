@@ -1,40 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.sonatype.oss</groupId>
+        <groupId>com.englishtown</groupId>
         <artifactId>oss-parent</artifactId>
-        <version>7</version>
+        <version>1.1.0</version>
     </parent>
 
-    <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-beta1</version>
+    <version>1.0.0-beta3</version>
 
-    <name>vertx-mod-jersey</name>
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
-    <url>https://github.com/englishtown/vertx-mod-jersey</url>
     <inceptionYear>2013</inceptionYear>
 
-    <organization>
-        <name>Englishtown</name>
-        <url>http://www.englishtown.com</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://englishtown.mit-license.org/</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-
         <!-- Set pullindeps to true if you want any modules specified in the 'includes' and 'deploys' fields
         in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
         module won't download and install those dependencies at run-time when they're first requested. -->
@@ -44,25 +25,25 @@
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
 
         <!--Dependency versions-->
-        <jersey.version>2.0-rc1</jersey.version>
-        <hk2.version>2.1.79</hk2.version>
+        <vertx.mod.hk2.version>1.0.0-beta3</vertx.mod.hk2.version>
+        <jersey.version>2.0</jersey.version>
+        <hk2.version>2.1.96</hk2.version>
         <javax.inject.version>1</javax.inject.version>
-        <vertx.version>2.0.0-beta2</vertx.version>
+        <vertx.version>2.0.0-beta3</vertx.version>
         <vertx.testtools.version>2.0.0-beta1</vertx.testtools.version>
-        <junit.version>4.11</junit.version>
-        <mockito.version>1.9.5</mockito.version>
 
         <!--Plugin versions-->
-        <maven.compiler.plugin.version>3.0</maven.compiler.plugin.version>
-        <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
-        <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
-        <maven.vertx.plugin.version>2.0.0-SNAPSHOT</maven.vertx.plugin.version>
-        <maven.surefire.plugin.version>2.14</maven.surefire.plugin.version>
-        <maven.failsafe.plugin.version>2.14</maven.failsafe.plugin.version>
-        <maven.surefire.report.plugin.version>2.14</maven.surefire.report.plugin.version>
-        <maven.javadoc.plugin.version>2.9</maven.javadoc.plugin.version>
-        <maven.dependency.plugin.version>2.7</maven.dependency.plugin.version>
+        <maven.vertx.plugin.version>1.0.0-beta1</maven.vertx.plugin.version>
     </properties>
+
+    <repositories>
+        <repository>
+            <id>release.maven.java.net</id>
+            <name>java.net Maven Release Repository</name>
+            <url>https://maven.java.net/content/groups/staging</url>
+            <layout>default</layout>
+        </repository>
+    </repositories>
 
     <dependencies>
         <dependency>
@@ -71,12 +52,20 @@
             <version>${jersey.version}</version>
             <exclusions>
                 <exclusion>
+                    <groupId>org.glassfish.hk2.external</groupId>
+                    <artifactId>javax.inject</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>hk2-locator</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>org.glassfish.hk2</groupId>
                     <artifactId>hk2-api</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.glassfish.hk2</groupId>
+                    <artifactId>osgi-resource-locator</artifactId>
                 </exclusion>
             </exclusions>
         </dependency>
@@ -89,7 +78,7 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-hk2</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${vertx.mod.hk2.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -110,7 +99,6 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -122,7 +110,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <version>${mockito.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -159,15 +146,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven.compiler.plugin.version}</version>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>${maven.resources.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-mod-to-target</id>
@@ -190,7 +172,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>${maven.dependency.plugin.version}</version>
                 <executions>
                     <execution>
                         <id>copy-mod-dependencies-to-target</id>
@@ -208,17 +189,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>${maven.surefire.plugin.version}</version>
-                <configuration>
-                    <includes>
-                        <include>**/*Test*.java</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>${maven.failsafe.plugin.version}</version>
                 <configuration>
                     <systemProperties>
                         <property>
@@ -240,6 +214,7 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
@@ -256,6 +231,14 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>maven-jgitflow-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
@@ -264,45 +247,26 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-report-plugin</artifactId>
-                <version>${maven.surefire.report.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>${maven.javadoc.plugin.version}</version>
-                <configuration>
-                    <aggregate>true</aggregate>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>
 
-    <pluginRepositories>
-        <pluginRepository>
-            <id>snapshots</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <issueManagement>
-        <system>Github Issues</system>
-        <url>https://github.com/englishtown/vertx-mod-jersey/issues</url>
-    </issueManagement>
-
     <distributionManagement>
         <site>
             <id>sling.englishtown.com</id>
-            <url>
-                dav:https://sling.englishtown.com/content/docs/${project.groupId}/${project.artifactId}/${project.version}
-            </url>
+            <url>dav:https://sling.englishtown.com/content/docs/${project.groupId}/${project.artifactId}/${project.version}</url>
         </site>
     </distributionManagement>
 
     <scm>
-        <connection>scm:git:git@github.com:englishtown/vertx-mod-jersey.git</connection>
-        <developerConnection>scm:git:git@github.com:englishtown/vertx-mod-jersey.git</developerConnection>
-        <tag>HEAD</tag>
-        <url>https://github.com/englishtown/vertx-mod-jersey</url>
+        <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
+        <tag>1.0.0-beta3</tag>
+        <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
 </project>

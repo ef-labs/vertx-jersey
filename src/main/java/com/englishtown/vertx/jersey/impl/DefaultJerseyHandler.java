@@ -30,6 +30,7 @@ import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import com.hazelcast.nio.FastByteArrayInputStream;
+import io.netty.handler.codec.http.QueryStringDecoder;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
@@ -49,6 +50,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -128,18 +130,51 @@ public class DefaultJerseyHandler implements JerseyHandler {
             final InputStream inputStream
     ) {
 
-        String scheme = vertxRequest.absoluteURI() == null ? null : vertxRequest.absoluteURI().getScheme();
-        boolean isSecure = "https".equalsIgnoreCase(scheme);
+        URI uri = getAbsoluteURI(vertxRequest);
+        boolean isSecure = "https".equalsIgnoreCase(uri.getScheme());
 
         // Create the jersey request
         final ContainerRequest jerseyRequest = new ContainerRequest(
                 baseUri,
-                vertxRequest.absoluteURI(),
+                uri,
                 vertxRequest.method(),
                 new DefaultSecurityContext(isSecure),
                 new MapPropertiesDelegate());
 
         handle(vertxRequest, inputStream, jerseyRequest);
+
+    }
+
+    protected URI getAbsoluteURI(HttpServerRequest vertxRequest) {
+
+        try {
+            return vertxRequest.absoluteURI();
+        } catch (IllegalArgumentException e) {
+            String uri = vertxRequest.uri();
+
+            if (!uri.contains("?")) {
+                throw e;
+            }
+
+            try {
+                container.logger().warn("Invalid URI: " + uri + ".  Attempting to parse query string.", e);
+                QueryStringDecoder decoder = new QueryStringDecoder(uri);
+
+                StringBuilder sb = new StringBuilder(decoder.path() + "?");
+
+                for (Map.Entry<String, List<String>> p : decoder.parameters().entrySet()) {
+                    for (String value : p.getValue()) {
+                        sb.append(p.getKey() + "=" + URLEncoder.encode(value, "UTF-8"));
+                    }
+                }
+
+                return URI.create(sb.toString());
+
+            } catch (Exception e1) {
+                throw new RuntimeException(e1);
+            }
+
+        }
 
     }
 
@@ -227,10 +262,30 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         String contentType = vertxRequest.headers().get(HttpHeaders.CONTENT_TYPE);
 
-        // Only read input stream data for content types form/json/xml
-        return MediaType.APPLICATION_FORM_URLENCODED.equalsIgnoreCase(contentType)
-                || MediaType.APPLICATION_JSON.equalsIgnoreCase(contentType)
-                || MediaType.APPLICATION_XML.equalsIgnoreCase(contentType);
+        if (contentType == null || contentType.isEmpty()) {
+            return false;
+        }
+
+        MediaType mediaType = MediaType.valueOf(contentType);
+
+        // Only media type accepted is application
+        if (!MediaType.APPLICATION_FORM_URLENCODED_TYPE.getType().equalsIgnoreCase(mediaType.getType())) {
+            return false;
+        }
+
+        // Need to do some special handling for forms:
+        // Jersey doesn't properly handle when charset is included
+        if (mediaType.getSubtype().equalsIgnoreCase(MediaType.APPLICATION_FORM_URLENCODED_TYPE.getSubtype())) {
+            if (!mediaType.getParameters().isEmpty()) {
+                vertxRequest.headers().remove(HttpHeaders.CONTENT_TYPE);
+                vertxRequest.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+            }
+            return true;
+        }
+
+        // Also accept json/xml sub types
+        return MediaType.APPLICATION_JSON_TYPE.getSubtype().equalsIgnoreCase(mediaType.getSubtype())
+                || MediaType.APPLICATION_XML_TYPE.getSubtype().equalsIgnoreCase(mediaType.getSubtype());
     }
 
 }
