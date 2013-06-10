@@ -10,7 +10,7 @@
 
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-beta5</version>
+    <version>1.0.0-beta6-SNAPSHOT</version>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <inceptionYear>2013</inceptionYear>
@@ -265,7 +265,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>1.0.0-beta5</tag>
+        <tag>HEAD</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
