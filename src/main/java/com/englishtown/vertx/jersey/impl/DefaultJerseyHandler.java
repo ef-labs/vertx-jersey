@@ -42,6 +42,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
@@ -62,6 +63,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     private Vertx vertx;
     private Container container;
+    private Logger logger;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
     private final ContainerResponseWriterProvider responseWriterProvider;
@@ -84,12 +86,14 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         this.vertx = vertx;
         this.container = container;
+        this.logger = container.logger();
 
         configurator.init(vertx, container);
         baseUri = configurator.getBaseUri();
         applicationHandlerDelegate = configurator.getApplicationHandler();
         maxBodySize = configurator.getMaxBodySize();
 
+        logger.debug("DefaultJerseyHandler - initialized");
     }
 
     /**
@@ -100,6 +104,9 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         // Wait for the body for jersey to handle form/json/xml params
         if (shouldReadData(vertxRequest)) {
+            if (logger.isDebugEnabled()) {
+                container.logger().debug("DefaultJerseyHandler - handle request and read body: " + vertxRequest.uri());
+            }
             final Buffer body = new Buffer();
 
             vertxRequest.dataHandler(new Handler<Buffer>() {
@@ -120,6 +127,9 @@ public class DefaultJerseyHandler implements JerseyHandler {
             });
 
         } else {
+            if (logger.isDebugEnabled()) {
+                container.logger().debug("DefaultJerseyHandler - handle request: " + vertxRequest.uri());
+            }
             DefaultJerseyHandler.this.handle(vertxRequest, null);
         }
 
