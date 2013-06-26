@@ -101,7 +101,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
         JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
 
         if (resources == null || resources.size() == 0) {
-            throw new RuntimeException("At lease one resource package name must be specified in the config " +
+            throw new RuntimeException("At least one resource package name must be specified in the config " +
                     CONFIG_RESOURCES);
         }
 
