@@ -278,8 +278,9 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         MediaType mediaType = MediaType.valueOf(contentType);
 
-        // Only media type accepted is application
-        if (!MediaType.APPLICATION_FORM_URLENCODED_TYPE.getType().equalsIgnoreCase(mediaType.getType())) {
+        // Only media type accepted is application (will check subtypes next)
+        String applicationType = MediaType.APPLICATION_FORM_URLENCODED_TYPE.getType();
+        if (!applicationType.equalsIgnoreCase(mediaType.getType())) {
             return false;
         }
 
