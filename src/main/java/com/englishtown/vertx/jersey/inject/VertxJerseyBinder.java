@@ -23,14 +23,8 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
-import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyHandlerConfigurator;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
+import com.englishtown.vertx.jersey.*;
+import com.englishtown.vertx.jersey.impl.*;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
@@ -165,7 +159,7 @@ public class VertxJerseyBinder extends AbstractBinder {
         });
 
         bind(DefaultApplicationHandlerDelegate.class).to(ApplicationHandlerDelegate.class);
-        bind(DefaultJerseyServer.class).to(JerseyServer.class);
+        bind(DefaultJerseyServerFactory.class).to(JerseyServerFactory.class);
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyHandlerConfigurator.class).to(JerseyHandlerConfigurator.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);

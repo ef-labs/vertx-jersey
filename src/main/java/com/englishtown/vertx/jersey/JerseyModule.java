@@ -37,11 +37,11 @@ import javax.inject.Inject;
  */
 public class JerseyModule extends Verticle {
 
-    private final JerseyServer jerseyServer;
+    private final JerseyServerFactory jerseyServerFactory;
 
     @Inject
-    public JerseyModule(JerseyServer jerseyServer) {
-        this.jerseyServer = jerseyServer;
+    public JerseyModule(JerseyServerFactory jerseyServerFactory) {
+        this.jerseyServerFactory = jerseyServerFactory;
     }
 
     /**
@@ -52,6 +52,7 @@ public class JerseyModule extends Verticle {
         this.start();
 
         JsonObject config = container.config();
+        JerseyServer jerseyServer = jerseyServerFactory.createServer();
 
         jerseyServer.init(config, vertx, container, new Handler<AsyncResult<HttpServer>>() {
             @Override

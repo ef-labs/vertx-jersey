@@ -58,6 +58,8 @@ public class JerseyModuleTest {
     @Mock
     JerseyServer jerseyServer;
     @Mock
+    JerseyServerFactory jerseyServerFactory;
+    @Mock
     Future<Void> startedResult;
     @Mock
     AsyncResult<HttpServer> asyncResult;
@@ -68,7 +70,8 @@ public class JerseyModuleTest {
 
     @Before
     public void setUp() {
-        jerseyModule = new JerseyModule(jerseyServer);
+        when(jerseyServerFactory.createServer()).thenReturn(jerseyServer);
+        jerseyModule = new JerseyModule(jerseyServerFactory);
         jerseyModule.setContainer(container);
     }
 

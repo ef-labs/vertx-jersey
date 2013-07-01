@@ -35,6 +35,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.net.URI;
 
 /**
  * Test jersey resource
@@ -59,8 +60,9 @@ public class TestResource {
     @GET
     @Path("html")
     @Produces(MediaType.TEXT_HTML)
-    public Response getHtml() {
-        File file = new File("src/test/web/index.html");
+    public Response getHtml() throws Exception {
+        URI uri = this.getClass().getResource("/web/index.html").toURI();
+        File file = new File(uri);
         if (!file.exists()) {
             throw new RuntimeException("File web/index.html does not exist");
         }
