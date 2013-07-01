@@ -25,13 +25,18 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.jersey.internal.inject.Injections;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.net.URI;
 
 /**
@@ -47,6 +52,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
     private JsonObject config;
+    private Logger logger;
 
     @Override
     public void init(Vertx vertx, Container container) {
@@ -54,6 +60,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
         if (config == null) {
             throw new IllegalStateException("The vert.x container configuration is null");
         }
+        logger = container.logger();
     }
 
     /**
@@ -81,6 +88,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
      */
     @Override
     public ApplicationHandlerDelegate getApplicationHandler() {
+        setFactory();
         ApplicationHandler handler = new ApplicationHandler(getResourceConfig());
         return new DefaultApplicationHandlerDelegate(handler);
     }
@@ -144,9 +152,35 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     }
 
     private void checkState() {
-        if (config == null) {
+        if (config == null || logger == null) {
             throw new IllegalStateException("The configurator has not been initialized.");
         }
+    }
+
+    private void setFactory() {
+        checkState();
+
+        // Jersey stores the ServiceLocatorFactory in a final static field
+        // This needs to be reset before being used so each verticle has its own isolated service locator
+
+        try {
+            Field field = Injections.class.getDeclaredField("factory");
+            field.setAccessible(true);
+
+            Field modifiersField = Field.class.getDeclaredField("modifiers");
+            modifiersField.setAccessible(true);
+            modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+            field.set(null, ServiceLocatorFactory.getInstance());
+
+        } catch (NoSuchFieldException e) {
+            logger.error("NoSuchFieldException while setting the service locator factory", e);
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            logger.error("IllegalAccessException while setting the service locator factory", e);
+            throw new RuntimeException(e);
+        }
+
     }
 
 }

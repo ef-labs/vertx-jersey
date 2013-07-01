@@ -26,9 +26,11 @@ package com.englishtown.vertx.jersey.inject;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.impl.DefaultApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
@@ -46,6 +48,7 @@ import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -162,6 +165,7 @@ public class VertxJerseyBinder extends AbstractBinder {
         });
 
         bind(DefaultApplicationHandlerDelegate.class).to(ApplicationHandlerDelegate.class);
+        bind(DefaultJerseyServer.class).to(JerseyServer.class);
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyHandlerConfigurator.class).to(JerseyHandlerConfigurator.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
@@ -169,12 +173,12 @@ public class VertxJerseyBinder extends AbstractBinder {
         // Vert.x instance
         bindFactory(VertxReferencingFactory.class).to(Vertx.class).in(PerLookup.class);
         bindFactory(ReferencingFactory.<Vertx>referenceFactory()).to(new TypeLiteral<Ref<Vertx>>() {
-        }).in(RequestScoped.class);
+        }).in(Singleton.class);
 
         // Container
         bindFactory(VertxContainerReferencingFactory.class).to(Container.class).in(PerLookup.class);
         bindFactory(ReferencingFactory.<Container>referenceFactory()).to(new TypeLiteral<Ref<Container>>() {
-        }).in(RequestScoped.class);
+        }).in(Singleton.class);
 
         // Request and read stream
         bindFactory(VertxRequestReferencingFactory.class).to(HttpServerRequest.class).in(PerLookup.class);

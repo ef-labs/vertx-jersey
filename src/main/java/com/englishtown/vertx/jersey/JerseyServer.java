@@ -24,46 +24,42 @@
 package com.englishtown.vertx.jersey;
 
 import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
-
-import javax.inject.Inject;
+import org.vertx.java.platform.Container;
 
 /**
- * The Vertx Module to enable Jersey to handle JAX-RS resources
+ * Represents a jersey server running in vert.x
  */
-public class JerseyModule extends Verticle {
-
-    private final JerseyServer jerseyServer;
-
-    @Inject
-    public JerseyModule(JerseyServer jerseyServer) {
-        this.jerseyServer = jerseyServer;
-    }
+public interface JerseyServer {
 
     /**
-     * {@inheritDoc}
+     * Creates a vert.x {@link HttpServer} with a jersey handler
+     *
+     * @param config    http server and jersey configuration settings
+     * @param vertx     the {@link Vertx} instance
+     * @param container the {@link Container} instance
      */
-    @Override
-    public void start(final Future<Void> startedResult) {
-        this.start();
+    void init(JsonObject config, Vertx vertx, Container container);
 
-        JsonObject config = container.config();
+    /**
+     * Creates a vert.x {@link HttpServer} with a jersey handler
+     *
+     * @param config      http server and jersey configuration settings
+     * @param vertx       the {@link Vertx} instance
+     * @param container   the {@link Container} instance
+     * @param doneHandler the callback for when initialization has completed
+     */
+    void init(JsonObject config, Vertx vertx, Container container, Handler<AsyncResult<HttpServer>> doneHandler);
 
-        jerseyServer.init(config, vertx, container, new Handler<AsyncResult<HttpServer>>() {
-            @Override
-            public void handle(AsyncResult<HttpServer> result) {
-                if (result.succeeded()) {
-                    startedResult.setResult(null);
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
-            }
-        });
-
-    }
+    /**
+     * Allows adding additional routes
+     *
+     * @param handler the callback to add routes
+     */
+    void routeMatcherHandler(Handler<RouteMatcher> handler);
 
 }

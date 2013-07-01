@@ -33,6 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import java.net.URI;
@@ -51,6 +52,8 @@ public class DefaultJerseyHandlerConfiguratorTest {
     Vertx vertx;
     @Mock
     Container container;
+    @Mock
+    Logger logger;
     JsonObject config;
     DefaultJerseyHandlerConfigurator configurator;
 
@@ -59,6 +62,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         config = new JsonObject();
         when(container.config()).thenReturn(config);
+        when(container.logger()).thenReturn(logger);
 
         configurator = new DefaultJerseyHandlerConfigurator();
         configurator.init(vertx, container);
@@ -141,8 +145,8 @@ public class DefaultJerseyHandlerConfiguratorTest {
             fail();
 
         } catch (RuntimeException e) {
-            assertEquals(e.getMessage(), "At lease one resource package name must be specified in the config " +
-                    "resources");
+            assertEquals("At least one resource package name must be specified in the config " +
+                    "resources", e.getMessage());
 
         }
 

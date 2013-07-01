@@ -28,6 +28,8 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.platform.Container;
 
+import java.net.URI;
+
 /**
  * The vert.x jersey http handler
  */
@@ -39,4 +41,7 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
      * @param container the container instance
      */
     void init(Vertx vertx, Container container);
+
+    URI getBaseUri();
+
 }

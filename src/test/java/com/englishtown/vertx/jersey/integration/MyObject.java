@@ -21,49 +21,21 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
-
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
-
-import javax.inject.Inject;
+package com.englishtown.vertx.jersey.integration;
 
 /**
- * The Vertx Module to enable Jersey to handle JAX-RS resources
+ * Test object for json serialization
  */
-public class JerseyModule extends Verticle {
+public class MyObject {
 
-    private final JerseyServer jerseyServer;
+    private String name;
 
-    @Inject
-    public JerseyModule(JerseyServer jerseyServer) {
-        this.jerseyServer = jerseyServer;
+    public String getName() {
+        return name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void start(final Future<Void> startedResult) {
-        this.start();
-
-        JsonObject config = container.config();
-
-        jerseyServer.init(config, vertx, container, new Handler<AsyncResult<HttpServer>>() {
-            @Override
-            public void handle(AsyncResult<HttpServer> result) {
-                if (result.succeeded()) {
-                    startedResult.setResult(null);
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
-            }
-        });
-
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

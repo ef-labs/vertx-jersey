@@ -96,6 +96,14 @@ public class DefaultJerseyHandler implements JerseyHandler {
         logger.debug("DefaultJerseyHandler - initialized");
     }
 
+    @Override
+    public URI getBaseUri() {
+        if (baseUri == null) {
+            throw new IllegalStateException("baseUri is null, have you called init() first?");
+        }
+        return baseUri;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -174,7 +182,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
                 for (Map.Entry<String, List<String>> p : decoder.parameters().entrySet()) {
                     for (String value : p.getValue()) {
-                        sb.append(p.getKey() + "=" + URLEncoder.encode(value, "UTF-8"));
+                        sb.append(p.getKey()).append("=").append(URLEncoder.encode(value, "UTF-8"));
                     }
                 }
 
@@ -209,10 +217,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
         jerseyRequest.setRequestScopedInitializer(new RequestScopedInitializer() {
             @Override
             public void initialize(ServiceLocator locator) {
-                locator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
-                }).getType()).set(vertx);
-                locator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
-                }).getType()).set(container);
                 locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
                 }).getType()).set(vertxRequest);
                 locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {

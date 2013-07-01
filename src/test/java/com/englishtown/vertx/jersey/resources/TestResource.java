@@ -23,10 +23,18 @@
 
 package com.englishtown.vertx.jersey.resources;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import com.englishtown.vertx.jersey.integration.MyObject;
+import org.glassfish.jersey.server.JSONP;
+import org.vertx.java.core.Handler;
+import org.vertx.java.core.Vertx;
+
+import javax.ws.rs.*;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.File;
 
 /**
  * Test jersey resource
@@ -35,9 +43,50 @@ import javax.ws.rs.core.MediaType;
 public class TestResource {
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String getHelloWorld() {
+        return "Hello world";
+    }
+
+    @GET
+    @JSONP(queryParam = "cb")
+    @Path("json")
+    @Produces({MediaType.APPLICATION_JSON, "application/javascript"})
     public String getJson() {
         return "{}";
+    }
+
+    @GET
+    @Path("html")
+    @Produces(MediaType.TEXT_HTML)
+    public Response getHtml() {
+        File file = new File("src/test/web/index.html");
+        if (!file.exists()) {
+            throw new RuntimeException("File web/index.html does not exist");
+        }
+        return Response.ok(file).build();
+    }
+
+    @POST
+    @Path("json")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void postJson(
+            final MyObject obj,
+            @Suspended final AsyncResponse response,
+            @Context Vertx vertx) {
+
+        vertx.runOnContext(new Handler<Void>() {
+            @Override
+            public void handle(Void event) {
+                if (obj == null) {
+                    throw new RuntimeException();
+                }
+                MyObject obj2 = new MyObject();
+                obj2.setName("async response");
+                response.resume(obj2);
+            }
+        });
     }
 
 }
