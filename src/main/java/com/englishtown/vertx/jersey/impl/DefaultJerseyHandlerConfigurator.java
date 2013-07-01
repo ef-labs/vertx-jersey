@@ -55,12 +55,12 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     private Logger logger;
 
     @Override
-    public void init(Vertx vertx, Container container) {
-        config = container.config();
+    public void init(JsonObject config, Logger logger) {
         if (config == null) {
-            throw new IllegalStateException("The vert.x container configuration is null");
+            throw new IllegalStateException("The provided configuration was null");
         }
-        logger = container.logger();
+        this.config = config;
+        this.logger = logger;
     }
 
     /**

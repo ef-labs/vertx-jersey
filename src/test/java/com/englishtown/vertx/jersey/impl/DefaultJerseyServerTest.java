@@ -103,7 +103,7 @@ public class DefaultJerseyServerTest {
     private void verifyResults(int port, String host) {
 
         verify(vertx, times(1)).createHttpServer();
-        verify(jerseyHandler).init(vertx, container);
+        verify(jerseyHandler).init(eq(vertx), eq(container), any(JsonObject.class));
         verify(httpServer).requestHandler(jerseyHandler);
         //noinspection unchecked
         verify(httpServer, times(1)).listen(eq(port), eq(host), any(Handler.class));

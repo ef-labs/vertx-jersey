@@ -65,7 +65,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
         when(container.logger()).thenReturn(logger);
 
         configurator = new DefaultJerseyHandlerConfigurator();
-        configurator.init(vertx, container);
+        configurator.init(config, logger);
 
     }
 
@@ -75,7 +75,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
         DefaultJerseyHandlerConfigurator configurator = new DefaultJerseyHandlerConfigurator();
 
         try {
-            configurator.init(mock(Vertx.class), mock(Container.class));
+            configurator.init(null, logger);
             fail();
         } catch (IllegalStateException e) {
             // Expected

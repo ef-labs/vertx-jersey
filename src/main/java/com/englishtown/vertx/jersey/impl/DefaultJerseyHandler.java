@@ -42,6 +42,7 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
+import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
@@ -82,13 +83,13 @@ public class DefaultJerseyHandler implements JerseyHandler {
     }
 
     @Override
-    public void init(Vertx vertx, Container container) {
+    public void init(Vertx vertx, Container container, JsonObject config) {
 
         this.vertx = vertx;
         this.container = container;
         this.logger = container.logger();
 
-        configurator.init(vertx, container);
+        configurator.init(config, container.logger());
         baseUri = configurator.getBaseUri();
         applicationHandlerDelegate = configurator.getApplicationHandler();
         maxBodySize = configurator.getMaxBodySize();

@@ -25,6 +25,8 @@ package com.englishtown.vertx.jersey;
 
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import java.net.URI;
@@ -34,7 +36,7 @@ import java.net.URI;
  */
 public interface JerseyHandlerConfigurator {
 
-    void init(Vertx vertx, Container container);
+    void init(JsonObject config, Logger logger);
 
     /**
      * Returns the base URI used by Jersey

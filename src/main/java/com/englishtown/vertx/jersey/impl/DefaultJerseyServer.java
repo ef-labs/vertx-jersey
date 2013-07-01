@@ -86,7 +86,7 @@ public class DefaultJerseyServer implements JerseyServer {
         HttpServer server = vertx.createHttpServer();
 
         // Init jersey handler
-        jerseyHandler.init(vertx, container);
+        jerseyHandler.init(vertx, container, config);
 
         if (receiveBufferSize > 0) {
             // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
