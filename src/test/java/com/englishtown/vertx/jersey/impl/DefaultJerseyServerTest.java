@@ -73,14 +73,6 @@ public class DefaultJerseyServerTest {
     Handler<AsyncResult<HttpServer>> doneHandler;
     @Mock
     Handler<RouteMatcher> routeMatcherHandler;
-    @Mock
-    Factory<Ref<Vertx>> vertxReferenceFactory;
-    @Mock
-    Factory<Ref<Container>> containerReferenceFactory;
-    @Mock
-    Ref<Vertx> vertxReference;
-    @Mock
-    Ref<Container> containerReference;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
 
@@ -90,13 +82,10 @@ public class DefaultJerseyServerTest {
         when(container.logger()).thenReturn(logger);
         when(vertx.createHttpServer()).thenReturn(httpServer);
 
-        when(vertxReferenceFactory.provide()).thenReturn(vertxReference);
-        when(containerReferenceFactory.provide()).thenReturn(containerReference);
-
         //noinspection unchecked
         Provider<JerseyHandler> provider = mock(Provider.class);
         when(provider.get()).thenReturn(jerseyHandler);
-        jerseyServer = new DefaultJerseyServer(provider, vertxReferenceFactory, containerReferenceFactory);
+        jerseyServer = new DefaultJerseyServer(provider);
 
     }
 
@@ -117,7 +106,7 @@ public class DefaultJerseyServerTest {
         Provider<JerseyHandler> provider = mock(Provider.class);
 
         try {
-            new DefaultJerseyServer(provider, null, null);
+            new DefaultJerseyServer(provider);
             fail();
         } catch (IllegalStateException e) {
             // Expected

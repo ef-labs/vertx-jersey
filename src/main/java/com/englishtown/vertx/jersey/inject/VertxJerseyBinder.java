@@ -23,32 +23,26 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import com.englishtown.vertx.jersey.*;
-import com.englishtown.vertx.jersey.impl.*;
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.JerseyServerFactory;
+import com.englishtown.vertx.jersey.impl.DefaultApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyServerFactory;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
-import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.internal.inject.ReferencingFactory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-import org.glassfish.jersey.process.internal.RequestScoped;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.streams.ReadStream;
-import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HK2 binder to configure the minimum interfaces required for the {@link com.englishtown.vertx.jersey.JerseyModule}
- * to start.
+ *
  */
 public class VertxJerseyBinder extends AbstractBinder {
 
@@ -107,46 +101,6 @@ public class VertxJerseyBinder extends AbstractBinder {
     }
 
     /**
-     * Referencing factory for vert.x request.
-     */
-    private static class VertxRequestReferencingFactory extends ReferencingFactory<HttpServerRequest> {
-        @Inject
-        public VertxRequestReferencingFactory(Provider<Ref<HttpServerRequest>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
-     * Referencing factory for vert.x vertx instance.
-     */
-    private static class VertxReferencingFactory extends ReferencingFactory<Vertx> {
-        @Inject
-        public VertxReferencingFactory(Provider<Ref<Vertx>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
-     * Referencing factory for vert.x container.
-     */
-    private static class VertxContainerReferencingFactory extends ReferencingFactory<Container> {
-        @Inject
-        public VertxContainerReferencingFactory(Provider<Ref<Container>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
-     * Referencing factory for vert.x response.
-     */
-    private static class VertxResponseReferencingFactory extends ReferencingFactory<HttpServerResponse> {
-        @Inject
-        public VertxResponseReferencingFactory(Provider<Ref<HttpServerResponse>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
      * Implement to provide binding definitions using the exposed binding
      * methods.
      */
@@ -164,27 +118,6 @@ public class VertxJerseyBinder extends AbstractBinder {
         bind(DefaultJerseyHandlerConfigurator.class).to(JerseyHandlerConfigurator.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
 
-        // Vert.x instance
-        bindFactory(VertxReferencingFactory.class).to(Vertx.class).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<Vertx>referenceFactory()).to(new TypeLiteral<Ref<Vertx>>() {
-        }).in(Singleton.class);
-
-        // Container
-        bindFactory(VertxContainerReferencingFactory.class).to(Container.class).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<Container>referenceFactory()).to(new TypeLiteral<Ref<Container>>() {
-        }).in(Singleton.class);
-
-        // Request and read stream
-        bindFactory(VertxRequestReferencingFactory.class).to(HttpServerRequest.class).in(PerLookup.class);
-        bindFactory(VertxRequestReferencingFactory.class).to(new TypeLiteral<ReadStream<HttpServerRequest>>() {
-        }).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<HttpServerRequest>referenceFactory()).to(new TypeLiteral<Ref<HttpServerRequest>>() {
-        }).in(RequestScoped.class);
-
-        // Response
-        bindFactory(VertxResponseReferencingFactory.class).to(HttpServerResponse.class).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<HttpServerResponse>referenceFactory()).to(new TypeLiteral<Ref<HttpServerResponse>>() {
-        }).in(RequestScoped.class);
-
     }
+
 }

@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey.inject;
 
+import org.glassfish.hk2.api.DynamicConfiguration;
 import org.glassfish.hk2.api.IterableProvider;
 import org.junit.Test;
 
@@ -35,53 +36,17 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link VertxJerseyBinder} unit tests
+ * {@link InternalVertxJerseyBinder} unit tests
  */
-public class VertxJerseyBinderTest {
+@SuppressWarnings("unchecked")
+public class InternalVertxJerseyBinderTest {
 
     @Test
-    public void testVertxRequestProcessorFactory() {
+    public void testConfigure() throws Exception {
 
-        IterableProvider<VertxRequestProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxRequestProcessorFactory factory;
-        List<VertxRequestProcessor> result;
-
-        List<VertxRequestProcessor> list = Arrays.asList(
-                mock(VertxRequestProcessor.class),
-                mock(VertxRequestProcessor.class));
-
-        when(providers.iterator()).thenReturn(list.iterator());
-
-        factory = new VertxJerseyBinder.VertxRequestProcessorFactory(providers);
-        result = factory.provide();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-
-        factory.dispose(result);
-
-    }
-
-    @Test
-    public void testVertxResponseProcessorFactory() {
-
-        IterableProvider<VertxResponseProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxResponseProcessorFactory factory;
-        List<VertxResponseProcessor> result;
-
-        List<VertxResponseProcessor> list = Arrays.asList(
-                mock(VertxResponseProcessor.class),
-                mock(VertxResponseProcessor.class));
-
-        when(providers.iterator()).thenReturn(list.iterator());
-
-        factory = new VertxJerseyBinder.VertxResponseProcessorFactory(providers);
-        result = factory.provide();
-
-        assertNotNull(result);
-        assertEquals(2, result.size());
-
-        factory.dispose(result);
+        InternalVertxJerseyBinder binder = new InternalVertxJerseyBinder();
+        DynamicConfiguration dynamicConfiguration = mock(DynamicConfiguration.class);
+        binder.bind(dynamicConfiguration);
 
     }
 

@@ -170,7 +170,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
-        assertEquals(0, resourceConfig.getInstances().size());
+        assertEquals(1, resourceConfig.getInstances().size());
 
         JsonArray features = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestFeature");
         config.putArray(DefaultJerseyHandlerConfigurator.CONFIG_FEATURES, features);
@@ -185,7 +185,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
-        assertEquals(1, resourceConfig.getInstances().size());
+        assertEquals(2, resourceConfig.getInstances().size());
 
         binders.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {

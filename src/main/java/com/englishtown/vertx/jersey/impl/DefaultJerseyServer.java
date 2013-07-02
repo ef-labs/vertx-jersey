@@ -25,8 +25,6 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.jersey.internal.util.collection.Ref;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -48,21 +46,15 @@ public class DefaultJerseyServer implements JerseyServer {
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
 
     private final JerseyHandler jerseyHandler;
-    private final Factory<Ref<Vertx>> vertxReferencingFactory;
-    private final Factory<Ref<Container>> containerReferencingFactory;
     private Handler<RouteMatcher> routeMatcherHandler;
 
     @Inject
     public DefaultJerseyServer(
-            Provider<JerseyHandler> jerseyHandlerProvider,
-            Factory<Ref<Vertx>> vertxReferencingFactory,
-            Factory<Ref<Container>> containerReferencingFactory) {
+            Provider<JerseyHandler> jerseyHandlerProvider) {
         this.jerseyHandler = jerseyHandlerProvider.get();
         if (jerseyHandler == null) {
             throw new IllegalStateException("The JerseyHandler provider returned null");
         }
-        this.vertxReferencingFactory = vertxReferencingFactory;
-        this.containerReferencingFactory = containerReferencingFactory;
     }
 
     @Override
@@ -72,10 +64,6 @@ public class DefaultJerseyServer implements JerseyServer {
 
     @Override
     public void init(JsonObject config, Vertx vertx, final Container container, final Handler<AsyncResult<HttpServer>> doneHandler) {
-
-        // Store vertx/container instances
-        vertxReferencingFactory.provide().set(vertx);
-        containerReferencingFactory.provide().set(container);
 
         // Get http server config values
         final String host = config.getString(CONFIG_HOST, "0.0.0.0");
