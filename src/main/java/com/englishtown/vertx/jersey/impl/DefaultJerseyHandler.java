@@ -218,6 +218,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
         jerseyRequest.setRequestScopedInitializer(new RequestScopedInitializer() {
             @Override
             public void initialize(ServiceLocator locator) {
+                locator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
+                }).getType()).set(vertx);
+                locator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
+                }).getType()).set(container);
                 locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
                 }).getType()).set(vertxRequest);
                 locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {

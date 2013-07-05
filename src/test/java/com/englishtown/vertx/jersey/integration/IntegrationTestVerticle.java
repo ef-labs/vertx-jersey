@@ -32,12 +32,15 @@ import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpClient;
 import org.vertx.java.core.http.HttpClientRequest;
 import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.testtools.TestVerticle;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import static org.vertx.testtools.VertxAssert.*;
 
@@ -60,14 +63,7 @@ public class IntegrationTestVerticle extends TestVerticle {
     @Override
     public void start(final Future<Void> startedResult) {
 
-        JsonArray features = new JsonArray().addString("org.glassfish.jersey.jackson.JacksonFeature");
-        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.jersey.resources");
-
-        JsonObject config = new JsonObject()
-                .putString("host", "localhost")
-                .putNumber("port", 8080)
-                .putArray("resources", resources)
-                .putArray("features", features);
+        JsonObject config = loadConfig();
 
         container.deployVerticle(JerseyModule.class.getName(), config, new Handler<AsyncResult<String>>() {
             @Override
@@ -81,6 +77,28 @@ public class IntegrationTestVerticle extends TestVerticle {
 
             }
         });
+
+    }
+
+    private JsonObject loadConfig() {
+
+        try (InputStream stream = this.getClass().getResourceAsStream("/config.json")) {
+            StringBuilder sb = new StringBuilder();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
+
+            String line = reader.readLine();
+            while (line != null) {
+                sb.append(line).append('\n');
+                line = reader.readLine();
+            }
+
+            return new JsonObject(sb.toString());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            fail();
+            return new JsonObject();
+        }
 
     }
 
@@ -124,7 +142,7 @@ public class IntegrationTestVerticle extends TestVerticle {
 
         HttpClient client = createHttpClient();
 
-        HttpClientRequest request = client.get("/test/json",
+        HttpClientRequest request = client.get("/rest/test/json",
                 new Handler<HttpClientResponse>() {
                     @Override
                     public void handle(HttpClientResponse response) {
@@ -141,7 +159,7 @@ public class IntegrationTestVerticle extends TestVerticle {
         HttpClient client = createHttpClient();
         final String contentType = "application/javascript";
 
-        HttpClientRequest request = client.get("/test/json?cb=foo_cb",
+        HttpClientRequest request = client.get("/rest/test/json?cb=foo_cb",
                 new Handler<HttpClientResponse>() {
                     @Override
                     public void handle(HttpClientResponse response) {
@@ -158,7 +176,7 @@ public class IntegrationTestVerticle extends TestVerticle {
 
         HttpClient client = createHttpClient();
 
-        HttpClientRequest request = client.get("/test/html",
+        HttpClientRequest request = client.get("/rest/test/html",
                 new Handler<HttpClientResponse>() {
                     @Override
                     public void handle(HttpClientResponse response) {
@@ -174,7 +192,7 @@ public class IntegrationTestVerticle extends TestVerticle {
 
         HttpClient client = createHttpClient();
 
-        HttpClientRequest request = client.post("/test/json",
+        HttpClientRequest request = client.post("/rest/test/json",
                 new Handler<HttpClientResponse>() {
                     @Override
                     public void handle(HttpClientResponse response) {

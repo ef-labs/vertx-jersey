@@ -26,10 +26,6 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.JerseyServerFactory;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.jersey.internal.util.collection.Ref;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -40,21 +36,14 @@ import javax.inject.Provider;
 public class DefaultJerseyServerFactory implements JerseyServerFactory {
 
     private final Provider<JerseyHandler> jerseyHandlerProvider;
-    private final Factory<Ref<Vertx>> vertxReferencingFactory;
-    private final Factory<Ref<Container>> containerReferencingFactory;
 
     @Inject
-    public DefaultJerseyServerFactory(
-            Provider<JerseyHandler> jerseyHandlerProvider,
-            Factory<Ref<Vertx>> vertxReferencingFactory,
-            Factory<Ref<Container>> containerReferencingFactory) {
+    public DefaultJerseyServerFactory(Provider<JerseyHandler> jerseyHandlerProvider) {
         this.jerseyHandlerProvider = jerseyHandlerProvider;
-        this.vertxReferencingFactory = vertxReferencingFactory;
-        this.containerReferencingFactory = containerReferencingFactory;
     }
 
     @Override
     public JerseyServer createServer() {
-        return new DefaultJerseyServer(jerseyHandlerProvider, vertxReferencingFactory, containerReferencingFactory);
+        return new DefaultJerseyServer(jerseyHandlerProvider);
     }
 }
