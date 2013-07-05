@@ -15,6 +15,9 @@ or method parameter.  Supported vert.x objects include
 * org.vertx.java.core.Vertx
 * org.vertx.java.platform.Container
 
+To inject custom objects, you must provide one or more binders in the configuration.  See the integration test test_postJson() for an example.
+
+
 ### Example Resource Method
 ```java
 @GET
@@ -41,14 +44,15 @@ The vertx-mod-jersey module configuration is as follows:
 
 ```json
 {
-    "host": <host>,
+    "host": "<host>",
     "port": <port>,
     "receive_buffer_size": <receive_buffer_size>,
     "max_body_size": <max_body_size>,
-    "base_path": <base_path>,
-    "resources": [<resources>],
-    "features": [<features>],
-    "binders": [<binders>]
+    "base_path": "<base_path>",
+    "resources": ["<resources>"],
+    "features": ["<features>"],
+    "binders": ["<binders>"],
+    "backlog_size": <backlog_sze>
 }
 ````
 
@@ -61,6 +65,7 @@ Default is `0.0.0.0`
 * `resources` - An array of package names to inspect for resources.
 * `features` - An array of feature classes to inject.  For example: `"org.glassfish.jersey.jackson.JacksonFeature"`
 * `binders` - An array of HK2 binder classes to configure injection bindings.
+* `backlog_size` - An int that sets the http server backlog size.  The default value is 10,000
 
 ### Examples
 #### Simple
