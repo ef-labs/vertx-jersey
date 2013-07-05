@@ -44,6 +44,7 @@ public class DefaultJerseyServer implements JerseyServer {
     final static String CONFIG_HOST = "host";
     final static String CONFIG_PORT = "port";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
+    final static String CONFIG_BACKLOG_SIZE = "backlog_size";
 
     private final JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
@@ -69,9 +70,13 @@ public class DefaultJerseyServer implements JerseyServer {
         final String host = config.getString(CONFIG_HOST, "0.0.0.0");
         final int port = config.getInteger(CONFIG_PORT, 80);
         int receiveBufferSize = config.getInteger(CONFIG_RECEIVE_BUFFER_SIZE, 0);
+        int backlogSize = config.getInteger(CONFIG_BACKLOG_SIZE, 10000);
 
         // Create http server
         HttpServer server = vertx.createHttpServer();
+
+        // Performance tweak
+        server.setAcceptBacklog(backlogSize);
 
         // Init jersey handler
         jerseyHandler.init(vertx, container, config);
