@@ -21,42 +21,29 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
+package com.englishtown.vertx.jersey.impl;
 
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.JerseyServerFactory;
 
-import java.net.URI;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
- * Provides configuration for a {@link JerseyHandler}
+ * Default implementation of {@link com.englishtown.vertx.jersey.JerseyServerFactory}
  */
-public interface JerseyHandlerConfigurator {
+public class DefaultJerseyServerFactory implements JerseyServerFactory {
 
-    void init(JsonObject config, Logger logger);
+    private final Provider<JerseyHandler> jerseyHandlerProvider;
 
-    /**
-     * Returns the base URI used by Jersey
-     *
-     * @return base URI
-     */
-    URI getBaseUri();
+    @Inject
+    public DefaultJerseyServerFactory(Provider<JerseyHandler> jerseyHandlerProvider) {
+        this.jerseyHandlerProvider = jerseyHandlerProvider;
+    }
 
-    /**
-     * Returns the Jersey {@link ApplicationHandler} instance
-     *
-     * @return the application handler instance
-     */
-    ApplicationHandlerDelegate getApplicationHandler();
-
-    /**
-     * The max body size in bytes when reading the vert.x input stream
-     *
-     * @return the max body size bytes
-     */
-    int getMaxBodySize();
-
+    @Override
+    public JerseyServer createServer() {
+        return new DefaultJerseyServer(jerseyHandlerProvider);
+    }
 }

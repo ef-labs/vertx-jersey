@@ -23,29 +23,25 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.vertx.java.busmods.BusModBase;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.platform.Verticle;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
-public class JerseyModule extends BusModBase {
+public class JerseyModule extends Verticle {
 
-    final static String CONFIG_HOST = "host";
-    final static String CONFIG_PORT = "port";
-    final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
-
-    private final Provider<JerseyHandler> jerseyHandlerProvider;
+    private final JerseyServerFactory jerseyServerFactory;
 
     @Inject
-    public JerseyModule(Provider<JerseyHandler> jerseyHandlerProvider) {
-        this.jerseyHandlerProvider = jerseyHandlerProvider;
+    public JerseyModule(JerseyServerFactory jerseyServerFactory) {
+        this.jerseyServerFactory = jerseyServerFactory;
     }
 
     /**
@@ -55,37 +51,15 @@ public class JerseyModule extends BusModBase {
     public void start(final Future<Void> startedResult) {
         this.start();
 
-        // Get http server config values
-        final String host = getOptionalStringConfig(CONFIG_HOST, "0.0.0.0");
-        final int port = getOptionalIntConfig(CONFIG_PORT, 80);
-        int receiveBufferSize = getOptionalIntConfig(CONFIG_RECEIVE_BUFFER_SIZE, 0);
+        JsonObject config = container.config();
+        JerseyServer jerseyServer = jerseyServerFactory.createServer();
 
-        // Create http server
-        HttpServer server = vertx.createHttpServer();
-
-        // Create jersey handler and set as request handler
-        JerseyHandler handler = jerseyHandlerProvider.get();
-        if (handler == null) {
-            throw new IllegalStateException("A JerseyHandlerProvider has not been configured");
-        }
-        handler.init(vertx, container);
-        server.requestHandler(handler);
-
-        if (receiveBufferSize > 0) {
-            // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
-            server.setReceiveBufferSize(receiveBufferSize);
-        }
-
-        // Start listening and log success/failure
-        server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
+        jerseyServer.init(config, vertx, container, new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
-                final String listenPath = "http://" + host + ":" + port;
                 if (result.succeeded()) {
-                    container.logger().info("Http server listening for " + listenPath);
                     startedResult.setResult(null);
                 } else {
-                    container.logger().error("Failed to start http server listening for " + listenPath, result.cause());
                     startedResult.setFailure(result.cause());
                 }
             }

@@ -21,42 +21,33 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
+package com.englishtown.vertx.jersey.inject;
 
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
+import org.glassfish.hk2.api.DynamicConfiguration;
+import org.glassfish.hk2.api.IterableProvider;
+import org.junit.Test;
 
-import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
- * Provides configuration for a {@link JerseyHandler}
+ * {@link InternalVertxJerseyBinder} unit tests
  */
-public interface JerseyHandlerConfigurator {
+@SuppressWarnings("unchecked")
+public class InternalVertxJerseyBinderTest {
 
-    void init(JsonObject config, Logger logger);
+    @Test
+    public void testConfigure() throws Exception {
 
-    /**
-     * Returns the base URI used by Jersey
-     *
-     * @return base URI
-     */
-    URI getBaseUri();
+        InternalVertxJerseyBinder binder = new InternalVertxJerseyBinder();
+        DynamicConfiguration dynamicConfiguration = mock(DynamicConfiguration.class);
+        binder.bind(dynamicConfiguration);
 
-    /**
-     * Returns the Jersey {@link ApplicationHandler} instance
-     *
-     * @return the application handler instance
-     */
-    ApplicationHandlerDelegate getApplicationHandler();
-
-    /**
-     * The max body size in bytes when reading the vert.x input stream
-     *
-     * @return the max body size bytes
-     */
-    int getMaxBodySize();
+    }
 
 }

@@ -25,12 +25,12 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
+import org.vertx.java.core.logging.Logger;
 
 import java.net.URI;
 
@@ -47,13 +47,15 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
     private JsonObject config;
+    private Logger logger;
 
     @Override
-    public void init(Vertx vertx, Container container) {
-        config = container.config();
+    public void init(JsonObject config, Logger logger) {
         if (config == null) {
-            throw new IllegalStateException("The vert.x container configuration is null");
+            throw new IllegalStateException("The provided configuration was null");
         }
+        this.config = config;
+        this.logger = logger;
     }
 
     /**
@@ -101,7 +103,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
         JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
 
         if (resources == null || resources.size() == 0) {
-            throw new RuntimeException("At lease one resource package name must be specified in the config " +
+            throw new RuntimeException("At least one resource package name must be specified in the config " +
                     CONFIG_RESOURCES);
         }
 
@@ -127,6 +129,9 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
             }
         }
 
+        // Always register the InternalVertxJerseyBinder
+        rc.register(new InternalVertxJerseyBinder());
+
         JsonArray binders = config.getArray(CONFIG_BINDERS, null);
         if (binders != null && binders.size() > 0) {
             for (int i = 0; i < binders.size(); i++) {
@@ -144,7 +149,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     }
 
     private void checkState() {
-        if (config == null) {
+        if (config == null || logger == null) {
             throw new IllegalStateException("The configurator has not been initialized.");
         }
     }

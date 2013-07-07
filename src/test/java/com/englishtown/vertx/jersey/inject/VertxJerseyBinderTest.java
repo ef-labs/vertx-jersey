@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import org.glassfish.hk2.api.DynamicConfiguration;
 import org.glassfish.hk2.api.IterableProvider;
 import org.junit.Test;
 
@@ -38,17 +37,7 @@ import static org.mockito.Mockito.when;
 /**
  * {@link VertxJerseyBinder} unit tests
  */
-@SuppressWarnings("unchecked")
 public class VertxJerseyBinderTest {
-
-    @Test
-    public void testConfigure() throws Exception {
-
-        VertxJerseyBinder binder = new VertxJerseyBinder();
-        DynamicConfiguration dynamicConfiguration = mock(DynamicConfiguration.class);
-        binder.bind(dynamicConfiguration);
-
-    }
 
     @Test
     public void testVertxRequestProcessorFactory() {

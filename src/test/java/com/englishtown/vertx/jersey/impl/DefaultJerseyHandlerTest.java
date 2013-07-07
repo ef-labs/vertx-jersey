@@ -123,7 +123,7 @@ public class DefaultJerseyHandlerTest {
                 (ContainerResponseWriter.class));
 
         DefaultJerseyHandler handler = new DefaultJerseyHandler(provider, processors, configurator);
-        handler.init(vertx, container);
+        handler.init(vertx, container, config);
 
         return handler;
     }

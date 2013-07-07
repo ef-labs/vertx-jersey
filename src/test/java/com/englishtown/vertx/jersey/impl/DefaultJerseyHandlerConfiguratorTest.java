@@ -33,6 +33,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
+import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import java.net.URI;
@@ -51,6 +52,8 @@ public class DefaultJerseyHandlerConfiguratorTest {
     Vertx vertx;
     @Mock
     Container container;
+    @Mock
+    Logger logger;
     JsonObject config;
     DefaultJerseyHandlerConfigurator configurator;
 
@@ -59,9 +62,10 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         config = new JsonObject();
         when(container.config()).thenReturn(config);
+        when(container.logger()).thenReturn(logger);
 
         configurator = new DefaultJerseyHandlerConfigurator();
-        configurator.init(vertx, container);
+        configurator.init(config, logger);
 
     }
 
@@ -71,7 +75,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
         DefaultJerseyHandlerConfigurator configurator = new DefaultJerseyHandlerConfigurator();
 
         try {
-            configurator.init(mock(Vertx.class), mock(Container.class));
+            configurator.init(null, logger);
             fail();
         } catch (IllegalStateException e) {
             // Expected
@@ -141,8 +145,8 @@ public class DefaultJerseyHandlerConfiguratorTest {
             fail();
 
         } catch (RuntimeException e) {
-            assertEquals(e.getMessage(), "At lease one resource package name must be specified in the config " +
-                    "resources");
+            assertEquals("At least one resource package name must be specified in the config " +
+                    "resources", e.getMessage());
 
         }
 
@@ -166,7 +170,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
-        assertEquals(0, resourceConfig.getInstances().size());
+        assertEquals(1, resourceConfig.getInstances().size());
 
         JsonArray features = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestFeature");
         config.putArray(DefaultJerseyHandlerConfigurator.CONFIG_FEATURES, features);
@@ -181,7 +185,7 @@ public class DefaultJerseyHandlerConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
-        assertEquals(1, resourceConfig.getInstances().size());
+        assertEquals(2, resourceConfig.getInstances().size());
 
         binders.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {

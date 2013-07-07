@@ -21,42 +21,21 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey;
-
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
-
-import java.net.URI;
+package com.englishtown.vertx.jersey.integration;
 
 /**
- * Provides configuration for a {@link JerseyHandler}
+ * Test object for json serialization
  */
-public interface JerseyHandlerConfigurator {
+public class MyObject {
 
-    void init(JsonObject config, Logger logger);
+    private String name;
 
-    /**
-     * Returns the base URI used by Jersey
-     *
-     * @return base URI
-     */
-    URI getBaseUri();
+    public String getName() {
+        return name;
+    }
 
-    /**
-     * Returns the Jersey {@link ApplicationHandler} instance
-     *
-     * @return the application handler instance
-     */
-    ApplicationHandlerDelegate getApplicationHandler();
-
-    /**
-     * The max body size in bytes when reading the vert.x input stream
-     *
-     * @return the max body size bytes
-     */
-    int getMaxBodySize();
+    public void setName(String name) {
+        this.name = name;
+    }
 
 }

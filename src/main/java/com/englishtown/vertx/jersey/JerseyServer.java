@@ -23,40 +23,43 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.glassfish.jersey.server.ApplicationHandler;
+import org.vertx.java.core.AsyncResult;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
-import java.net.URI;
-
 /**
- * Provides configuration for a {@link JerseyHandler}
+ * Represents a jersey server running in vert.x
  */
-public interface JerseyHandlerConfigurator {
-
-    void init(JsonObject config, Logger logger);
+public interface JerseyServer {
 
     /**
-     * Returns the base URI used by Jersey
+     * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @return base URI
+     * @param config    http server and jersey configuration settings
+     * @param vertx     the {@link Vertx} instance
+     * @param container the {@link Container} instance
      */
-    URI getBaseUri();
+    void init(JsonObject config, Vertx vertx, Container container);
 
     /**
-     * Returns the Jersey {@link ApplicationHandler} instance
+     * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @return the application handler instance
+     * @param config      http server and jersey configuration settings
+     * @param vertx       the {@link Vertx} instance
+     * @param container   the {@link Container} instance
+     * @param doneHandler the callback for when initialization has completed
      */
-    ApplicationHandlerDelegate getApplicationHandler();
+    void init(JsonObject config, Vertx vertx, Container container, Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
-     * The max body size in bytes when reading the vert.x input stream
+     * Allows adding additional routes
      *
-     * @return the max body size bytes
+     * @param handler the callback to add routes
      */
-    int getMaxBodySize();
+    void routeMatcherHandler(Handler<RouteMatcher> handler);
 
 }
