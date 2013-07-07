@@ -1,8 +1,8 @@
 {
     "main": "com.englishtown.vertx.jersey.JerseyModule",
-    "includes": "com.englishtown~vertx-mod-hk2~1.0.0-CR1-SNAPSHOT",
+    "includes": "com.englishtown~vertx-mod-hk2~1.0.0-CR2",
     "description":"Allows creating JAX-RS Jersey resources that will handle incoming http requests to vert.x",
-    "licenses": ["http://englishtown.mit-license.org/"],
+    "licenses": ["The MIT License"],
     "author": "Englishtown",
     "keywords": ["JAX-RS", "Jersey", "REST", "RESTful", "JSR 339"],
     "homepage": "https://github.com/englishtown/vertx-mod-jersey"
