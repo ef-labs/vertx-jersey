@@ -10,7 +10,7 @@
 
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-CR1-SNAPSHOT</version>
+    <version>1.0.0-CR2-SNAPSHOT</version>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <inceptionYear>2013</inceptionYear>
