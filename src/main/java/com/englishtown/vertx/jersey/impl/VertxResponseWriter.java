@@ -122,42 +122,66 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
         void checkState() {
             if (isClosed) {
-                throw new RuntimeException("Stream closed");
+                throw new RuntimeException("Stream is closed");
             }
         }
     }
 
-    private static class VertxChunkedOutputStream extends VertxOutputStream {
+    private static class VertxChunkedOutputStream extends OutputStream {
+
+        private final HttpServerResponse response;
+        private boolean isClosed;
 
         private VertxChunkedOutputStream(HttpServerResponse response) {
-            super(response);
-            response.setChunked(true);
+            this.response = response;
         }
 
         /**
          * {@inheritDoc}
          */
         @Override
-        public void flush() throws IOException {
+        public void write(int b) throws IOException {
             checkState();
-            if (buffer.length() > 0) {
-                response.write(buffer);
-                buffer = new Buffer();
-            }
+            Buffer buffer = new Buffer();
+            buffer.appendByte((byte) b);
+            response.write(buffer);
         }
 
         /**
          * {@inheritDoc}
          */
+        @Override
+        public void write(byte[] b) throws IOException {
+            checkState();
+            response.write(new Buffer(b));
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+            checkState();
+            Buffer buffer = new Buffer();
+            if (off == 0 && len == b.length) {
+                buffer.appendBytes(b);
+            } else {
+                buffer.appendBytes(Arrays.copyOfRange(b, off, off + len));
+            }
+            response.write(buffer);
+        }
+
         @Override
         public void close() throws IOException {
-            // Write any remaining buffer to the vert.x response
-            if (buffer != null && buffer.length() > 0) {
-                response.write(buffer);
-            }
-            buffer = null;
             isClosed = true;
         }
+
+        void checkState() {
+            if (isClosed) {
+                throw new RuntimeException("Stream is closed");
+            }
+        }
+
     }
 
     private final HttpServerRequest vertxRequest;
@@ -208,8 +232,12 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         }
 
         // Return output stream based on whether entity is chunked
-        return responseContext.isChunked() ? new VertxChunkedOutputStream(response)
-                : new VertxOutputStream(response);
+        if (responseContext.isChunked()) {
+            response.setChunked(true);
+            return new VertxChunkedOutputStream(response);
+        } else {
+            return new VertxOutputStream(response);
+        }
     }
 
     /**
