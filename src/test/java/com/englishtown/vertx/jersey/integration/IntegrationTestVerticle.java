@@ -204,4 +204,20 @@ public class IntegrationTestVerticle extends TestVerticle {
         request.end("{\"name\":\"post\"}");
     }
 
+    @Test
+    public void test_getChunked() throws Exception {
+
+        HttpClient client = createHttpClient();
+
+        HttpClientRequest request = client.get("/rest/test/chunked",
+                new Handler<HttpClientResponse>() {
+                    @Override
+                    public void handle(HttpClientResponse response) {
+                        verifyResponse(response, 200, MediaType.TEXT_PLAIN, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+                    }
+                });
+
+        request.end();
+    }
+
 }
