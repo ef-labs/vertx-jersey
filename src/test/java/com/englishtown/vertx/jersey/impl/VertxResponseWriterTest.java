@@ -140,18 +140,15 @@ public class VertxResponseWriterTest {
         verify(response, times(1)).setChunked(eq(true));
 
         outputStream.write("Chunked data".getBytes());
-        outputStream.flush();
         verify(response, times(1)).write(any(Buffer.class));
 
         outputStream.flush();
         verify(response, times(1)).write(any(Buffer.class));
 
         outputStream.write("Chunked data".getBytes());
-        outputStream.flush();
         verify(response, times(2)).write(any(Buffer.class));
 
         outputStream.write("Chunked data".getBytes());
-        outputStream.flush();
         verify(response, times(3)).write(any(Buffer.class));
 
         outputStream.write("Final chunked data".getBytes());

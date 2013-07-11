@@ -24,6 +24,7 @@
 package com.englishtown.vertx.jersey.resources;
 
 import com.englishtown.vertx.jersey.integration.MyObject;
+import org.glassfish.jersey.server.ChunkedOutput;
 import org.glassfish.jersey.server.JSONP;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
@@ -35,6 +36,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 
 /**
@@ -89,6 +91,45 @@ public class TestResource {
                 response.resume(obj2);
             }
         });
+    }
+
+    @GET
+    @Path("chunked")
+    @Produces(MediaType.TEXT_PLAIN)
+    public void getChunked(
+            @Suspended final AsyncResponse response,
+            @Context final Vertx vertx) {
+
+        final ChunkedOutput<String> chunkedOutput = new ChunkedOutput<>(String.class);
+
+        vertx.runOnContext(new Handler<Void>() {
+            @Override
+            public void handle(Void aVoid) {
+
+                final ChunkedOutput<String> chunkedOutput = new ChunkedOutput<>(String.class);
+
+                response.resume(chunkedOutput);
+
+                vertx.runOnContext(new Handler<Void>() {
+                    @Override
+                    public void handle(Void aVoid) {
+                        String s = "aaaaaaaaaa";
+                        try {
+                            chunkedOutput.write(s);
+                            chunkedOutput.write(s);
+                            chunkedOutput.write(s);
+                            chunkedOutput.close();
+                        } catch (IOException e) {
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+
+    private void writeChunk(ChunkedOutput<String> chunkedOutput) {
+
     }
 
 }
