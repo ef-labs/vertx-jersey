@@ -10,7 +10,7 @@
 
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-CR4-SNAPSHOT</version>
+    <version>1.0.0-final</version>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <inceptionYear>2013</inceptionYear>
@@ -25,15 +25,14 @@
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
 
         <!--Dependency versions-->
-        <vertx.mod.hk2.version>1.0.0-CR3</vertx.mod.hk2.version>
+        <vertx.mod.hk2.version>1.0.0-final</vertx.mod.hk2.version>
         <jersey.version>2.0</jersey.version>
         <hk2.version>2.1.96</hk2.version>
-        <javax.inject.version>1</javax.inject.version>
-        <vertx.version>2.0.0-CR3</vertx.version>
-        <vertx.testtools.version>2.0.0-CR2</vertx.testtools.version>
+        <vertx.version>2.0.0-final</vertx.version>
+        <vertx.testtools.version>2.0.0-final</vertx.testtools.version>
 
         <!--Plugin versions-->
-        <maven.vertx.plugin.version>1.0.0-CR2</maven.vertx.plugin.version>
+        <maven.vertx.plugin.version>2.0.0-final</maven.vertx.plugin.version>
     </properties>
 
     <repositories>
@@ -286,7 +285,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>1.0.0-final</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
