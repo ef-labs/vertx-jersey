@@ -47,12 +47,12 @@ public class VertxResponseWriterProviderTest {
         Vertx vertx = mock(Vertx.class);
         Container container = mock(Container.class);
         List<VertxResponseProcessor> responseProcessors = new ArrayList<>();
-        VertxResponseWriterProvider provider = new VertxResponseWriterProvider(vertx, container, responseProcessors);
+        VertxResponseWriterProvider provider = new VertxResponseWriterProvider(vertx, container);
         HttpServerRequest vertxRequest = mock(HttpServerRequest.class);
         ContainerRequest jerseyRequest = mock(ContainerRequest.class);
         ContainerResponseWriter writer;
 
-        writer = provider.get(vertxRequest, jerseyRequest);
+        writer = provider.get(vertxRequest, jerseyRequest, responseProcessors);
         assertNotNull(writer);
     }
 }

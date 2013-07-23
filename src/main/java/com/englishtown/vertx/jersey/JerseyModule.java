@@ -31,17 +31,20 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Verticle;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
 public class JerseyModule extends Verticle {
 
-    private final JerseyServerFactory jerseyServerFactory;
+    private final Provider<JerseyConfigurator> configuratorProvider;
+    private final Provider<JerseyServer> jerseyServerProvider;
 
     @Inject
-    public JerseyModule(JerseyServerFactory jerseyServerFactory) {
-        this.jerseyServerFactory = jerseyServerFactory;
+    public JerseyModule(Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider) {
+        this.jerseyServerProvider = jerseyServerProvider;
+        this.configuratorProvider = configuratorProvider;
     }
 
     /**
@@ -52,9 +55,12 @@ public class JerseyModule extends Verticle {
         this.start();
 
         JsonObject config = container.config();
-        JerseyServer jerseyServer = jerseyServerFactory.createServer();
+        JerseyServer jerseyServer = jerseyServerProvider.get();
+        JerseyConfigurator configurator = configuratorProvider.get();
 
-        jerseyServer.init(config, vertx, container, new Handler<AsyncResult<HttpServer>>() {
+        configurator.init(config, vertx, container);
+
+        jerseyServer.init(configurator, new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
                 if (result.succeeded()) {

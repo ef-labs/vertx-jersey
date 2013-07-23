@@ -34,7 +34,6 @@ import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -45,17 +44,18 @@ public class VertxResponseWriterProvider implements ContainerResponseWriterProvi
 
     private final Vertx vertx;
     private final Container container;
-    private final List<VertxResponseProcessor> responseProcessors;
 
     @Inject
-    public VertxResponseWriterProvider(Vertx vertx, Container container, List<VertxResponseProcessor> responseProcessors) {
+    public VertxResponseWriterProvider(Vertx vertx, Container container) {
         this.vertx = vertx;
         this.container = container;
-        this.responseProcessors = responseProcessors != null ? responseProcessors : new ArrayList<VertxResponseProcessor>();
     }
 
     @Override
-    public ContainerResponseWriter get(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest) {
+    public ContainerResponseWriter get(
+            HttpServerRequest vertxRequest,
+            ContainerRequest jerseyRequest,
+            List<VertxResponseProcessor> responseProcessors) {
         return new VertxResponseWriter(vertxRequest, vertx, container, responseProcessors);
     }
 

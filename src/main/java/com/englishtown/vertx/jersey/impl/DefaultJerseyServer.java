@@ -23,14 +23,13 @@
 
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
@@ -41,17 +40,11 @@ import javax.inject.Provider;
  */
 public class DefaultJerseyServer implements JerseyServer {
 
-    final static String CONFIG_HOST = "host";
-    final static String CONFIG_PORT = "port";
-    final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
-    final static String CONFIG_BACKLOG_SIZE = "backlog_size";
-
     private final JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
 
     @Inject
-    public DefaultJerseyServer(
-            Provider<JerseyHandler> jerseyHandlerProvider) {
+    public DefaultJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider) {
         this.jerseyHandler = jerseyHandlerProvider.get();
         if (jerseyHandler == null) {
             throw new IllegalStateException("The JerseyHandler provider returned null");
@@ -59,32 +52,29 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     @Override
-    public void init(JsonObject config, Vertx vertx, final Container container) {
-        init(config, vertx, container, null);
+    public void init(JerseyConfigurator configurator) {
+        init(configurator, null);
     }
 
     @Override
-    public void init(JsonObject config, Vertx vertx, final Container container, final Handler<AsyncResult<HttpServer>> doneHandler) {
-
-        // Get http server config values
-        final String host = config.getString(CONFIG_HOST, "0.0.0.0");
-        final int port = config.getInteger(CONFIG_PORT, 80);
-        int receiveBufferSize = config.getInteger(CONFIG_RECEIVE_BUFFER_SIZE, 0);
-        int backlogSize = config.getInteger(CONFIG_BACKLOG_SIZE, 10000);
+    public void init(
+            final JerseyConfigurator configurator,
+            final Handler<AsyncResult<HttpServer>> doneHandler) {
 
         // Create http server
-        HttpServer server = vertx.createHttpServer();
+        HttpServer server = configurator.getVertx().createHttpServer();
 
         // Performance tweak
-        server.setAcceptBacklog(backlogSize);
+        server.setAcceptBacklog(configurator.getAcceptBacklog());
 
-        // Init jersey handler
-        jerseyHandler.init(vertx, container, config);
-
-        if (receiveBufferSize > 0) {
+        Integer receiveBufferSize = configurator.getReceiveBufferSize();
+        if (receiveBufferSize != null && receiveBufferSize > 0) {
             // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
             server.setReceiveBufferSize(receiveBufferSize);
         }
+
+        // Init jersey handler
+        jerseyHandler.init(configurator);
 
         // Set request handler, use route matcher if a route handler is provided.
         if (routeMatcherHandler == null) {
@@ -95,6 +85,10 @@ public class DefaultJerseyServer implements JerseyServer {
             rm.all(pattern, jerseyHandler);
             routeMatcherHandler.handle(rm);
         }
+
+        final String host = configurator.getHost();
+        final int port = configurator.getPort();
+        final Container container = configurator.getContainer();
 
         // Start listening and log success/failure
         server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {

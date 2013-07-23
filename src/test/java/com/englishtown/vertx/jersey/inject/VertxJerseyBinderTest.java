@@ -43,7 +43,7 @@ public class VertxJerseyBinderTest {
     public void testVertxRequestProcessorFactory() {
 
         IterableProvider<VertxRequestProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxRequestProcessorFactory factory;
+        InternalVertxJerseyBinder.VertxRequestProcessorFactory factory;
         List<VertxRequestProcessor> result;
 
         List<VertxRequestProcessor> list = Arrays.asList(
@@ -52,7 +52,7 @@ public class VertxJerseyBinderTest {
 
         when(providers.iterator()).thenReturn(list.iterator());
 
-        factory = new VertxJerseyBinder.VertxRequestProcessorFactory(providers);
+        factory = new InternalVertxJerseyBinder.VertxRequestProcessorFactory(providers);
         result = factory.provide();
 
         assertNotNull(result);
@@ -66,7 +66,7 @@ public class VertxJerseyBinderTest {
     public void testVertxResponseProcessorFactory() {
 
         IterableProvider<VertxResponseProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxResponseProcessorFactory factory;
+        InternalVertxJerseyBinder.VertxResponseProcessorFactory factory;
         List<VertxResponseProcessor> result;
 
         List<VertxResponseProcessor> list = Arrays.asList(
@@ -75,7 +75,7 @@ public class VertxJerseyBinderTest {
 
         when(providers.iterator()).thenReturn(list.iterator());
 
-        factory = new VertxJerseyBinder.VertxResponseProcessorFactory(providers);
+        factory = new InternalVertxJerseyBinder.VertxResponseProcessorFactory(providers);
         result = factory.provide();
 
         assertNotNull(result);

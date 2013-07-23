@@ -26,7 +26,6 @@ package com.englishtown.vertx.jersey;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import java.net.URI;
@@ -38,10 +37,9 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
     /**
      * Initialize the handler with vertx and container instances
      *
-     * @param vertx     the vertx instance
-     * @param container the container instance
+     * @param configurator contains configuration details
      */
-    void init(Vertx vertx, Container container, JsonObject config);
+    void init(JerseyConfigurator configurator);
 
     URI getBaseUri();
 

@@ -24,20 +24,27 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
+import org.vertx.java.platform.Container;
 
 import java.net.URI;
 
 /**
- * Default {@link JerseyHandlerConfigurator} implementation
+ * Default {@link com.englishtown.vertx.jersey.JerseyConfigurator} implementation
  */
-public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurator {
+public class DefaultJerseyConfigurator implements JerseyConfigurator {
+
+    final static String CONFIG_HOST = "host";
+    final static String CONFIG_PORT = "port";
+    final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
+    final static String CONFIG_BACKLOG_SIZE = "backlog_size";
 
     public static final String CONFIG_BASE_PATH = "base_path";
     public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
@@ -46,16 +53,85 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
     public static final String CONFIG_BINDERS = "binders";
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
+    private Vertx vertx;
+    private Container container;
     private JsonObject config;
     private Logger logger;
 
     @Override
-    public void init(JsonObject config, Logger logger) {
+    public void init(JsonObject config, Vertx vertx, Container container) {
+        this.vertx = vertx;
+        this.container = container;
+
         if (config == null) {
             throw new IllegalStateException("The provided configuration was null");
         }
         this.config = config;
-        this.logger = logger;
+        logger = container.logger();
+    }
+
+    /**
+     * Returns the current vertx instance
+     *
+     * @return the {@link org.vertx.java.core.Vertx} instance
+     */
+    @Override
+    public Vertx getVertx() {
+        return vertx;
+    }
+
+    /**
+     * Returns the current container instance
+     *
+     * @return the {@link org.vertx.java.platform.Container} instance
+     */
+    @Override
+    public Container getContainer() {
+        return container;
+    }
+
+    /**
+     * The http web server host
+     *
+     * @return the http web server host to listen to
+     */
+    @Override
+    public String getHost() {
+        checkState();
+        return config.getString(CONFIG_HOST, "0.0.0.0");
+    }
+
+    /**
+     * The http web server port
+     *
+     * @return the http web server port to listen to
+     */
+    @Override
+    public int getPort() {
+        checkState();
+        return config.getInteger(CONFIG_PORT, 80);
+    }
+
+    /**
+     * The TCP receive buffer size for connections in bytes
+     *
+     * @return buffer size in bytes
+     */
+    @Override
+    public Integer getReceiveBufferSize() {
+        checkState();
+        return config.getInteger(CONFIG_RECEIVE_BUFFER_SIZE);
+    }
+
+    /**
+     * The accept backlog
+     *
+     * @return the accept backlog
+     */
+    @Override
+    public int getAcceptBacklog() {
+        checkState();
+        return config.getInteger(CONFIG_BACKLOG_SIZE, 10000);
     }
 
     /**
@@ -130,7 +206,7 @@ public class DefaultJerseyHandlerConfigurator implements JerseyHandlerConfigurat
         }
 
         // Always register the InternalVertxJerseyBinder
-        rc.register(new InternalVertxJerseyBinder());
+        rc.register(new InternalVertxJerseyBinder(vertx, container));
 
         JsonArray binders = config.getArray(CONFIG_BINDERS, null);
         if (binders != null && binders.size() > 0) {

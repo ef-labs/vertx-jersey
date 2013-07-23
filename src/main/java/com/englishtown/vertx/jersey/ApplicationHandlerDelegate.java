@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey;
 
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ContainerRequest;
 
 /**
@@ -37,5 +38,12 @@ public interface ApplicationHandlerDelegate {
      * @param request the Jersey {@link ContainerRequest} to process
      */
     void handle(ContainerRequest request);
+
+    /**
+     * Returns the application handler service locator
+     *
+     * @return inner service locator
+     */
+    ServiceLocator getServiceLocator();
 
 }

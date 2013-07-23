@@ -29,16 +29,13 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Provider;
@@ -58,7 +55,11 @@ public class JerseyModuleTest {
     @Mock
     JerseyServer jerseyServer;
     @Mock
-    JerseyServerFactory jerseyServerFactory;
+    Provider<JerseyServer> jerseyServerProvider;
+    @Mock
+    JerseyConfigurator configurator;
+    @Mock
+    Provider<JerseyConfigurator> configuratorProvider;
     @Mock
     Future<Void> startedResult;
     @Mock
@@ -70,8 +71,9 @@ public class JerseyModuleTest {
 
     @Before
     public void setUp() {
-        when(jerseyServerFactory.createServer()).thenReturn(jerseyServer);
-        jerseyModule = new JerseyModule(jerseyServerFactory);
+        when(jerseyServerProvider.get()).thenReturn(jerseyServer);
+        when(configuratorProvider.get()).thenReturn(configurator);
+        jerseyModule = new JerseyModule(jerseyServerProvider, configuratorProvider);
         jerseyModule.setContainer(container);
     }
 
@@ -83,7 +85,7 @@ public class JerseyModuleTest {
         verify(startedResult, times(0)).setResult(null);
         verify(startedResult, times(0)).setFailure(any(Throwable.class));
 
-        verify(jerseyServer).init(any(JsonObject.class), any(Vertx.class), any(Container.class), handlerCaptor.capture());
+        verify(jerseyServer).init(any(JerseyConfigurator.class), handlerCaptor.capture());
 
         when(asyncResult.succeeded()).thenReturn(true).thenReturn(false);
 

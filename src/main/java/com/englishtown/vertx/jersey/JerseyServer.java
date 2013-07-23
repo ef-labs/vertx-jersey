@@ -28,7 +28,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 /**
@@ -39,21 +38,17 @@ public interface JerseyServer {
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @param config    http server and jersey configuration settings
-     * @param vertx     the {@link Vertx} instance
-     * @param container the {@link Container} instance
+     * @param configurator http server and jersey configuration settings
      */
-    void init(JsonObject config, Vertx vertx, Container container);
+    void init(JerseyConfigurator configurator);
 
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @param config      http server and jersey configuration settings
-     * @param vertx       the {@link Vertx} instance
-     * @param container   the {@link Container} instance
-     * @param doneHandler the callback for when initialization has completed
+     * @param configurator http server and jersey configuration settings
+     * @param doneHandler  the callback for when initialization has completed
      */
-    void init(JsonObject config, Vertx vertx, Container container, Handler<AsyncResult<HttpServer>> doneHandler);
+    void init(JerseyConfigurator configurator, Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
      * Allows adding additional routes
