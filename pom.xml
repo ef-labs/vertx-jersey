@@ -19,7 +19,7 @@
         <!-- Set pullindeps to true if you want any modules specified in the 'includes' and 'deploys' fields
         in your mod.json to be automatically pulled in during packaging and added inside your module. Doing this means your
         module won't download and install those dependencies at run-time when they're first requested. -->
-        <vertx.pullInDeps>true</vertx.pullInDeps>
+        <vertx.pullInDeps>false</vertx.pullInDeps>
 
         <!--Vertx module name-->
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
