@@ -27,11 +27,24 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.vertx.java.core.http.HttpServerRequest;
 
+import java.util.List;
+
 /**
  * Injectable interface to provide the Jersey ContainerResponseWriter instance for the current request
  */
 public interface ContainerResponseWriterProvider {
 
-    public ContainerResponseWriter get(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest);
+    /**
+     * Returns the response writer
+     *
+     * @param vertxRequest       the vertx request
+     * @param jerseyRequest      the jersey request
+     * @param responseProcessors an optional list of response processors
+     * @return the response writer
+     */
+    public ContainerResponseWriter get(
+            HttpServerRequest vertxRequest,
+            ContainerRequest jerseyRequest,
+            List<VertxResponseProcessor> responseProcessors);
 
 }

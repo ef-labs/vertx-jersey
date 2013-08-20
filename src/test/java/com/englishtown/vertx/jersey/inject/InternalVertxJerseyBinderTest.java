@@ -26,6 +26,8 @@ package com.englishtown.vertx.jersey.inject;
 import org.glassfish.hk2.api.DynamicConfiguration;
 import org.glassfish.hk2.api.IterableProvider;
 import org.junit.Test;
+import org.vertx.java.core.Vertx;
+import org.vertx.java.platform.Container;
 
 import java.util.Arrays;
 import java.util.List;
@@ -44,7 +46,7 @@ public class InternalVertxJerseyBinderTest {
     @Test
     public void testConfigure() throws Exception {
 
-        InternalVertxJerseyBinder binder = new InternalVertxJerseyBinder();
+        InternalVertxJerseyBinder binder = new InternalVertxJerseyBinder(mock(Vertx.class), mock(Container.class));
         DynamicConfiguration dynamicConfiguration = mock(DynamicConfiguration.class);
         binder.bind(dynamicConfiguration);
 

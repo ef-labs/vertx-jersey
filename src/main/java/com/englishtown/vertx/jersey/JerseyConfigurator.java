@@ -26,7 +26,6 @@ package com.englishtown.vertx.jersey;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import java.net.URI;
@@ -34,9 +33,58 @@ import java.net.URI;
 /**
  * Provides configuration for a {@link JerseyHandler}
  */
-public interface JerseyHandlerConfigurator {
+public interface JerseyConfigurator {
 
-    void init(JsonObject config, Logger logger);
+    /**
+     * Initializes the configurator
+     *
+     * @param config    the underlying configuration settings
+     * @param vertx     the vertx instance
+     * @param container the container instance
+     */
+    void init(JsonObject config, Vertx vertx, Container container);
+
+    /**
+     * Returns the current vertx instance
+     *
+     * @return the {@link Vertx} instance
+     */
+    Vertx getVertx();
+
+    /**
+     * Returns the current container instance
+     *
+     * @return the {@link Container} instance
+     */
+    Container getContainer();
+
+    /**
+     * The http web server host
+     *
+     * @return the http web server host to listen to
+     */
+    String getHost();
+
+    /**
+     * The http web server port
+     *
+     * @return the http web server port to listen to
+     */
+    int getPort();
+
+    /**
+     * The TCP receive buffer size for connections in bytes
+     *
+     * @return buffer size in bytes
+     */
+    Integer getReceiveBufferSize();
+
+    /**
+     * The accept backlog
+     *
+     * @return the accept backlog
+     */
+    int getAcceptBacklog();
 
     /**
      * Returns the base URI used by Jersey

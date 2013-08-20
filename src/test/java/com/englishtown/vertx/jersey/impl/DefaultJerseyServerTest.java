@@ -24,8 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.jersey.internal.util.collection.Ref;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -73,6 +72,8 @@ public class DefaultJerseyServerTest {
     Handler<AsyncResult<HttpServer>> doneHandler;
     @Mock
     Handler<RouteMatcher> routeMatcherHandler;
+    @Mock
+    JerseyConfigurator configurator;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
 
@@ -81,18 +82,20 @@ public class DefaultJerseyServerTest {
 
         when(container.logger()).thenReturn(logger);
         when(vertx.createHttpServer()).thenReturn(httpServer);
+        when(configurator.getVertx()).thenReturn(vertx);
+        when(configurator.getContainer()).thenReturn(container);
 
         //noinspection unchecked
-        Provider<JerseyHandler> provider = mock(Provider.class);
-        when(provider.get()).thenReturn(jerseyHandler);
-        jerseyServer = new DefaultJerseyServer(provider);
+        Provider<JerseyHandler> handlerProvider = mock(Provider.class);
+        when(handlerProvider.get()).thenReturn(jerseyHandler);
+        jerseyServer = new DefaultJerseyServer(handlerProvider);
 
     }
 
     private void verifyResults(int port, String host) {
 
         verify(vertx, times(1)).createHttpServer();
-        verify(jerseyHandler).init(eq(vertx), eq(container), any(JsonObject.class));
+        verify(jerseyHandler).init(any(JerseyConfigurator.class));
         verify(httpServer).requestHandler(jerseyHandler);
         //noinspection unchecked
         verify(httpServer, times(1)).listen(eq(port), eq(host), any(Handler.class));
@@ -117,7 +120,9 @@ public class DefaultJerseyServerTest {
 
     @Test
     public void testInit_Default_Config() throws Exception {
-        jerseyServer.init(new JsonObject(), vertx, container);
+        when(configurator.getHost()).thenReturn("0.0.0.0");
+        when(configurator.getPort()).thenReturn(80);
+        jerseyServer.init(configurator);
         verifyResults(80, "0.0.0.0");
     }
 
@@ -128,12 +133,13 @@ public class DefaultJerseyServerTest {
         int port = 8888;
         int bufferSize = 1024;
 
-        JsonObject config = new JsonObject()
-                .putString(DefaultJerseyServer.CONFIG_HOST, host)
-                .putNumber(DefaultJerseyServer.CONFIG_PORT, port)
-                .putNumber(DefaultJerseyServer.CONFIG_RECEIVE_BUFFER_SIZE, bufferSize);
+        when(configurator.getHost()).thenReturn(host);
+        when(configurator.getPort()).thenReturn(port);
+        when(configurator.getReceiveBufferSize()).thenReturn(bufferSize);
+        when(configurator.getVertx()).thenReturn(vertx);
+        when(configurator.getContainer()).thenReturn(container);
 
-        jerseyServer.init(config, vertx, container);
+        jerseyServer.init(configurator);
         verifyResults(port, host);
 
         verify(httpServer).setReceiveBufferSize(bufferSize);
@@ -142,7 +148,7 @@ public class DefaultJerseyServerTest {
     @Test
     public void testInit_Listen_Result() throws Exception {
 
-        jerseyServer.init(new JsonObject(), vertx, container, doneHandler);
+        jerseyServer.init(configurator, doneHandler);
 
         verify(httpServer).listen(anyInt(), anyString(), handlerCaptor.capture());
         Handler<AsyncResult<HttpServer>> handler = handlerCaptor.getValue();
@@ -167,7 +173,7 @@ public class DefaultJerseyServerTest {
         when(jerseyHandler.getBaseUri()).thenReturn(uri);
 
         jerseyServer.routeMatcherHandler(routeMatcherHandler);
-        jerseyServer.init(new JsonObject(), vertx, container);
+        jerseyServer.init(configurator);
 
         verify(routeMatcherHandler).handle(any(RouteMatcher.class));
 

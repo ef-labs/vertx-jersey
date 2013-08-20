@@ -25,9 +25,10 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import com.hazelcast.nio.FastByteArrayInputStream;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -42,7 +43,6 @@ import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
@@ -68,31 +68,29 @@ public class DefaultJerseyHandler implements JerseyHandler {
     private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
     private final ContainerResponseWriterProvider responseWriterProvider;
-    private final JerseyHandlerConfigurator configurator;
     private int maxBodySize;
-    private final List<VertxRequestProcessor> requestProcessors;
+    private List<VertxRequestProcessor> requestProcessors;
+    private List<VertxResponseProcessor> responseProcessors;
 
     @Inject
     public DefaultJerseyHandler(
-            ContainerResponseWriterProvider responseWriterProvider,
-            List<VertxRequestProcessor> requestProcessors,
-            JerseyHandlerConfigurator configurator) {
+            ContainerResponseWriterProvider responseWriterProvider) {
         this.responseWriterProvider = responseWriterProvider;
-        this.requestProcessors = requestProcessors != null ? requestProcessors : new ArrayList<VertxRequestProcessor>();
-        this.configurator = configurator;
     }
 
     @Override
-    public void init(Vertx vertx, Container container, JsonObject config) {
+    public void init(JerseyConfigurator configurator) {
+        this.vertx = configurator.getVertx();
+        this.container = configurator.getContainer();
+        logger = container.logger();
 
-        this.vertx = vertx;
-        this.container = container;
-        this.logger = container.logger();
-
-        configurator.init(config, container.logger());
         baseUri = configurator.getBaseUri();
-        applicationHandlerDelegate = configurator.getApplicationHandler();
         maxBodySize = configurator.getMaxBodySize();
+        applicationHandlerDelegate = configurator.getApplicationHandler();
+
+        ServiceLocator locator = applicationHandlerDelegate.getServiceLocator();
+        requestProcessors = locator.getAllServices(VertxRequestProcessor.class);
+        responseProcessors = locator.getAllServices(VertxResponseProcessor.class);
 
         logger.debug("DefaultJerseyHandler - initialized");
     }
@@ -202,7 +200,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
                           final ContainerRequest jerseyRequest) {
 
         // Provide the vertx response writer
-        jerseyRequest.setWriter(responseWriterProvider.get(vertxRequest, jerseyRequest));
+        jerseyRequest.setWriter(responseWriterProvider.get(vertxRequest, jerseyRequest, responseProcessors));
 
         // Set entity stream if provided (form posts)
         if (inputStream != null) {
@@ -218,10 +216,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
         jerseyRequest.setRequestScopedInitializer(new RequestScopedInitializer() {
             @Override
             public void initialize(ServiceLocator locator) {
-                locator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
-                }).getType()).set(vertx);
-                locator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
-                }).getType()).set(container);
                 locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
                 }).getType()).set(vertxRequest);
                 locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {

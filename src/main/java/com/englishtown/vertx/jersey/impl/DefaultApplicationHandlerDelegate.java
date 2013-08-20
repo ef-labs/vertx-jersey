@@ -24,6 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
 
@@ -47,4 +48,15 @@ public class DefaultApplicationHandlerDelegate implements ApplicationHandlerDele
     public void handle(ContainerRequest request) {
         delegate.handle(request);
     }
+
+    /**
+     * Returns the application handler service locator
+     *
+     * @return inner service locator
+     */
+    @Override
+    public ServiceLocator getServiceLocator() {
+        return delegate.getServiceLocator();
+    }
+
 }

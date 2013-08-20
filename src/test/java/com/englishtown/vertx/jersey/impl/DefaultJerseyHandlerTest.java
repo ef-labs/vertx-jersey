@@ -24,19 +24,22 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyHandlerConfigurator;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
@@ -67,138 +70,124 @@ import static org.mockito.Mockito.*;
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultJerseyHandlerTest {
 
+    DefaultJerseyHandler jerseyHandler;
+    JsonObject config = new JsonObject();
+
     @Mock
-    JerseyHandlerConfigurator configurator;
+    JerseyConfigurator configurator;
     @Mock
     ApplicationHandlerDelegate applicationHandlerDelegate;
     @Mock
     HttpServerRequest request;
     @Mock
     HttpServerResponse response;
+    @Mock
+    ServiceLocator serviceLocator;
+    @Mock
+    Vertx vertx;
+    @Mock
+    Container container;
+    @Mock
+    Logger logger;
+    @Mock
+    Ref<Vertx> vertxRef;
+    @Mock
+    Ref<Container> containerRef;
+    @Captor
+    ArgumentCaptor<Handler<Buffer>> dataHandlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<Void>> endHandlerCaptor;
 
     @Before
     public void setUp() {
 
+        when(applicationHandlerDelegate.getServiceLocator()).thenReturn(serviceLocator);
         when(configurator.getApplicationHandler()).thenReturn(applicationHandlerDelegate);
         when(configurator.getMaxBodySize()).thenReturn(1024);
+        when(configurator.getVertx()).thenReturn(vertx);
+        when(configurator.getContainer()).thenReturn(container);
 
         when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
         when(request.response()).thenReturn(response);
 
+        when(container.config()).thenReturn(config);
+        when(container.logger()).thenReturn(logger);
+
+        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.jersey.resources");
+        config.putArray(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+
+        ContainerResponseWriterProvider provider = mock(ContainerResponseWriterProvider.class);
+        when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class), any(List.class))).thenReturn(mock
+                (ContainerResponseWriter.class));
+
+        when(serviceLocator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
+        }).getType())).thenReturn(vertxRef);
+        when(serviceLocator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
+        }).getType())).thenReturn(containerRef);
+
+        jerseyHandler = new DefaultJerseyHandler(provider);
     }
 
     @Test
     public void testHandle() throws Exception {
 
-        DefaultJerseyHandler handler = createInstance();
         when(request.method()).thenReturn(HttpMethod.GET);
         when(request.headers()).thenReturn(mock(MultiMap.class));
 
-        handler.handle(request);
+        jerseyHandler.init(configurator);
+        jerseyHandler.handle(request);
         verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
 
-    }
-
-    private DefaultJerseyHandler createInstance() {
-        VertxRequestProcessor[] processors = null;
-        return createInstance(processors);
-    }
-
-    private DefaultJerseyHandler createInstance(VertxRequestProcessor... requestProcessors) {
-
-        Vertx vertx = mock(Vertx.class);
-        Container container = mock(Container.class);
-        List<VertxRequestProcessor> processors = requestProcessors != null ? Arrays.asList(requestProcessors) : null;
-
-        JsonObject config = new JsonObject();
-        Logger logger = mock(Logger.class);
-        when(container.config()).thenReturn(config);
-        when(container.logger()).thenReturn(logger);
-
-        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.jersey.resources");
-        config.putArray(DefaultJerseyHandlerConfigurator.CONFIG_RESOURCES, resources);
-
-        ContainerResponseWriterProvider provider = mock(ContainerResponseWriterProvider.class);
-        when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class))).thenReturn(mock
-                (ContainerResponseWriter.class));
-
-        DefaultJerseyHandler handler = new DefaultJerseyHandler(provider, processors, configurator);
-        handler.init(vertx, container, config);
-
-        return handler;
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void testHandle_JSON_POST() throws Exception {
 
-        DefaultJerseyHandler handler = createInstance();
-
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         when(request.method()).thenReturn(HttpMethod.POST);
         when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
 
-        final Handler<Buffer>[] dataHandler = new Handler[1];
-        when(request.dataHandler(any(Handler.class))).thenAnswer(new Answer<HttpServerRequest>() {
-            @Override
-            public HttpServerRequest answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                dataHandler[0] = (Handler<Buffer>) args[0];
-                return request;
-            }
-        });
+        jerseyHandler.init(configurator);
+        jerseyHandler.handle(request);
 
-        final Handler<Void>[] endHandler = new Handler[1];
-        when(request.endHandler(any(Handler.class))).thenAnswer(new Answer<Void>() {
-            @Override
-            public Void answer(InvocationOnMock invocation) throws Throwable {
-                Object[] args = invocation.getArguments();
-                endHandler[0] = (Handler<Void>) args[0];
-                return null;
-            }
-        });
-
-        handler.handle(request);
+        verify(request).dataHandler(dataHandlerCaptor.capture());
+        verify(request).endHandler(endHandlerCaptor.capture());
 
         Buffer data = new Buffer("{}");
-        dataHandler[0].handle(data);
-        endHandler[0].handle(null);
+        dataHandlerCaptor.getValue().handle(data);
+        endHandlerCaptor.getValue().handle(null);
 
         verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
 
     }
 
     @Test
-    public void testHandle_VertxRequestHandler() throws Exception {
-
-        DefaultJerseyHandler handler = createInstance(
-                new VertxRequestProcessor() {
-                    @Override
-                    public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
-                        done.handle(null);
-                    }
-                },
-                new VertxRequestProcessor() {
-                    @Override
-                    public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done) {
-                        done.handle(null);
-                    }
-                }
-        );
+    public void testHandle_RequestProcessors() throws Exception {
 
         when(request.headers()).thenReturn(mock(MultiMap.class));
         InputStream inputStream = null;
 
-        handler.handle(request, inputStream);
-        verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
+        VertxRequestProcessor rp1 = mock(VertxRequestProcessor.class);
+        VertxRequestProcessor rp2 = mock(VertxRequestProcessor.class);
+        List<VertxRequestProcessor> list = Arrays.asList(rp1, rp2);
+        when(serviceLocator.getAllServices(eq(VertxRequestProcessor.class))).thenReturn(list);
 
+        jerseyHandler.init(configurator);
+        jerseyHandler.handle(request, inputStream);
+
+        verify(rp1).process(any(HttpServerRequest.class), any(ContainerRequest.class), endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
+        verify(rp2).process(any(HttpServerRequest.class), any(ContainerRequest.class), endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
+
+        verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
     }
 
     @Test
     public void testShouldReadData() throws Exception {
 
-        DefaultJerseyHandler handler = createInstance();
         boolean result;
 
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
@@ -207,43 +196,41 @@ public class DefaultJerseyHandlerTest {
         when(request.method()).thenReturn(HttpMethod.GET).thenReturn(HttpMethod.PUT);
         when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertFalse(result);
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertFalse(result);
 
         headers.clear();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertTrue(result);
 
         headers.clear();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
         when(request.method()).thenReturn(HttpMethod.POST);
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertTrue(result);
 
         headers.clear();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertTrue(result);
 
         headers.clear();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED + "; charset=UTF-8");
 
-        result = handler.shouldReadData(request);
+        result = jerseyHandler.shouldReadData(request);
         assertTrue(result);
 
     }
 
     @Test
     public void testGetAbsoluteURI() throws Exception {
-
-        DefaultJerseyHandler handler = createInstance();
         URI uri;
 
         String goodUrl = "http://test.englishtown.com/test";
@@ -253,12 +240,24 @@ public class DefaultJerseyHandlerTest {
         when(request.absoluteURI()).thenReturn(URI.create(goodUrl)).thenThrow(new IllegalArgumentException());
         when(request.uri()).thenReturn(badUrl);
 
-        uri = handler.getAbsoluteURI(request);
+        jerseyHandler.init(configurator);
+
+        uri = jerseyHandler.getAbsoluteURI(request);
         assertEquals("http://test.englishtown.com/test", uri.toString());
 
-        uri = handler.getAbsoluteURI(request);
+        uri = jerseyHandler.getAbsoluteURI(request);
         assertEquals("http://test.englishtown.com/test?a=b%3Dc%7Cd%3De", uri.toString());
 
+    }
+
+    @Test
+    public void testGetBaseURI() throws Exception {
+        URI baseUri = URI.create("http://test.englishtown.com");
+        when(configurator.getBaseUri()).thenReturn(baseUri);
+        jerseyHandler.init(configurator);
+
+        URI result = jerseyHandler.getBaseUri();
+        assertEquals(baseUri, result);
     }
 
 }

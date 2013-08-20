@@ -48,32 +48,15 @@ import java.util.List;
  */
 public class InternalVertxJerseyBinder extends AbstractBinder {
 
+    private final Vertx vertx;
+    private final Container container;
+
     /**
      * Referencing factory for vert.x request.
      */
     private static class VertxRequestReferencingFactory extends ReferencingFactory<HttpServerRequest> {
         @Inject
         public VertxRequestReferencingFactory(Provider<Ref<HttpServerRequest>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
-     * Referencing factory for vert.x vertx instance.
-     */
-    private static class VertxReferencingFactory extends ReferencingFactory<Vertx> {
-        @Inject
-        public VertxReferencingFactory(Provider<Ref<Vertx>> referenceFactory) {
-            super(referenceFactory);
-        }
-    }
-
-    /**
-     * Referencing factory for vert.x container.
-     */
-    private static class VertxContainerReferencingFactory extends ReferencingFactory<Container> {
-        @Inject
-        public VertxContainerReferencingFactory(Provider<Ref<Container>> referenceFactory) {
             super(referenceFactory);
         }
     }
@@ -88,6 +71,65 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         }
     }
 
+    static class VertxResponseProcessorFactory implements Factory<List<VertxResponseProcessor>> {
+
+        private final List<VertxResponseProcessor> processors = new ArrayList<>();
+
+        @Inject
+        public VertxResponseProcessorFactory(IterableProvider<VertxResponseProcessor> providers) {
+            for (VertxResponseProcessor processor : providers) {
+                processors.add(processor);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<VertxResponseProcessor> provide() {
+            return processors;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<VertxResponseProcessor> instance) {
+        }
+    }
+
+    static class VertxRequestProcessorFactory implements Factory<List<VertxRequestProcessor>> {
+
+        private final List<VertxRequestProcessor> processors = new ArrayList<>();
+
+        @Inject
+        public VertxRequestProcessorFactory(IterableProvider<VertxRequestProcessor> providers) {
+            for (VertxRequestProcessor processor : providers) {
+                processors.add(processor);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<VertxRequestProcessor> provide() {
+            return processors;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<VertxRequestProcessor> instance) {
+        }
+    }
+
+    public InternalVertxJerseyBinder(Vertx vertx, Container container) {
+        this.vertx = vertx;
+        this.container = container;
+    }
+
     /**
      * Implement to provide binding definitions using the exposed binding
      * methods.
@@ -95,15 +137,9 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
     @Override
     protected void configure() {
 
-        // Vert.x instance
-        bindFactory(VertxReferencingFactory.class).to(Vertx.class).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<Vertx>referenceFactory()).to(new TypeLiteral<Ref<Vertx>>() {
-        }).in(RequestScoped.class);
-
-        // Container
-        bindFactory(VertxContainerReferencingFactory.class).to(Container.class).in(PerLookup.class);
-        bindFactory(ReferencingFactory.<Container>referenceFactory()).to(new TypeLiteral<Ref<Container>>() {
-        }).in(RequestScoped.class);
+        // Bind the vertx and container instances
+        bind(vertx).to(Vertx.class);
+        bind(container).to(Container.class);
 
         // Request and read stream
         bindFactory(VertxRequestReferencingFactory.class).to(HttpServerRequest.class).in(PerLookup.class);
@@ -116,6 +152,11 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         bindFactory(VertxResponseReferencingFactory.class).to(HttpServerResponse.class).in(PerLookup.class);
         bindFactory(ReferencingFactory.<HttpServerResponse>referenceFactory()).to(new TypeLiteral<Ref<HttpServerResponse>>() {
         }).in(RequestScoped.class);
+
+        bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
+        });
+        bindFactory(VertxResponseProcessorFactory.class).to(new TypeLiteral<List<VertxResponseProcessor>>() {
+        });
 
     }
 }
