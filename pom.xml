@@ -25,7 +25,7 @@
         <module.name>${project.groupId}~${project.artifactId}~${project.version}</module.name>
 
         <!--Dependency versions-->
-        <vertx.mod.hk2.version>1.0.0-final</vertx.mod.hk2.version>
+        <vertx.mod.hk2.version>1.0.1-final</vertx.mod.hk2.version>
         <jersey.version>2.0</jersey.version>
         <hk2.version>2.1.96</hk2.version>
         <vertx.version>2.0.0-final</vertx.version>
