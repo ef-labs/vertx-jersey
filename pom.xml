@@ -110,7 +110,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>2.2.0-final</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
