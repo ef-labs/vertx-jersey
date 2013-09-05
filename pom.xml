@@ -17,7 +17,7 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.mod.hk2.version>1.4.0-final</vertx.mod.hk2.version>
+        <vertx.mod.hk2.version>1.5.0-SNAPSHOT</vertx.mod.hk2.version>
         <jersey.version>2.2</jersey.version>
         <hk2.version>2.2.0-b15</hk2.version>
     </properties>
