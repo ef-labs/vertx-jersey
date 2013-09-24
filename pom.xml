@@ -18,8 +18,7 @@
     <properties>
         <!--Dependency versions-->
         <vertx.mod.hk2.version>1.5.0-SNAPSHOT</vertx.mod.hk2.version>
-        <jersey.version>2.2</jersey.version>
-        <hk2.version>2.2.0-b15</hk2.version>
+        <jersey.version>2.3</jersey.version>
     </properties>
 
     <dependencies>
@@ -45,12 +44,6 @@
                     <artifactId>osgi-resource-locator</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.hk2</groupId>
-            <artifactId>hk2-api</artifactId>
-            <version>${hk2.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>

@@ -1,4 +1,5 @@
 {
+    "main": "com.englishtown.vertx.jersey.JerseyModule",
     "includes": "com.englishtown~vertx-mod-hk2~1.5.0-SNAPSHOT",
     "description":"Allows creating JAX-RS Jersey resources that will handle incoming http requests to vert.x",
     "licenses": ["The MIT License"],
