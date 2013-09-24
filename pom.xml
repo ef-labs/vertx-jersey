@@ -10,16 +10,15 @@
 
     <artifactId>vertx-mod-jersey</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.0-final</version>
+    <version>2.3.0-final</version>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <inceptionYear>2013</inceptionYear>
 
     <properties>
         <!--Dependency versions-->
-        <vertx.mod.hk2.version>1.4.0-final</vertx.mod.hk2.version>
-        <jersey.version>2.2</jersey.version>
-        <hk2.version>2.2.0-b15</hk2.version>
+        <vertx.mod.hk2.version>1.5.0-final</vertx.mod.hk2.version>
+        <jersey.version>2.3</jersey.version>
     </properties>
 
     <dependencies>
@@ -45,12 +44,6 @@
                     <artifactId>osgi-resource-locator</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.hk2</groupId>
-            <artifactId>hk2-api</artifactId>
-            <version>${hk2.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
@@ -110,7 +103,7 @@
     <scm>
         <connection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</connection>
         <developerConnection>scm:git:ssh://git@github.com/englishtown/${project.artifactId}.git</developerConnection>
-        <tag>2.2.0-final</tag>
+        <tag>2.3.0-final</tag>
         <url>https://github.com/englishtown/${project.artifactId}</url>
     </scm>
 
