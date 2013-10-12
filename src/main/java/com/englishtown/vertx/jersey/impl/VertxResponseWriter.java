@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
@@ -188,20 +189,24 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     private final Vertx vertx;
     private final Container container;
     private final List<VertxResponseProcessor> responseProcessors;
+    private final List<VertxPostResponseProcessor> postResponseProcessors;
 
     private long suspendTimerId;
     private TimeoutHandler timeoutHandler;
+    private ContainerResponse jerseyResponse;
 
     @Inject
     public VertxResponseWriter(
             HttpServerRequest vertxRequest,
             Vertx vertx,
             Container container,
-            List<VertxResponseProcessor> responseProcessors) {
+            List<VertxResponseProcessor> responseProcessors,
+            List<VertxPostResponseProcessor> postResponseProcessors) {
         this.vertxRequest = vertxRequest;
         this.vertx = vertx;
         this.container = container;
         this.responseProcessors = responseProcessors;
+        this.postResponseProcessors = postResponseProcessors;
     }
 
     /**
@@ -209,6 +214,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public OutputStream writeResponseStatusAndHeaders(long contentLength, ContainerResponse responseContext) throws ContainerException {
+        jerseyResponse = responseContext;
         HttpServerResponse response = vertxRequest.response();
 
         // Write the status
@@ -227,8 +233,10 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         }
 
         // Run any response processors
-        for (VertxResponseProcessor processor : responseProcessors) {
-            processor.process(response, responseContext);
+        if (!responseProcessors.isEmpty()) {
+            for (VertxResponseProcessor processor : responseProcessors) {
+                processor.process(response, responseContext);
+            }
         }
 
         // Return output stream based on whether entity is chunked
@@ -296,7 +304,15 @@ public class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void commit() {
+        // End the vertx response
         vertxRequest.response().end();
+
+        // Call any post response processors
+        if (!postResponseProcessors.isEmpty()) {
+            for (VertxPostResponseProcessor processor : postResponseProcessors) {
+                processor.process(vertxRequest.response(), jerseyResponse);
+            }
+        }
     }
 
     /**

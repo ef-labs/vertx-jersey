@@ -23,10 +23,15 @@
 
 package com.englishtown.vertx.jersey.inject.impl;
 
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.platform.Container;
@@ -35,24 +40,46 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.mock;
 
 /**
  * {@link VertxResponseWriterProvider} unit tests
  */
+@RunWith(MockitoJUnitRunner.class)
 public class VertxResponseWriterProviderTest {
+
+    VertxResponseWriterProvider provider;
+    List<VertxResponseProcessor> responseProcessors = new ArrayList<>();
+    List<VertxPostResponseProcessor> postResponseProcessors = new ArrayList<>();
+
+    @Mock
+    Vertx vertx;
+    @Mock
+    Container container;
+    @Mock
+    HttpServerRequest vertxRequest;
+    @Mock
+    ContainerRequest jerseyRequest;
+    @Mock
+    VertxResponseProcessor responseProcessor;
+    @Mock
+    VertxPostResponseProcessor postResponseProcessor;
+
+    @Before
+    public void setUp() {
+
+        responseProcessors.add(responseProcessor);
+        postResponseProcessors.add(postResponseProcessor);
+
+        provider = new VertxResponseWriterProvider(vertx, container, responseProcessors, postResponseProcessors);
+
+    }
+
     @Test
     public void testGet() throws Exception {
 
-        Vertx vertx = mock(Vertx.class);
-        Container container = mock(Container.class);
-        List<VertxResponseProcessor> responseProcessors = new ArrayList<>();
-        VertxResponseWriterProvider provider = new VertxResponseWriterProvider(vertx, container);
-        HttpServerRequest vertxRequest = mock(HttpServerRequest.class);
-        ContainerRequest jerseyRequest = mock(ContainerRequest.class);
         ContainerResponseWriter writer;
 
-        writer = provider.get(vertxRequest, jerseyRequest, responseProcessors);
+        writer = provider.get(vertxRequest, jerseyRequest);
         assertNotNull(writer);
     }
 }

@@ -32,12 +32,100 @@ import com.englishtown.vertx.jersey.impl.DefaultJerseyConfigurator;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
+import org.glassfish.hk2.api.Factory;
+import org.glassfish.hk2.api.IterableProvider;
+import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  */
 public class VertxJerseyBinder extends AbstractBinder {
+
+    static class VertxRequestProcessorFactory implements Factory<List<VertxRequestProcessor>> {
+
+        private final List<VertxRequestProcessor> processors = new ArrayList<>();
+
+        @Inject
+        public VertxRequestProcessorFactory(IterableProvider<VertxRequestProcessor> providers) {
+            for (VertxRequestProcessor processor : providers) {
+                processors.add(processor);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<VertxRequestProcessor> provide() {
+            return processors;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<VertxRequestProcessor> instance) {
+        }
+    }
+
+    static class VertxResponseProcessorFactory implements Factory<List<VertxResponseProcessor>> {
+
+        private final List<VertxResponseProcessor> processors = new ArrayList<>();
+
+        @Inject
+        public VertxResponseProcessorFactory(IterableProvider<VertxResponseProcessor> providers) {
+            for (VertxResponseProcessor processor : providers) {
+                processors.add(processor);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<VertxResponseProcessor> provide() {
+            return processors;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<VertxResponseProcessor> instance) {
+        }
+    }
+
+    static class VertxPostResponseProcessorFactory implements Factory<List<VertxPostResponseProcessor>> {
+
+        private final List<VertxPostResponseProcessor> processors = new ArrayList<>();
+
+        @Inject
+        public VertxPostResponseProcessorFactory(IterableProvider<VertxPostResponseProcessor> providers) {
+            for (VertxPostResponseProcessor processor : providers) {
+                processors.add(processor);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<VertxPostResponseProcessor> provide() {
+            return processors;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<VertxPostResponseProcessor> instance) {
+        }
+    }
 
     /**
      * Implement to provide binding definitions using the exposed binding
@@ -51,6 +139,13 @@ public class VertxJerseyBinder extends AbstractBinder {
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyConfigurator.class).to(JerseyConfigurator.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
+
+        bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
+        });
+        bindFactory(VertxResponseProcessorFactory.class).to(new TypeLiteral<List<VertxResponseProcessor>>() {
+        });
+        bindFactory(VertxPostResponseProcessorFactory.class).to(new TypeLiteral<List<VertxPostResponseProcessor>>() {
+        });
 
     }
 

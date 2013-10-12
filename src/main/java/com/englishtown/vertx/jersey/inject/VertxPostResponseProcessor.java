@@ -23,26 +23,22 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import org.glassfish.hk2.api.DynamicConfiguration;
-import org.junit.Test;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.platform.Container;
-
-import static org.mockito.Mockito.mock;
+import org.glassfish.jersey.server.ContainerResponse;
+import org.vertx.java.core.http.HttpServerResponse;
 
 /**
- * {@link InternalVertxJerseyBinder} unit tests
+ * Injectable interface to provide additional processing after the vert.x response has ended.
  */
-@SuppressWarnings("unchecked")
-public class InternalVertxJerseyBinderTest {
+public interface VertxPostResponseProcessor {
 
-    @Test
-    public void testConfigure() throws Exception {
-
-        InternalVertxJerseyBinder binder = new InternalVertxJerseyBinder(mock(Vertx.class), mock(Container.class));
-        DynamicConfiguration dynamicConfiguration = mock(DynamicConfiguration.class);
-        binder.bind(dynamicConfiguration);
-
-    }
+    /**
+     * <p>
+     * Provide processing after the the vert.x response end() method has been called
+     * </p>
+     *
+     * @param vertxResponse  the vert.x http server response
+     * @param jerseyResponse the jersey container response
+     */
+    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse);
 
 }

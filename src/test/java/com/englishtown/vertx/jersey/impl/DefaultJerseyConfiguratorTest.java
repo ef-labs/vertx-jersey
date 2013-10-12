@@ -39,7 +39,6 @@ import org.vertx.java.platform.Container;
 import java.net.URI;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**

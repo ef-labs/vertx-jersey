@@ -23,11 +23,16 @@
 
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.MultiMap;
 import org.vertx.java.core.Vertx;
@@ -43,7 +48,7 @@ import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import java.io.OutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -54,18 +59,46 @@ import static org.mockito.Mockito.*;
  * {@link VertxResponseWriter} unit tests
  */
 @SuppressWarnings("unchecked")
+@RunWith(MockitoJUnitRunner.class)
 public class VertxResponseWriterTest {
+
+    VertxResponseWriter writer;
+    List<VertxResponseProcessor> responseProcessors = new ArrayList<>();
+    List<VertxPostResponseProcessor> postResponseProcessors = new ArrayList<>();
+    long timerId = 10;
+
+    @Mock
+    Vertx vertx;
+    @Mock
+    Container container;
+    @Mock
+    Logger logger;
+    @Mock
+    HttpServerRequest request;
+    @Mock
+    HttpServerResponse response;
+
+    @Before
+    public void setUp() {
+        when(request.response()).thenReturn(response);
+        when(vertx.setTimer(anyLong(), any(Handler.class))).thenReturn(timerId);
+        when(container.logger()).thenReturn(logger);
+
+        writer = new VertxResponseWriter(request, vertx, container, responseProcessors, postResponseProcessors);
+    }
 
     @Test
     public void testWriteResponseStatusAndHeaders() throws Exception {
-
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        VertxResponseWriter writer = createInstance(response, mock(Vertx.class));
 
         ContainerResponse cr = mock(ContainerResponse.class);
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
         when(cr.getHeaders()).thenReturn(headers);
+
+        VertxResponseProcessor processor1 = mock(VertxResponseProcessor.class);
+        VertxResponseProcessor processor2 = mock(VertxResponseProcessor.class);
+        responseProcessors.add(processor1);
+        responseProcessors.add(processor2);
 
         headers.add("x-test", "custom header");
         OutputStream outputStream = writer.writeResponseStatusAndHeaders(15, cr);
@@ -74,6 +107,8 @@ public class VertxResponseWriterTest {
         verify(response, times(1)).setStatusCode(anyInt());
         verify(response, times(1)).setStatusMessage(anyString());
         verify(response, times(2)).putHeader(anyString(), anyString());
+        verify(processor1).process(eq(response), eq(cr));
+        verify(processor2).process(eq(response), eq(cr));
 
         writer.writeResponseStatusAndHeaders(-1, cr);
         verify(response, times(3)).putHeader(anyString(), anyString());
@@ -82,9 +117,6 @@ public class VertxResponseWriterTest {
 
     @Test
     public void testWrite() throws Exception {
-
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        VertxResponseWriter writer = createInstance(response, mock(Vertx.class));
 
         ContainerResponse cr = mock(ContainerResponse.class);
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
@@ -127,9 +159,6 @@ public class VertxResponseWriterTest {
     @Test
     public void testWrite_Chunked() throws Exception {
 
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        VertxResponseWriter writer = createInstance(response, mock(Vertx.class));
-
         ContainerResponse cr = mock(ContainerResponse.class);
         MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
@@ -164,44 +193,9 @@ public class VertxResponseWriterTest {
 
     }
 
-    private VertxResponseWriter createInstance() {
-        return createInstance(mock(HttpServerResponse.class), mock(Vertx.class));
-    }
-
-    private VertxResponseWriter createInstance(HttpServerResponse responseMock, Vertx vertxMock) {
-
-        HttpServerRequest request = mock(HttpServerRequest.class);
-        when(request.response()).thenReturn(responseMock);
-
-        long id = 10;
-        when(vertxMock.setTimer(anyLong(), any(Handler.class))).thenReturn(id);
-
-        List<VertxResponseProcessor> responseProcessors = Arrays.asList(
-                new VertxResponseProcessor() {
-                    @Override
-                    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
-                    }
-                },
-                new VertxResponseProcessor() {
-                    @Override
-                    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse) {
-                    }
-                }
-        );
-
-        Container container = mock(Container.class);
-        Logger logger = mock(Logger.class);
-        when(container.logger()).thenReturn(logger);
-
-        return new VertxResponseWriter(request, vertxMock, container, responseProcessors);
-
-    }
-
     @Test
     public void testSuspend() throws Exception {
 
-        Vertx vertx = mock(Vertx.class);
-        VertxResponseWriter writer = createInstance(mock(HttpServerResponse.class), vertx);
         boolean result;
         ContainerResponseWriter.TimeoutHandler timeoutHandler = mock(ContainerResponseWriter.TimeoutHandler.class);
 
@@ -222,8 +216,6 @@ public class VertxResponseWriterTest {
     @Test
     public void testSetSuspendTimeout() throws Exception {
 
-        Vertx vertx = mock(Vertx.class);
-        VertxResponseWriter writer = createInstance(mock(HttpServerResponse.class), vertx);
         ContainerResponseWriter.TimeoutHandler timeoutHandler = mock(ContainerResponseWriter.TimeoutHandler.class);
 
         try {
@@ -242,19 +234,21 @@ public class VertxResponseWriterTest {
     @Test
     public void testCommit() throws Exception {
 
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        VertxResponseWriter writer = createInstance(response, mock(Vertx.class));
+        VertxPostResponseProcessor processor1 = mock(VertxPostResponseProcessor.class);
+        VertxPostResponseProcessor processor2 = mock(VertxPostResponseProcessor.class);
+        postResponseProcessors.add(processor1);
+        postResponseProcessors.add(processor2);
 
         writer.commit();
-        verify(response, times(1)).end();
+        verify(response).end();
+        verify(processor1).process(eq(response), any(ContainerResponse.class));
+        verify(processor2).process(eq(response), any(ContainerResponse.class));
 
     }
 
     @Test
     public void testFailure() throws Exception {
 
-        HttpServerResponse response = mock(HttpServerResponse.class);
-        VertxResponseWriter writer = createInstance(response, mock(Vertx.class));
         Throwable error = mock(Throwable.class);
 
         writer.failure(error);
@@ -267,7 +261,6 @@ public class VertxResponseWriterTest {
     @Test
     public void testEnableResponseBuffering() throws Exception {
 
-        VertxResponseWriter writer = createInstance();
         boolean result;
 
         result = writer.enableResponseBuffering();

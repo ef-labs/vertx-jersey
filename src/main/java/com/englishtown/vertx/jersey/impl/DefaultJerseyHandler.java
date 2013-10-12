@@ -24,11 +24,10 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
-import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import com.hazelcast.nio.FastByteArrayInputStream;
 import io.netty.handler.codec.http.QueryStringDecoder;
@@ -53,7 +52,6 @@ import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -67,15 +65,17 @@ public class DefaultJerseyHandler implements JerseyHandler {
     private Logger logger;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
-    private final ContainerResponseWriterProvider responseWriterProvider;
     private int maxBodySize;
-    private List<VertxRequestProcessor> requestProcessors;
-    private List<VertxResponseProcessor> responseProcessors;
+
+    private final ContainerResponseWriterProvider responseWriterProvider;
+    private final List<VertxRequestProcessor> requestProcessors;
 
     @Inject
     public DefaultJerseyHandler(
-            ContainerResponseWriterProvider responseWriterProvider) {
+            ContainerResponseWriterProvider responseWriterProvider,
+            List<VertxRequestProcessor> requestProcessors) {
         this.responseWriterProvider = responseWriterProvider;
+        this.requestProcessors = requestProcessors;
     }
 
     @Override
@@ -87,10 +87,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
         baseUri = configurator.getBaseUri();
         maxBodySize = configurator.getMaxBodySize();
         applicationHandlerDelegate = configurator.getApplicationHandler();
-
-        ServiceLocator locator = applicationHandlerDelegate.getServiceLocator();
-        requestProcessors = locator.getAllServices(VertxRequestProcessor.class);
-        responseProcessors = locator.getAllServices(VertxResponseProcessor.class);
 
         logger.debug("DefaultJerseyHandler - initialized");
     }
@@ -200,7 +196,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
                           final ContainerRequest jerseyRequest) {
 
         // Provide the vertx response writer
-        jerseyRequest.setWriter(responseWriterProvider.get(vertxRequest, jerseyRequest, responseProcessors));
+        jerseyRequest.setWriter(responseWriterProvider.get(vertxRequest, jerseyRequest));
 
         // Set entity stream if provided (form posts)
         if (inputStream != null) {
@@ -224,7 +220,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
         });
 
         // Call vertx before request processors
-        if (requestProcessors.size() > 0) {
+        if (!requestProcessors.isEmpty()) {
             callVertxRequestProcessor(0, vertxRequest, jerseyRequest, new Handler<Void>() {
                 @Override
                 public void handle(Void aVoid) {

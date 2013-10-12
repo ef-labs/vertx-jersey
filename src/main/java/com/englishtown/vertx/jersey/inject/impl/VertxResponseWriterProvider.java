@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey.inject.impl;
 
 import com.englishtown.vertx.jersey.impl.VertxResponseWriter;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
@@ -44,19 +45,26 @@ public class VertxResponseWriterProvider implements ContainerResponseWriterProvi
 
     private final Vertx vertx;
     private final Container container;
+    private final List<VertxResponseProcessor> responseProcessors;
+    private final List<VertxPostResponseProcessor> postResponseProcessors;
 
     @Inject
-    public VertxResponseWriterProvider(Vertx vertx, Container container) {
+    public VertxResponseWriterProvider(
+            Vertx vertx,
+            Container container,
+            List<VertxResponseProcessor> responseProcessors,
+            List<VertxPostResponseProcessor> postResponseProcessors) {
         this.vertx = vertx;
         this.container = container;
+        this.responseProcessors = responseProcessors;
+        this.postResponseProcessors = postResponseProcessors;
     }
 
     @Override
     public ContainerResponseWriter get(
             HttpServerRequest vertxRequest,
-            ContainerRequest jerseyRequest,
-            List<VertxResponseProcessor> responseProcessors) {
-        return new VertxResponseWriter(vertxRequest, vertx, container, responseProcessors);
+            ContainerRequest jerseyRequest) {
+        return new VertxResponseWriter(vertxRequest, vertx, container, responseProcessors, postResponseProcessors);
     }
 
 }

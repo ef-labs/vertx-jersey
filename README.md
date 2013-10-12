@@ -88,3 +88,26 @@ Default is `0.0.0.0`
     "binders": ["com.englishtown.vertx.jersey.AppBinder"]
 }
 ```
+
+## How to use
+
+Due to the way vert.x module class loaders work, your best bet is to include vertx-mod-jersey in your mod.json.  Directly deploying the vertx-mod-jersey module will run into class loader problems when reading your JAX-RS resources.
+
+```json
+{
+    "includes": "com.englishtown~vertx-mod-jersey~2.3.0-final"
+}
+```
+
+The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, jersey-server, etc.) should be added to your project with scope "provided".
+
+You have 3 ways to start the Jersey Server:
+
+1. In your mod.json file, make the start Verticle JerseyModule (`"main": "com.englishtown.vertx.jersey.JerseyModule"`).
+2. In your own Verticle specified in mod.json `"main"`, create an instance of the JerseyServer and initialize similarly to how JerseyModule does.
+3. Use vertx-mod-whenjersey, this uses When.java and simplifies the process.
+
+
+Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.
+
+Note: if you are using vertx-mod-hk2, ensure you are using the same version as included in vertx-mod-jersey.

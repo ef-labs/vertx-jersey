@@ -25,10 +25,8 @@ package com.englishtown.vertx.jersey;
 
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.platform.Container;
 
 /**
  * Represents a jersey server running in vert.x

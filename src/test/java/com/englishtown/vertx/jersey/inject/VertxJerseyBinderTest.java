@@ -37,13 +37,14 @@ import static org.mockito.Mockito.when;
 /**
  * {@link VertxJerseyBinder} unit tests
  */
+@SuppressWarnings("unchecked")
 public class VertxJerseyBinderTest {
 
     @Test
     public void testVertxRequestProcessorFactory() {
 
         IterableProvider<VertxRequestProcessor> providers = mock(IterableProvider.class);
-        InternalVertxJerseyBinder.VertxRequestProcessorFactory factory;
+        VertxJerseyBinder.VertxRequestProcessorFactory factory;
         List<VertxRequestProcessor> result;
 
         List<VertxRequestProcessor> list = Arrays.asList(
@@ -52,7 +53,7 @@ public class VertxJerseyBinderTest {
 
         when(providers.iterator()).thenReturn(list.iterator());
 
-        factory = new InternalVertxJerseyBinder.VertxRequestProcessorFactory(providers);
+        factory = new VertxJerseyBinder.VertxRequestProcessorFactory(providers);
         result = factory.provide();
 
         assertNotNull(result);
@@ -66,7 +67,7 @@ public class VertxJerseyBinderTest {
     public void testVertxResponseProcessorFactory() {
 
         IterableProvider<VertxResponseProcessor> providers = mock(IterableProvider.class);
-        InternalVertxJerseyBinder.VertxResponseProcessorFactory factory;
+        VertxJerseyBinder.VertxResponseProcessorFactory factory;
         List<VertxResponseProcessor> result;
 
         List<VertxResponseProcessor> list = Arrays.asList(
@@ -75,7 +76,30 @@ public class VertxJerseyBinderTest {
 
         when(providers.iterator()).thenReturn(list.iterator());
 
-        factory = new InternalVertxJerseyBinder.VertxResponseProcessorFactory(providers);
+        factory = new VertxJerseyBinder.VertxResponseProcessorFactory(providers);
+        result = factory.provide();
+
+        assertNotNull(result);
+        assertEquals(2, result.size());
+
+        factory.dispose(result);
+
+    }
+
+    @Test
+    public void testVertxPostResponseProcessorFactory() {
+
+        IterableProvider<VertxPostResponseProcessor> providers = mock(IterableProvider.class);
+        VertxJerseyBinder.VertxPostResponseProcessorFactory factory;
+        List<VertxPostResponseProcessor> result;
+
+        List<VertxPostResponseProcessor> list = Arrays.asList(
+                mock(VertxPostResponseProcessor.class),
+                mock(VertxPostResponseProcessor.class));
+
+        when(providers.iterator()).thenReturn(list.iterator());
+
+        factory = new VertxJerseyBinder.VertxPostResponseProcessorFactory(providers);
         result = factory.provide();
 
         assertNotNull(result);
