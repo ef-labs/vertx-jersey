@@ -28,6 +28,7 @@ import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import org.glassfish.hk2.api.IterableProvider;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
@@ -57,6 +58,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,6 +74,7 @@ public class DefaultJerseyHandlerTest {
 
     DefaultJerseyHandler jerseyHandler;
     JsonObject config = new JsonObject();
+    List<VertxRequestProcessor> requestProcessors = new ArrayList<>();
 
     @Mock
     JerseyConfigurator configurator;
@@ -117,15 +120,14 @@ public class DefaultJerseyHandlerTest {
         config.putArray(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
 
         ContainerResponseWriterProvider provider = mock(ContainerResponseWriterProvider.class);
-        when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class), any(List.class))).thenReturn(mock
-                (ContainerResponseWriter.class));
+        when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class))).thenReturn(mock(ContainerResponseWriter.class));
 
         when(serviceLocator.<Ref<Vertx>>getService((new TypeLiteral<Ref<Vertx>>() {
         }).getType())).thenReturn(vertxRef);
         when(serviceLocator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
         }).getType())).thenReturn(containerRef);
 
-        jerseyHandler = new DefaultJerseyHandler(provider);
+        jerseyHandler = new DefaultJerseyHandler(provider, requestProcessors);
     }
 
     @Test
@@ -140,7 +142,6 @@ public class DefaultJerseyHandlerTest {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testHandle_JSON_POST() throws Exception {
 
@@ -171,8 +172,9 @@ public class DefaultJerseyHandlerTest {
 
         VertxRequestProcessor rp1 = mock(VertxRequestProcessor.class);
         VertxRequestProcessor rp2 = mock(VertxRequestProcessor.class);
-        List<VertxRequestProcessor> list = Arrays.asList(rp1, rp2);
-        when(serviceLocator.getAllServices(eq(VertxRequestProcessor.class))).thenReturn(list);
+
+        requestProcessors.add(rp1);
+        requestProcessors.add(rp2);
 
         jerseyHandler.init(configurator);
         jerseyHandler.handle(request, inputStream);

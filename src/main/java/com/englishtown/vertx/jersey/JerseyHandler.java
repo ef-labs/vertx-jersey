@@ -24,9 +24,7 @@
 package com.englishtown.vertx.jersey;
 
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.platform.Container;
 
 import java.net.URI;
 

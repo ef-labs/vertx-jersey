@@ -23,8 +23,6 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import org.glassfish.hk2.api.Factory;
-import org.glassfish.hk2.api.IterableProvider;
 import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -39,8 +37,6 @@ import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * HK2 binder to configure the minimum interfaces required for the {@link com.englishtown.vertx.jersey.JerseyModule}
@@ -71,60 +67,6 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         }
     }
 
-    static class VertxResponseProcessorFactory implements Factory<List<VertxResponseProcessor>> {
-
-        private final List<VertxResponseProcessor> processors = new ArrayList<>();
-
-        @Inject
-        public VertxResponseProcessorFactory(IterableProvider<VertxResponseProcessor> providers) {
-            for (VertxResponseProcessor processor : providers) {
-                processors.add(processor);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<VertxResponseProcessor> provide() {
-            return processors;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void dispose(List<VertxResponseProcessor> instance) {
-        }
-    }
-
-    static class VertxRequestProcessorFactory implements Factory<List<VertxRequestProcessor>> {
-
-        private final List<VertxRequestProcessor> processors = new ArrayList<>();
-
-        @Inject
-        public VertxRequestProcessorFactory(IterableProvider<VertxRequestProcessor> providers) {
-            for (VertxRequestProcessor processor : providers) {
-                processors.add(processor);
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public List<VertxRequestProcessor> provide() {
-            return processors;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        public void dispose(List<VertxRequestProcessor> instance) {
-        }
-    }
-
     public InternalVertxJerseyBinder(Vertx vertx, Container container) {
         this.vertx = vertx;
         this.container = container;
@@ -152,11 +94,6 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         bindFactory(VertxResponseReferencingFactory.class).to(HttpServerResponse.class).in(PerLookup.class);
         bindFactory(ReferencingFactory.<HttpServerResponse>referenceFactory()).to(new TypeLiteral<Ref<HttpServerResponse>>() {
         }).in(RequestScoped.class);
-
-        bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
-        });
-        bindFactory(VertxResponseProcessorFactory.class).to(new TypeLiteral<List<VertxResponseProcessor>>() {
-        });
 
     }
 }
