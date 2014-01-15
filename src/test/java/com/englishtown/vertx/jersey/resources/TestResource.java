@@ -100,8 +100,6 @@ public class TestResource {
             @Suspended final AsyncResponse response,
             @Context final Vertx vertx) {
 
-        final ChunkedOutput<String> chunkedOutput = new ChunkedOutput<>(String.class);
-
         vertx.runOnContext(new Handler<Void>() {
             @Override
             public void handle(Void aVoid) {

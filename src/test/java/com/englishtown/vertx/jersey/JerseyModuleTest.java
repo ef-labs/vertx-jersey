@@ -33,15 +33,11 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Provider;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.*;
 
 /**

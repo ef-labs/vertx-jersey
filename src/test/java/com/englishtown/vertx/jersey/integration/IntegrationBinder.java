@@ -4,8 +4,6 @@ import com.englishtown.vertx.jersey.inject.VertxJerseyBinder;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
-import javax.inject.Singleton;
-
 /**
  *
  */

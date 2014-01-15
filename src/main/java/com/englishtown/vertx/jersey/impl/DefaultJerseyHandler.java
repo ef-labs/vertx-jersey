@@ -29,7 +29,6 @@ import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
-import com.hazelcast.nio.FastByteArrayInputStream;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
@@ -49,6 +48,7 @@ import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
@@ -124,7 +124,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
             vertxRequest.endHandler(new Handler<Void>() {
                 @Override
                 public void handle(Void event) {
-                    InputStream inputStream = new FastByteArrayInputStream(body.getBytes());
+                    InputStream inputStream = new ByteArrayInputStream(body.getBytes());
                     DefaultJerseyHandler.this.handle(vertxRequest, inputStream);
                 }
             });
