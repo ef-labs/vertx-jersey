@@ -52,7 +52,6 @@ import static org.vertx.testtools.VertxAssert.*;
  * Time: 4:06 PM
  * To change this template use File | Settings | File Templates.
  */
-@RunWith(CPJavaClassRunner.class)
 public class IntegrationTestVerticle extends TestVerticle {
 
     /**
