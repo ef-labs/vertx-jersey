@@ -55,4 +55,11 @@ public interface JerseyServer {
      */
     void routeMatcherHandler(Handler<RouteMatcher> handler);
 
+    /**
+     * Returns the JerseyHandler instance for the JerseyServer
+     *
+     * @return the JerseyHandler instance
+     */
+    JerseyHandler getHandler();
+
 }

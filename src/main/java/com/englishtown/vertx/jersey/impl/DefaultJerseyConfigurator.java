@@ -28,6 +28,7 @@ import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -57,6 +58,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     private Container container;
     private JsonObject config;
     private Logger logger;
+    private Handler<ResourceConfig> resourceConfigHandler;
 
     @Override
     public void init(JsonObject config, Vertx vertx, Container container) {
@@ -68,6 +70,26 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         }
         this.config = config;
         logger = container.logger();
+    }
+
+    /**
+     * Sets a call back to perform additional {@link org.glassfish.jersey.server.ResourceConfig} initialization.
+     *
+     * @param resourceConfigHandler the call back
+     */
+    @Override
+    public void setResourceConfigHandler(Handler<ResourceConfig> resourceConfigHandler) {
+        this.resourceConfigHandler = resourceConfigHandler;
+    }
+
+    /**
+     * Returns a callback for additional resource config initialization if one has been set.
+     *
+     * @return the resource config callback
+     */
+    @Override
+    public Handler<ResourceConfig> getResourceConfigHandler() {
+        return resourceConfigHandler;
     }
 
     /**
@@ -218,6 +240,10 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
                     throw new RuntimeException(e);
                 }
             }
+        }
+
+        if (resourceConfigHandler != null) {
+            resourceConfigHandler.handle(rc);
         }
 
         return rc;

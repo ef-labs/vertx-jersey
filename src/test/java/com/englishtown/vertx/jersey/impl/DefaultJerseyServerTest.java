@@ -178,4 +178,10 @@ public class DefaultJerseyServerTest {
 
     }
 
+    @Test
+    public void testGetHandler() throws Exception {
+        JerseyHandler handler = jerseyServer.getHandler();
+        assertEquals(jerseyHandler, handler);
+    }
+
 }

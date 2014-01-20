@@ -33,6 +33,7 @@ import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,6 +57,7 @@ import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.InputStream;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -258,6 +260,47 @@ public class DefaultJerseyHandlerTest {
 
         URI result = jerseyHandler.getBaseUri();
         assertEquals(baseUri, result);
+    }
+
+    @Test
+    public void testSetRequestScopedInitializer() throws Exception {
+
+        ContainerRequest jerseyRequest = mock(ContainerRequest.class);
+        ArgumentCaptor<RequestScopedInitializer> captor = ArgumentCaptor.forClass(RequestScopedInitializer.class);
+
+        assertNull(jerseyHandler.getRequestScopedInitializer());
+
+        final boolean[] success = new boolean[1];
+        jerseyHandler.setRequestScopedInitializer(new RequestScopedInitializer() {
+            @Override
+            public void initialize(ServiceLocator locator) {
+                success[0] = true;
+            }
+        });
+
+        assertNotNull(jerseyHandler.getRequestScopedInitializer());
+
+        when(request.method()).thenReturn(HttpMethod.GET);
+        when(request.headers()).thenReturn(mock(MultiMap.class));
+
+        when(serviceLocator.<Ref<Object>>getService(any(Type.class))).thenReturn(new Ref<Object>() {
+            @Override
+            public void set(Object obj) {
+            }
+
+            @Override
+            public Object get() {
+                return null;
+            }
+        });
+
+        jerseyHandler.init(configurator);
+        jerseyHandler.handle(request, null, jerseyRequest);
+
+        verify(jerseyRequest).setRequestScopedInitializer(captor.capture());
+        captor.getValue().initialize(serviceLocator);
+
+        assertTrue(success[0]);
     }
 
 }

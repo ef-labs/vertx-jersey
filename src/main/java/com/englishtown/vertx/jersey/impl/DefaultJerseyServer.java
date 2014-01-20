@@ -112,4 +112,14 @@ public class DefaultJerseyServer implements JerseyServer {
     public void routeMatcherHandler(Handler<RouteMatcher> handler) {
         this.routeMatcherHandler = handler;
     }
+
+    /**
+     * Returns the JerseyHandler instance for the JerseyServer
+     *
+     * @return the JerseyHandler instance
+     */
+    @Override
+    public JerseyHandler getHandler() {
+        return jerseyHandler;
+    }
 }

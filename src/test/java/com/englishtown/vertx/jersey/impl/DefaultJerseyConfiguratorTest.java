@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
@@ -185,6 +186,23 @@ public class DefaultJerseyConfiguratorTest {
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
         assertEquals(2, resourceConfig.getInstances().size());
+
+        assertNull(configurator.getResourceConfigHandler());
+
+        final boolean[] success = new boolean[1];
+        configurator.setResourceConfigHandler(new Handler<ResourceConfig>() {
+            @Override
+            public void handle(ResourceConfig rc) {
+                success[0] = true;
+            }
+        });
+
+        assertNotNull(configurator.getResourceConfigHandler());
+
+        resourceConfig = configurator.getResourceConfig();
+
+        assertNotNull(resourceConfig);
+        assertTrue(success[0]);
 
         binders.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {
