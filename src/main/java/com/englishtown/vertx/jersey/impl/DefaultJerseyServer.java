@@ -64,6 +64,13 @@ public class DefaultJerseyServer implements JerseyServer {
         // Create http server
         HttpServer server = configurator.getVertx().createHttpServer();
 
+        // Enable https
+        if (configurator.getSSL()) {
+            server.setSSL(true)
+                    .setKeyStorePassword(configurator.getKeyStorePassword())
+                    .setKeyStorePath(configurator.getKeyStorePath());
+        }
+
         // Performance tweak
         server.setAcceptBacklog(configurator.getAcceptBacklog());
 
@@ -94,7 +101,7 @@ public class DefaultJerseyServer implements JerseyServer {
         server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
             @Override
             public void handle(AsyncResult<HttpServer> result) {
-                final String listenPath = "http://" + host + ":" + port;
+                final String listenPath = (configurator.getSSL() ? "https" : "http") + "://" + host + ":" + port;
                 if (result.succeeded()) {
                     container.logger().info("Http server listening for " + listenPath);
                 } else {

@@ -89,6 +89,27 @@ public interface JerseyConfigurator {
     int getPort();
 
     /**
+     * Whether the web server should be https.
+     *
+     * @return whether the web server should be https.
+     */
+    boolean getSSL();
+
+    /**
+     * The key store password when using ssl
+     *
+     * @return the key store password
+     */
+    String getKeyStorePassword();
+
+    /**
+     * The key store path when using ssl
+     *
+     * @return the key store path
+     */
+    String getKeyStorePath();
+
+    /**
      * The TCP receive buffer size for connections in bytes
      *
      * @return buffer size in bytes

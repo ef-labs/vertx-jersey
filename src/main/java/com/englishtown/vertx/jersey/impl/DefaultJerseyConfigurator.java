@@ -44,6 +44,9 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
     final static String CONFIG_HOST = "host";
     final static String CONFIG_PORT = "port";
+    final static String CONFIG_SSL = "ssl";
+    final static String CONFIG_KEY_STORE_PASSWORD = "key_store_password";
+    final static String CONFIG_KEY_STORE_PATH = "key_store_path";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_BACKLOG_SIZE = "backlog_size";
 
@@ -132,6 +135,36 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     public int getPort() {
         checkState();
         return config.getInteger(CONFIG_PORT, 80);
+    }
+
+    /**
+     * Whether the web server should be https.
+     *
+     * @return whether the web server should be https.
+     */
+    @Override
+    public boolean getSSL() {
+        return config.getBoolean(CONFIG_SSL, false);
+    }
+
+    /**
+     * The key store password when using ssl
+     *
+     * @return the key store password
+     */
+    @Override
+    public String getKeyStorePassword() {
+        return config.getString(CONFIG_KEY_STORE_PASSWORD, "wibble");
+    }
+
+    /**
+     * The key store path when using ssl
+     *
+     * @return the key store path
+     */
+    @Override
+    public String getKeyStorePath() {
+        return config.getString(CONFIG_KEY_STORE_PATH, "server-keystore.jks");
     }
 
     /**

@@ -83,6 +83,9 @@ public class DefaultJerseyServerTest {
         when(vertx.createHttpServer()).thenReturn(httpServer);
         when(configurator.getVertx()).thenReturn(vertx);
         when(configurator.getContainer()).thenReturn(container);
+        when(httpServer.setSSL(anyBoolean())).thenReturn(httpServer);
+        when(httpServer.setKeyStorePassword(anyString())).thenReturn(httpServer);
+        when(httpServer.setKeyStorePath(anyString())).thenReturn(httpServer);
 
         //noinspection unchecked
         Provider<JerseyHandler> handlerProvider = mock(Provider.class);
@@ -131,12 +134,14 @@ public class DefaultJerseyServerTest {
         String host = "test.englishtown.com";
         int port = 8888;
         int bufferSize = 1024;
+        boolean ssl = true;
 
         when(configurator.getHost()).thenReturn(host);
         when(configurator.getPort()).thenReturn(port);
         when(configurator.getReceiveBufferSize()).thenReturn(bufferSize);
         when(configurator.getVertx()).thenReturn(vertx);
         when(configurator.getContainer()).thenReturn(container);
+        when(configurator.getSSL()).thenReturn(ssl);
 
         jerseyServer.init(configurator);
         verifyResults(port, host);

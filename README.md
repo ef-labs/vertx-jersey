@@ -46,6 +46,9 @@ The vertx-mod-jersey module configuration is as follows:
 {
     "host": "<host>",
     "port": <port>,
+    "ssl": <ssl>,
+    "key_store_password": <key_store_password>,
+    "key_store_path": <key_store_path>,
     "receive_buffer_size": <receive_buffer_size>,
     "max_body_size": <max_body_size>,
     "base_path": "<base_path>",
@@ -59,6 +62,9 @@ The vertx-mod-jersey module configuration is as follows:
 * `host` - The host or ip address to listen at for connections. `0.0.0.0` means listen at all available addresses.
 Default is `0.0.0.0`
 * `port` -  The port to listen at for connections. Default is `80`.
+* `ssl`. Should the server use `https` as a protocol? Default is `false`.
+* `key_store_password`. Password of Java keystore which holds the server certificate. Only used if `ssl` is `true`. Default is `wibble`.
+* `key_store_path`. Path to keystore which holds the server certificate. Default is `server-keystore.jks`. Only used if `ssl` is `true`. *Don't put the keystore under your webroot!*.
 * `receive_buffer_size` - The int receive buffer size.  The value is optional.
 * `max_body_size` - The int max body size allowed.  The default value is 1MB.
 * `base_path` - The base path jersey responds to.  Default is `/`.
@@ -91,15 +97,24 @@ Default is `0.0.0.0`
 
 ## How to use
 
-Due to the way vert.x module class loaders work, your best bet is to include vertx-mod-jersey in your mod.json.  Directly deploying the vertx-mod-jersey module will run into class loader problems when reading your JAX-RS resources.
+Add vertx-mod-jersey as an include in your mod.json.
 
 ```json
 {
-    "includes": "com.englishtown~vertx-mod-jersey~2.3.0-final"
+    "includes": "com.englishtown~vertx-mod-jersey~2.4.0-final"
 }
 ```
 
 The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, jersey-server, etc.) should be added to your project with scope "provided".
+
+```xml
+<dependency>
+    <groupId>com.englishtown</groupId>
+    <artifactId>vertx-mod-jersey</artifactId>
+    <version>2.4.0-final</version>
+    <scope>provided</scope>
+</dependency>
+```
 
 You have 3 ways to start the Jersey Server:
 
@@ -109,5 +124,14 @@ You have 3 ways to start the Jersey Server:
 
 
 Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.
+
+#### Dependency Injection
+The JerseyModule requires dependency injection.  An HK2 binder `com.englishtown.vertx.hk2.BootstrapBinder` is provided for use with the vertx-mod-hk2 module.
+
+If using HK2, ensure you have configured the HK2VerticleFactory in langs.properties:
+`java=com.englishtown~vertx-mod-hk2~1.5.0-final:com.englishtown.vertx.hk2.HK2VerticleFactory`
+
+Or by setting a system property:
+`-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.5.0-final:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Note: if you are using vertx-mod-hk2, ensure you are using the same version as included in vertx-mod-jersey.
