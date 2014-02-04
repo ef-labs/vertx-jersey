@@ -33,7 +33,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
@@ -66,7 +65,6 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     private Vertx vertx;
     private Container container;
     private JsonObject config;
-    private Logger logger;
     private Handler<ResourceConfig> resourceConfigHandler;
 
     @Inject
@@ -83,7 +81,6 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
             throw new IllegalStateException("The provided configuration was null");
         }
         this.config = config;
-        logger = container.logger();
     }
 
     /**
@@ -303,7 +300,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     }
 
     private void checkState() {
-        if (config == null || logger == null) {
+        if (config == null) {
             throw new IllegalStateException("The configurator has not been initialized.");
         }
     }
