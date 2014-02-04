@@ -25,7 +25,6 @@ package com.englishtown.vertx.jersey.integration;
 
 import com.englishtown.vertx.jersey.JerseyModule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;

@@ -26,6 +26,7 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
+import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.vertx.java.core.Handler;
@@ -35,7 +36,10 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
+import javax.inject.Inject;
+import javax.inject.Provider;
 import java.net.URI;
+import java.util.List;
 
 /**
  * Default {@link com.englishtown.vertx.jersey.JerseyConfigurator} implementation
@@ -57,11 +61,18 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     public static final String CONFIG_BINDERS = "binders";
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
+    private final List<Provider<Binder>> binderProviders;
+
     private Vertx vertx;
     private Container container;
     private JsonObject config;
     private Logger logger;
     private Handler<ResourceConfig> resourceConfigHandler;
+
+    @Inject
+    public DefaultJerseyConfigurator(List<Provider<Binder>> binderProviders) {
+        this.binderProviders = binderProviders;
+    }
 
     @Override
     public void init(JsonObject config, Vertx vertx, Container container) {
@@ -263,6 +274,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         // Always register the InternalVertxJerseyBinder
         rc.register(new InternalVertxJerseyBinder(vertx, container));
 
+        // Register configured binders
         JsonArray binders = config.getArray(CONFIG_BINDERS, null);
         if (binders != null && binders.size() > 0) {
             for (int i = 0; i < binders.size(); i++) {
@@ -272,6 +284,13 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+        // Register any additional binders
+        if (binderProviders != null) {
+            for (Provider<Binder> provider : binderProviders) {
+                rc.register(provider.get());
             }
         }
 

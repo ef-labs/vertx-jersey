@@ -35,9 +35,11 @@ import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
 import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +129,33 @@ public class VertxJerseyBinder extends AbstractBinder {
         }
     }
 
+    static class BinderProviderFactory implements Factory<List<Provider<Binder>>> {
+
+        private final List<Provider<Binder>> binders = new ArrayList<>();
+
+        @Inject
+        public BinderProviderFactory(IterableProvider<Provider<Binder>> providers) {
+            for (Provider<Binder> binderProvider : providers) {
+                binders.add(binderProvider);
+            }
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public List<Provider<Binder>> provide() {
+            return binders;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void dispose(List<Provider<Binder>> instance) {
+        }
+    }
+
     /**
      * Implement to provide binding definitions using the exposed binding
      * methods.
@@ -145,6 +174,8 @@ public class VertxJerseyBinder extends AbstractBinder {
         bindFactory(VertxResponseProcessorFactory.class).to(new TypeLiteral<List<VertxResponseProcessor>>() {
         });
         bindFactory(VertxPostResponseProcessorFactory.class).to(new TypeLiteral<List<VertxPostResponseProcessor>>() {
+        });
+        bindFactory(BinderProviderFactory.class).to(new TypeLiteral<List<Provider<Binder>>>() {
         });
 
     }

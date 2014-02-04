@@ -24,6 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,7 +38,10 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
+import javax.inject.Provider;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -54,8 +58,14 @@ public class DefaultJerseyConfiguratorTest {
     Container container;
     @Mock
     Logger logger;
+    @Mock
+    Binder binder;
+    @Mock
+    Provider<Binder> binderProvider;
+
     JsonObject config;
     DefaultJerseyConfigurator configurator;
+    List<Provider<Binder>> binderProviders = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
@@ -64,7 +74,10 @@ public class DefaultJerseyConfiguratorTest {
         when(container.config()).thenReturn(config);
         when(container.logger()).thenReturn(logger);
 
-        configurator = new DefaultJerseyConfigurator();
+        when(binderProvider.get()).thenReturn(binder);
+        binderProviders.add(binderProvider);
+
+        configurator = new DefaultJerseyConfigurator(binderProviders);
         configurator.init(config, vertx, container);
 
     }
@@ -72,7 +85,7 @@ public class DefaultJerseyConfiguratorTest {
     @Test
     public void testInit_No_Config() throws Exception {
 
-        DefaultJerseyConfigurator configurator = new DefaultJerseyConfigurator();
+        DefaultJerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
 
         try {
             configurator.init(null, null, null);
@@ -170,7 +183,7 @@ public class DefaultJerseyConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
-        assertEquals(1, resourceConfig.getInstances().size());
+        assertEquals(2, resourceConfig.getInstances().size());
 
         JsonArray features = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestFeature");
         config.putArray(DefaultJerseyConfigurator.CONFIG_FEATURES, features);
@@ -185,7 +198,7 @@ public class DefaultJerseyConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
-        assertEquals(2, resourceConfig.getInstances().size());
+        assertEquals(3, resourceConfig.getInstances().size());
 
         assertNull(configurator.getResourceConfigHandler());
 
