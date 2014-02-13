@@ -84,26 +84,6 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     }
 
     /**
-     * Sets a call back to perform additional {@link org.glassfish.jersey.server.ResourceConfig} initialization.
-     *
-     * @param resourceConfigHandler the call back
-     */
-    @Override
-    public void setResourceConfigHandler(Handler<ResourceConfig> resourceConfigHandler) {
-        this.resourceConfigHandler = resourceConfigHandler;
-    }
-
-    /**
-     * Returns a callback for additional resource config initialization if one has been set.
-     *
-     * @return the resource config callback
-     */
-    @Override
-    public Handler<ResourceConfig> getResourceConfigHandler() {
-        return resourceConfigHandler;
-    }
-
-    /**
      * Returns the current vertx instance
      *
      * @return the {@link org.vertx.java.core.Vertx} instance

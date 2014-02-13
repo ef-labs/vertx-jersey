@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
@@ -39,20 +38,6 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
      * @param configurator contains configuration details
      */
     void init(JerseyConfigurator configurator);
-
-    /**
-     * Add additional request scoped initialization
-     *
-     * @param requestScopedInitializer the request scope initializer
-     */
-    void setRequestScopedInitializer(RequestScopedInitializer requestScopedInitializer);
-
-    /**
-     * Returns a {@link org.glassfish.jersey.server.spi.RequestScopedInitializer} if one has been set.
-     *
-     * @return the RequestScopedInitializer instance
-     */
-    RequestScopedInitializer getRequestScopedInitializer();
 
     URI getBaseUri();
 

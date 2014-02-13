@@ -24,8 +24,6 @@
 package com.englishtown.vertx.jersey;
 
 import org.glassfish.jersey.server.ApplicationHandler;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
@@ -45,20 +43,6 @@ public interface JerseyConfigurator {
      * @param container the container instance
      */
     void init(JsonObject config, Vertx vertx, Container container);
-
-    /**
-     * Sets a call back to perform additional {@link org.glassfish.jersey.server.ResourceConfig} initialization.
-     *
-     * @param resourceConfigHandler the call back
-     */
-    void setResourceConfigHandler(Handler<ResourceConfig> resourceConfigHandler);
-
-    /**
-     * Returns a callback for additional resource config initialization if one has been set.
-     *
-     * @return the resource config callback
-     */
-    Handler<ResourceConfig> getResourceConfigHandler();
 
     /**
      * Returns the current vertx instance

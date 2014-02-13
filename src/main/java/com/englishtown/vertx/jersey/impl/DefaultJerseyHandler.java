@@ -66,7 +66,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
     private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
     private int maxBodySize;
-    private RequestScopedInitializer requestScopedInitializer;
 
     private final ContainerResponseWriterProvider responseWriterProvider;
     private final List<VertxRequestProcessor> requestProcessors;
@@ -90,26 +89,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
         applicationHandlerDelegate = configurator.getApplicationHandler();
 
         logger.debug("DefaultJerseyHandler - initialized");
-    }
-
-    /**
-     * Add additional request scoped initialization
-     *
-     * @param requestScopedInitializer the request scope initializer
-     */
-    @Override
-    public void setRequestScopedInitializer(RequestScopedInitializer requestScopedInitializer) {
-        this.requestScopedInitializer = requestScopedInitializer;
-    }
-
-    /**
-     * Returns a {@link org.glassfish.jersey.server.spi.RequestScopedInitializer} if one has been set.
-     *
-     * @return the RequestScopedInitializer instance
-     */
-    @Override
-    public RequestScopedInitializer getRequestScopedInitializer() {
-        return requestScopedInitializer;
     }
 
     @Override
@@ -237,9 +216,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 }).getType()).set(vertxRequest);
                 locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {
                 }).getType()).set(vertxRequest.response());
-                if (requestScopedInitializer != null) {
-                    requestScopedInitializer.initialize(locator);
-                }
             }
         });
 
