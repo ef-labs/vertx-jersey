@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.AsyncResult;
@@ -72,6 +73,8 @@ public class DefaultJerseyServerTest {
     @Mock
     Handler<RouteMatcher> routeMatcherHandler;
     @Mock
+    Provider<JerseyHandler> jerseyHandlerProvider;
+    @Mock
     JerseyConfigurator configurator;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
@@ -87,10 +90,8 @@ public class DefaultJerseyServerTest {
         when(httpServer.setKeyStorePassword(anyString())).thenReturn(httpServer);
         when(httpServer.setKeyStorePath(anyString())).thenReturn(httpServer);
 
-        //noinspection unchecked
-        Provider<JerseyHandler> handlerProvider = mock(Provider.class);
-        when(handlerProvider.get()).thenReturn(jerseyHandler);
-        jerseyServer = new DefaultJerseyServer(handlerProvider);
+        when(jerseyHandlerProvider.get()).thenReturn(jerseyHandler);
+        jerseyServer = new DefaultJerseyServer(jerseyHandlerProvider);
 
     }
 
@@ -99,19 +100,17 @@ public class DefaultJerseyServerTest {
         verify(vertx, times(1)).createHttpServer();
         verify(jerseyHandler).init(any(JerseyConfigurator.class));
         verify(httpServer).requestHandler(jerseyHandler);
-        //noinspection unchecked
-        verify(httpServer, times(1)).listen(eq(port), eq(host), any(Handler.class));
+        verify(httpServer, times(1)).listen(eq(port), eq(host), Matchers.<Handler<AsyncResult<HttpServer>>>any());
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testConstructor_No_Handler() throws Exception {
 
-        //noinspection unchecked
-        Provider<JerseyHandler> provider = mock(Provider.class);
-
         try {
-            new DefaultJerseyServer(provider);
+            reset(jerseyHandlerProvider);
+            new DefaultJerseyServer(jerseyHandlerProvider);
             fail();
         } catch (IllegalStateException e) {
             // Expected
