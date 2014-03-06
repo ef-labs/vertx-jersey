@@ -28,6 +28,7 @@
                 <groupId>com.englishtown</groupId>
                 <artifactId>vertx-mod-jersey</artifactId>
                 <version>${project.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

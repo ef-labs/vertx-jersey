@@ -15,6 +15,7 @@
 
     <modules>
         <module>vertx-mod-jersey</module>
+        <module>vertx-mod-jerseymetrics</module>
         <module>examples</module>
     </modules>
 
