@@ -1,0 +1,8 @@
+{
+    "host": "localhost",
+    "port": 8080,
+    "base_path": "/",
+    "resources": ["com.englishtown.vertx.samples.resources"],
+    "features": ["org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature"],
+    "binders": ["com.englishtown.vertx.samples.SecurityContextBinder"]
+}

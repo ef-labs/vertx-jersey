@@ -1,0 +1,7 @@
+{
+    "host": "localhost",
+    "port": 8080,
+    "base_path": "/",
+    "resources": ["com.englishtown.vertx.samples.resources"],
+    "binders": ["com.englishtown.vertx.samples.ExampleBinder"]
+}
