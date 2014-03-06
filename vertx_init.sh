@@ -16,6 +16,9 @@ mvn vertx:init
 cd ${DIRNAME}/vertx-mod-jerseymetrics
 mvn vertx:init
 
+cd ${DIRNAME}/vertx-mod-whenjersey
+mvn vertx:init
+
 cd ${DIRNAME}/examples/chunked
 mvn vertx:init
 
