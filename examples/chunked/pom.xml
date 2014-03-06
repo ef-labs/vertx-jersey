@@ -31,7 +31,7 @@
                 <groupId>io.vertx</groupId>
                 <artifactId>vertx-maven-plugin</artifactId>
                 <configuration>
-                    <configFile>src/test/java/config.json</configFile>
+                    <configFile>src/test/resources/config.json</configFile>
                 </configuration>
             </plugin>
             <plugin>

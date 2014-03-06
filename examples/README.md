@@ -1,6 +1,5 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-jersey-samples.png)](https://travis-ci.org/englishtown/vertx-jersey-samples)
 
-# Vert.x Sample Modules
+# Vert.x Jersey Example Modules
 
 ## chunked
 How to return chunked responses using vert.x and jersey.

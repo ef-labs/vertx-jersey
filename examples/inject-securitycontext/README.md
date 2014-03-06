@@ -5,8 +5,8 @@ It also demonstrates using the JAX-RS `@RolesAllowed` security annotation.
 
 ## Run It
 
-To run this example inside IDEA, add a maven Run/Debug Configuration with the following command line setting:
-`vertx:runMod -Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.6.0-SNAPSHOT:com.englishtown.vertx.hk2.HK2VerticleFactory`
+1. Run from the command line `mvn vertx:runMod'
+2. Run from inside IDEA via the vert.x maven plugin vertx:runMod
 
 
 Try the following urls in your browser:
@@ -32,8 +32,12 @@ config.json sets up the vertx-mod-jersey module with the following settings:
     "host": "localhost",
     "port": 8080,
     "base_path": "/",
-    "resources": ["com.englishtown.vertx.samples.resources"],
+    "resources": ["com.englishtown.vertx.jersey.examples.resources"],
     "features": ["org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature"],
-    "binders": ["com.englishtown.vertx.samples.SecurityContextBinder"]
+    "binders": [],
+    "hk2_binder": [
+        "com.englishtown.vertx.hk2.BootstrapBinder",
+        "com.englishtown.vertx.jersey.examples.SecurityContextBinder"
+        ]
 }
 ```

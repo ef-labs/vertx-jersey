@@ -3,9 +3,10 @@
     "port": 8080,
     "base_path": "/",
     "resources": ["com.englishtown.vertx.jersey.examples.resources"],
+    "features": ["org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature"],
     "binders": [],
     "hk2_binder": [
         "com.englishtown.vertx.hk2.BootstrapBinder",
-        "com.englishtown.vertx.jersey.examples.ExampleBinder"
-    ]
+        "com.englishtown.vertx.jersey.examples.SecurityContextBinder"
+        ]
 }
