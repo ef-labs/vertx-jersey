@@ -26,19 +26,17 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
-import org.glassfish.hk2.utilities.Binder;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.vertx.java.core.Handler;
+import org.jvnet.hk2.annotations.Optional;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 import java.net.URI;
-import java.util.List;
 
 /**
  * Default {@link com.englishtown.vertx.jersey.JerseyConfigurator} implementation
@@ -60,16 +58,20 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     public static final String CONFIG_BINDERS = "binders";
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
-    private final List<Provider<Binder>> binderProviders;
+    private final ServiceLocator locator;
 
     private Vertx vertx;
     private Container container;
     private JsonObject config;
-    private Handler<ResourceConfig> resourceConfigHandler;
 
+    /**
+     * Injection constructor
+     *
+     * @param locator an optional ServiceLocator instance to be the Jersey parent locator
+     */
     @Inject
-    public DefaultJerseyConfigurator(List<Provider<Binder>> binderProviders) {
-        this.binderProviders = binderProviders;
+    public DefaultJerseyConfigurator(@Optional ServiceLocator locator) {
+        this.locator = locator;
     }
 
     @Override
@@ -202,7 +204,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
      */
     @Override
     public ApplicationHandlerDelegate getApplicationHandler() {
-        ApplicationHandler handler = new ApplicationHandler(getResourceConfig());
+        ApplicationHandler handler = new ApplicationHandler(getResourceConfig(), null, locator);
         return new DefaultApplicationHandlerDelegate(handler);
     }
 
@@ -264,19 +266,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
             }
         }
 
-        // Register any additional binders
-        if (binderProviders != null) {
-            for (Provider<Binder> provider : binderProviders) {
-                rc.register(provider.get());
-            }
-        }
-
-        if (resourceConfigHandler != null) {
-            resourceConfigHandler.handle(rc);
-        }
-
         return rc;
-
     }
 
     private void checkState() {

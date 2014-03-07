@@ -118,7 +118,7 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
         Provider<JerseyServer> serverProvider = mock(Provider.class);
         when(serverProvider.get()).thenReturn(server);
 
-        JerseyConfigurator configurator = new DefaultJerseyConfigurator(new ArrayList<Provider<Binder>>());
+        JerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
         Provider<JerseyConfigurator> configuratorProvider = mock(Provider.class);
         when(configuratorProvider.get()).thenReturn(configurator);
 

@@ -24,11 +24,13 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.jvnet.hk2.internal.ServiceLocatorImpl;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.vertx.java.core.Vertx;
@@ -57,14 +59,9 @@ public class DefaultJerseyConfiguratorTest {
     Container container;
     @Mock
     Logger logger;
-    @Mock
-    Binder binder;
-    @Mock
-    Provider<Binder> binderProvider;
 
     JsonObject config;
     DefaultJerseyConfigurator configurator;
-    List<Provider<Binder>> binderProviders = new ArrayList<>();
 
     @Before
     public void setUp() throws Exception {
@@ -73,10 +70,8 @@ public class DefaultJerseyConfiguratorTest {
         when(container.config()).thenReturn(config);
         when(container.logger()).thenReturn(logger);
 
-        when(binderProvider.get()).thenReturn(binder);
-        binderProviders.add(binderProvider);
-
-        configurator = new DefaultJerseyConfigurator(binderProviders);
+        ServiceLocator locator = new ServiceLocatorImpl("test", null);
+        configurator = new DefaultJerseyConfigurator(locator);
         configurator.init(config, vertx, container);
 
     }
@@ -182,7 +177,7 @@ public class DefaultJerseyConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
-        assertEquals(2, resourceConfig.getInstances().size());
+        assertEquals(1, resourceConfig.getInstances().size());
 
         JsonArray features = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestFeature");
         config.putArray(DefaultJerseyConfigurator.CONFIG_FEATURES, features);
@@ -197,7 +192,7 @@ public class DefaultJerseyConfiguratorTest {
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
-        assertEquals(3, resourceConfig.getInstances().size());
+        assertEquals(2, resourceConfig.getInstances().size());
 
         binders.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {
