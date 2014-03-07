@@ -3,7 +3,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>vertx-jersey-examples</artifactId>
+    <artifactId>examples</artifactId>
     <packaging>pom</packaging>
     <version>2.5.0-SNAPSHOT</version>
 
@@ -18,8 +18,8 @@
         <module>filter</module>
         <module>inject-securitycontext</module>
         <module>inject-vertxrequesthandler</module>
-        <module>jersey-inject-vertx</module>
-        <module>vertx-jersey-jackson</module>
+        <module>inject-vertx</module>
+        <module>jackson</module>
     </modules>
 
     <dependencyManagement>
