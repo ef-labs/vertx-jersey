@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>examples-inject-securitycontext</artifactId>
+    <artifactId>vertx-jersey-examples-inject-securitycontext</artifactId>
 
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
@@ -16,7 +16,6 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-hk2</artifactId>
-            <version>${vertx.mod.hk2.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
