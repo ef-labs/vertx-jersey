@@ -4,5 +4,5 @@
     "licenses": ["The MIT License"],
     "author": "Englishtown",
     "keywords": ["when", "jersey", "when.java", "promises"],
-    "homepage": "https://github.com/englishtown/vertx-mod-whenjersey"
+    "homepage": "https://github.com/englishtown/vertx-mod-jersey"
 }

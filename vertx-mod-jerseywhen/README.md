@@ -1,4 +1,4 @@
-# vertx-mod-whenjersey
+# vertx-mod-jerseywhen
 
 Provides when.java wrappers for vertx-mod-jersey objects
 

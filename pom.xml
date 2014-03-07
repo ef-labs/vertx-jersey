@@ -16,7 +16,7 @@
     <modules>
         <module>vertx-mod-jersey</module>
         <module>vertx-mod-jerseymetrics</module>
-        <module>vertx-mod-whenjersey</module>
+        <module>vertx-mod-jerseywhen</module>
         <module>examples</module>
     </modules>
 
