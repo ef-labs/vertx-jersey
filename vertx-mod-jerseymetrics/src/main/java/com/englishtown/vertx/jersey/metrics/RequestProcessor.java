@@ -42,8 +42,8 @@ public class RequestProcessor implements VertxRequestProcessor {
     public static final String FIRST_BYTE_TIMER_CONTEXT = "et.timer.firstByte.context";
     public static final String LAST_BYTE_TIMER_CONTEXT = "et.timer.lastByte.context";
 
-    public static final String FIRST_BYTE_TIMER_NAME = "com.englishtown.vertx.jersey.metrics.firstByte";
-    public static final String LAST_BYTE_TIMER_NAME = "com.englishtown.vertx.jersey.metrics.lastByte";
+    public static final String FIRST_BYTE_TIMER_NAME = "et.metrics.jersey.firstByte";
+    public static final String LAST_BYTE_TIMER_NAME = "et.metrics.jersey.lastByte";
 
     private final Timer firstByteTimer;
     private final Timer lastByteTimer;
