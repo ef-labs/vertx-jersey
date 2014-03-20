@@ -221,9 +221,17 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         // Call vertx before request processors
         if (!requestProcessors.isEmpty()) {
+            // Pause the vert.x request if we haven't already read the body
+            if (inputStream == null) {
+                vertxRequest.pause();
+            }
             callVertxRequestProcessor(0, vertxRequest, jerseyRequest, new Handler<Void>() {
                 @Override
                 public void handle(Void aVoid) {
+                    // Resume the vert.x request if we haven't already read the body
+                    if (inputStream == null) {
+                        vertxRequest.resume();
+                    }
                     applicationHandlerDelegate.handle(jerseyRequest);
                 }
             });
