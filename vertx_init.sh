@@ -15,24 +15,3 @@ mvn vertx:init
 
 cd ${DIRNAME}/vertx-mod-jerseymetrics
 mvn vertx:init
-
-cd ${DIRNAME}/vertx-mod-jerseywhen
-mvn vertx:init
-
-cd ${DIRNAME}/examples/chunked
-mvn vertx:init
-
-cd ${DIRNAME}/examples/filter
-mvn vertx:init
-
-cd ${DIRNAME}/examples/inject-securitycontext
-mvn vertx:init
-
-cd ${DIRNAME}/examples/inject-vertxrequesthandler
-mvn vertx:init
-
-cd ${DIRNAME}/examples/jersey-inject-vertx
-mvn vertx:init
-
-cd ${DIRNAME}/examples/vertx-jersey-jackson
-mvn vertx:init

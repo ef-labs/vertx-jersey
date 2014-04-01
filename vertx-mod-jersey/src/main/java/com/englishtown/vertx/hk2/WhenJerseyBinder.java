@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.hk2;
 
+import com.englishtown.vertx.jersey.inject.VertxJerseyBinder;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
@@ -37,6 +38,7 @@ public class WhenJerseyBinder extends AbstractBinder {
      */
     @Override
     protected void configure() {
+        install(new VertxJerseyBinder());
         bind(DefaultWhenJerseyServer.class).to(WhenJerseyServer.class);
     }
 }

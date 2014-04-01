@@ -32,6 +32,11 @@
             <artifactId>vertx-mod-hk2</artifactId>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>when.java</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <!--Test dependencies-->
         <dependency>
@@ -53,6 +58,11 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
+            <artifactId>when.java-testtools</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

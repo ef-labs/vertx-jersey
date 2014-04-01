@@ -120,7 +120,7 @@ You have 3 ways to start the Jersey Server:
 
 1. In your mod.json file, make the start Verticle JerseyModule (`"main": "com.englishtown.vertx.jersey.JerseyModule"`).
 2. In your own Verticle specified in mod.json `"main"`, create an instance of the JerseyServer and initialize similarly to how JerseyModule does.
-3. Use vertx-mod-jerseywhen, this uses When.java and simplifies the process.
+3. Use when.java and `com.englishtown.vertx.jersey.promises.WhenJerseyServer` to simplify the process.
 
 
 Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.
@@ -135,3 +135,43 @@ Or by setting a system property:
 `-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.5.0-final:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Note: if you are using vertx-mod-hk2, ensure you are using the same version as included in vertx-mod-jersey.
+
+
+## Promises
+
+Provides when.java wrappers to create a JerseyServer.  You must provide the when.java dependency.
+
+### Example
+
+The following example assumes a `com.englishtown.vertx.jersey.promises.WhenJerseyServer` instance has been injected using the `com.englishtown.vertx.hk2.WhenJerseyBinder` and vertx-mod-hk2 module.
+
+```java
+
+    @Override
+    public void start(final Future<Void> startedResult) {
+
+        // Get the jersey server configuration
+        JsonObject config = config.getObject("jersey"); new JsonObject()
+
+        // Create the jersey server and set the startedResult
+        whenJerseyServer.createServer(config).then(
+                new FulfilledRunnable<JerseyServer>() {
+                    @Override
+                    public Promise<JerseyServer, Void> run(JerseyServer value) {
+                        start();
+                        startedResult.setResult(null);
+                        return null;
+                    }
+                },
+                new RejectedRunnable<JerseyServer>() {
+                    @Override
+                    public Promise<JerseyServer, Void> run(Value<JerseyServer> value) {
+                        startedResult.setFailure(value.error);
+                        return null;
+                    }
+                }
+        );
+
+    }
+
+```

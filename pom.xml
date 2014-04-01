@@ -16,7 +16,6 @@
     <modules>
         <module>vertx-mod-jersey</module>
         <module>vertx-mod-jerseymetrics</module>
-        <module>vertx-mod-jerseywhen</module>
         <module>examples</module>
     </modules>
 
@@ -27,6 +26,8 @@
 
         <vertx.version>2.1RC1</vertx.version>
         <vertx.mod.hk2.version>1.6.0-SNAPSHOT</vertx.mod.hk2.version>
+        <when.java.version>2.0.0-SNAPSHOT</when.java.version>
+        <when.java.testtools.version>2.0.0-SNAPSHOT</when.java.testtools.version>
     </properties>
 
     <dependencyManagement>
@@ -64,6 +65,18 @@
                 <artifactId>vertx-mod-hk2</artifactId>
                 <version>${vertx.mod.hk2.version}</version>
                 <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.englishtown</groupId>
+                <artifactId>when.java</artifactId>
+                <version>${when.java.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.englishtown</groupId>
+                <artifactId>when.java-testtools</artifactId>
+                <version>${when.java.testtools.version}</version>
+                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
