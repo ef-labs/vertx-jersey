@@ -1,8 +1,11 @@
 package com.englishtown.vertx.jersey.examples.resources;
 
+import com.englishtown.vertx.jersey.WriteStreamOutput;
+import com.englishtown.vertx.jersey.impl.DefaultWriteStreamOutput;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
+import org.vertx.java.core.buffer.Buffer;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -10,7 +13,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.io.IOException;
 
 /**
@@ -116,6 +121,39 @@ public class ChunkedResource {
     @Produces(MediaType.TEXT_PLAIN)
     public String getString() {
         return value;
+    }
+
+    @GET
+    @Path("stream")
+    @Produces(MediaType.TEXT_PLAIN)
+    public void getStream(
+            @Context final Vertx vertx,
+            @Suspended final AsyncResponse asyncResponse) {
+
+        final WriteStreamOutput writeStreamOutput = new DefaultWriteStreamOutput();
+        final Buffer buffer1 = new Buffer().appendString("abcdefghijklmnopqrstuvwxyz");
+        final Buffer buffer2 = new Buffer().appendString("0123456789");
+        int length = buffer1.length() + buffer2.length();
+
+        asyncResponse.resume(Response
+                .ok(writeStreamOutput)
+                .header(HttpHeaders.CONTENT_LENGTH, length)
+                .build());
+
+        vertx.runOnContext(new Handler<Void>() {
+            @Override
+            public void handle(Void event) {
+                writeStreamOutput.write(buffer1);
+
+                vertx.runOnContext(new Handler<Void>() {
+                    @Override
+                    public void handle(Void event) {
+                        writeStreamOutput.write(buffer2);
+                        writeStreamOutput.end();
+                    }
+                });
+            }
+        });
     }
 
 }

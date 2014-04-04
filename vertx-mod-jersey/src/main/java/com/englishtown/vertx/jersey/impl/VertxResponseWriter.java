@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.WriteStreamOutput;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.jersey.server.ContainerException;
@@ -185,6 +186,38 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
     }
 
+    private static class NOPOutputStream extends OutputStream {
+
+        private NOPOutputStream() {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(int b) throws IOException {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b) throws IOException {
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public void write(byte[] b, int off, int len) throws IOException {
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+
+    }
+
     private final HttpServerRequest vertxRequest;
     private final Vertx vertx;
     private final Container container;
@@ -194,6 +227,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     private long suspendTimerId;
     private TimeoutHandler timeoutHandler;
     private ContainerResponse jerseyResponse;
+    private boolean isWriteStream;
 
     @Inject
     public VertxResponseWriter(
@@ -243,6 +277,16 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         if (responseContext.isChunked()) {
             response.setChunked(true);
             return new VertxChunkedOutputStream(response);
+        } else if (responseContext.hasEntity() && WriteStreamOutput.class.isAssignableFrom(responseContext.getEntityClass())) {
+            WriteStreamOutput writeStreamOutput = (WriteStreamOutput) responseContext.getEntity();
+            writeStreamOutput.init(response, new Handler<Void>() {
+                @Override
+                public void handle(Void event) {
+                    end();
+                }
+            });
+            isWriteStream = true;
+            return new NOPOutputStream();
         } else {
             return new VertxOutputStream(response);
         }
@@ -304,6 +348,13 @@ public class VertxResponseWriter implements ContainerResponseWriter {
      */
     @Override
     public void commit() {
+        // End the vertx response if not a write stream
+        if (!isWriteStream) {
+            end();
+        }
+    }
+
+    protected void end() {
         // End the vertx response
         vertxRequest.response().end();
 

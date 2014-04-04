@@ -27,19 +27,16 @@ import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyConfigurator;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
+import com.englishtown.vertx.jersey.impl.*;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
 import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
+import javax.inject.Singleton;
+import javax.ws.rs.ext.MessageBodyWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -141,6 +138,7 @@ public class VertxJerseyBinder extends AbstractBinder {
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyConfigurator.class).to(JerseyConfigurator.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
+        bind(WriteStreamBodyWriter.class).to(MessageBodyWriter.class).in(Singleton.class);
 
         bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {
         });
