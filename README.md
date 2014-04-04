@@ -129,10 +129,10 @@ Use #1 if you don't have anything else to do at application start.  Use #2 if yo
 The JerseyModule requires dependency injection.  An HK2 binder `com.englishtown.vertx.hk2.BootstrapBinder` is provided for use with the vertx-mod-hk2 module.
 
 If using HK2, ensure you have configured the HK2VerticleFactory in langs.properties:
-`java=com.englishtown~vertx-mod-hk2~1.5.0-final:com.englishtown.vertx.hk2.HK2VerticleFactory`
+`java=com.englishtown~vertx-mod-hk2~1.6.0-SNAPSHOT:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Or by setting a system property:
-`-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.5.0-final:com.englishtown.vertx.hk2.HK2VerticleFactory`
+`-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.6.0-SNAPSHOT:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Note: if you are using vertx-mod-hk2, ensure you are using the same version as included in vertx-mod-jersey.
 
