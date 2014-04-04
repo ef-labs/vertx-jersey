@@ -134,7 +134,7 @@ If using HK2, ensure you have configured the HK2VerticleFactory in langs.propert
 Or by setting a system property:
 `-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.6.0-SNAPSHOT:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
-Note: if you are using vertx-mod-hk2, ensure you are using the same version as included in vertx-mod-jersey.
+__Note: if you are using vertx-mod-hk2, ensure you are using 1.5.0-final or higher.__
 
 
 ## Promises
