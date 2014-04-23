@@ -189,10 +189,9 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         checkState();
         String basePath = config.getString(CONFIG_BASE_PATH, "/");
 
-        // TODO: Does basePath need the trailing "/"?
-//        if (!basePath.endsWith("/")) {
-//            basePath += "/";
-//        }
+        if (!basePath.endsWith("/")) {
+            basePath += "/";
+        }
 
         return URI.create(basePath);
     }

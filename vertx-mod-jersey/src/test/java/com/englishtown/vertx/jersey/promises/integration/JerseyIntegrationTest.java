@@ -38,7 +38,6 @@ import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
-import org.glassfish.hk2.utilities.Binder;
 import org.junit.Test;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;

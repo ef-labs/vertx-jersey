@@ -148,7 +148,8 @@ public class IntegrationTestVerticle extends TestVerticle {
                     public void handle(HttpClientResponse response) {
                         verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{}");
                     }
-                });
+                }
+        );
 
         request.end();
     }
@@ -165,7 +166,8 @@ public class IntegrationTestVerticle extends TestVerticle {
                     public void handle(HttpClientResponse response) {
                         verifyResponse(response, 200, contentType, "foo_cb({})");
                     }
-                });
+                }
+        );
 
         request.headers().add(HttpHeaders.ACCEPT, contentType);
         request.end();
@@ -182,7 +184,8 @@ public class IntegrationTestVerticle extends TestVerticle {
                     public void handle(HttpClientResponse response) {
                         verifyResponse(response, 200, MediaType.TEXT_HTML, null);
                     }
-                });
+                }
+        );
 
         request.end();
     }
@@ -198,7 +201,8 @@ public class IntegrationTestVerticle extends TestVerticle {
                     public void handle(HttpClientResponse response) {
                         verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{\"name\":\"async response\"}");
                     }
-                });
+                }
+        );
 
         request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         request.end("{\"name\":\"post\"}");
@@ -215,7 +219,8 @@ public class IntegrationTestVerticle extends TestVerticle {
                     public void handle(HttpClientResponse response) {
                         verifyResponse(response, 200, MediaType.TEXT_PLAIN, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
                     }
-                });
+                }
+        );
 
         request.end();
     }

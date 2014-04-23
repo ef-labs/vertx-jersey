@@ -37,6 +37,7 @@ import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.http.HttpServer;
+import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.RouteMatcher;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
@@ -44,8 +45,8 @@ import org.vertx.java.platform.Container;
 import javax.inject.Provider;
 import java.net.URI;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 /**
@@ -55,6 +56,7 @@ import static org.mockito.Mockito.*;
 public class DefaultJerseyServerTest {
 
     DefaultJerseyServer jerseyServer;
+    URI baseUri = URI.create("http://test.englishtown.com/test");
 
     @Mock
     Vertx vertx;
@@ -78,6 +80,8 @@ public class DefaultJerseyServerTest {
     JerseyConfigurator configurator;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<HttpServerRequest>> requestHandlerCaptor;
 
     @Before
     public void setUp() {
@@ -90,6 +94,7 @@ public class DefaultJerseyServerTest {
         when(httpServer.setKeyStorePassword(anyString())).thenReturn(httpServer);
         when(httpServer.setKeyStorePath(anyString())).thenReturn(httpServer);
 
+        when(jerseyHandler.getBaseUri()).thenReturn(baseUri);
         when(jerseyHandlerProvider.get()).thenReturn(jerseyHandler);
         jerseyServer = new DefaultJerseyServer(jerseyHandlerProvider);
 
@@ -97,10 +102,15 @@ public class DefaultJerseyServerTest {
 
     private void verifyResults(int port, String host) {
 
-        verify(vertx, times(1)).createHttpServer();
+        verify(vertx).createHttpServer();
         verify(jerseyHandler).init(any(JerseyConfigurator.class));
-        verify(httpServer).requestHandler(jerseyHandler);
-        verify(httpServer, times(1)).listen(eq(port), eq(host), Matchers.<Handler<AsyncResult<HttpServer>>>any());
+
+        verify(httpServer).requestHandler(requestHandlerCaptor.capture());
+        Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
+        assertNotNull(handler);
+        assertThat(handler, is(RouteMatcher.class));
+
+        verify(httpServer).listen(eq(port), eq(host), Matchers.<Handler<AsyncResult<HttpServer>>>any());
 
     }
 

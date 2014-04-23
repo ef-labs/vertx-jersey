@@ -25,7 +25,6 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.utilities.Binder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,10 +38,7 @@ import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.core.logging.Logger;
 import org.vertx.java.platform.Container;
 
-import javax.inject.Provider;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
@@ -108,6 +104,7 @@ public class DefaultJerseyConfiguratorTest {
 
         expected = "test/base/path";
         config.putString(DefaultJerseyConfigurator.CONFIG_BASE_PATH, expected);
+        expected += "/";
 
         uri = configurator.getBaseUri();
         assertEquals(expected, uri.getPath());
