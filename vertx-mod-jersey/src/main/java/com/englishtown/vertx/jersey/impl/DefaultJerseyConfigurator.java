@@ -188,11 +188,6 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     public URI getBaseUri() {
         checkState();
         String basePath = config.getString(CONFIG_BASE_PATH, "/");
-
-        if (!basePath.endsWith("/")) {
-            basePath += "/";
-        }
-
         return URI.create(basePath);
     }
 

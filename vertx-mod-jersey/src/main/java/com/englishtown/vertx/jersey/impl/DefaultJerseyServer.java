@@ -85,9 +85,14 @@ public class DefaultJerseyServer implements JerseyServer {
 
         // Set request handler for the baseUri
         RouteMatcher rm = new RouteMatcher();
-        String pattern = "^" + jerseyHandler.getBaseUri().getPath() + ".*";
-        rm.all(pattern, jerseyHandler);
         server.requestHandler(rm);
+        String pattern = "^" + jerseyHandler.getBaseUri().getPath();
+        if (pattern.endsWith("/")) {
+            rm.all(pattern + ".*", jerseyHandler);
+        } else {
+            rm.all(pattern + "$", jerseyHandler);
+            rm.all(pattern + "/.*", jerseyHandler);
+        }
 
         // Add any additional routes if handler is provided
         if (routeMatcherHandler != null) {
