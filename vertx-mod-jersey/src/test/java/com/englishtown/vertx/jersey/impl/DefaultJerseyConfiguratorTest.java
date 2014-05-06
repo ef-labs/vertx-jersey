@@ -104,6 +104,7 @@ public class DefaultJerseyConfiguratorTest {
 
         expected = "test/base/path";
         config.putString(DefaultJerseyConfigurator.CONFIG_BASE_PATH, expected);
+        expected += "/";
 
         uri = configurator.getBaseUri();
         assertEquals(expected, uri.getPath());
