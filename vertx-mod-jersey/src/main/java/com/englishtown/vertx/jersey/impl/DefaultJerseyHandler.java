@@ -48,6 +48,7 @@ import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
@@ -146,9 +147,13 @@ public class DefaultJerseyHandler implements JerseyHandler {
         URI uri = getAbsoluteURI(vertxRequest);
         boolean isSecure = "https".equalsIgnoreCase(uri.getScheme());
 
+        UriBuilder baseUriBuilder = UriBuilder.fromUri(uri)
+                .replacePath(baseUri.getPath())
+                .replaceQuery(null);
+
         // Create the jersey request
         final ContainerRequest jerseyRequest = new ContainerRequest(
-                baseUri,
+                baseUriBuilder.build(),
                 uri,
                 vertxRequest.method(),
                 new DefaultSecurityContext(isSecure),
@@ -160,8 +165,26 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     protected URI getAbsoluteURI(HttpServerRequest vertxRequest) {
 
+        URI absoluteUri;
+        String hostAndPort = vertxRequest.headers().get(HttpHeaders.HOST);
+
         try {
-            return vertxRequest.absoluteURI();
+            absoluteUri = vertxRequest.absoluteURI();
+
+            if (hostAndPort != null && !hostAndPort.isEmpty()) {
+                String[] parts = hostAndPort.split(":");
+                String host = parts[0];
+                int port = (parts.length > 1 ? Integer.valueOf(parts[1]) : -1);
+
+                if (!host.equalsIgnoreCase(absoluteUri.getHost()) || port != absoluteUri.getPort()) {
+                     absoluteUri = UriBuilder.fromUri(absoluteUri)
+                             .host(host)
+                             .port(port)
+                             .build();
+                }
+            }
+
+            return absoluteUri;
         } catch (IllegalArgumentException e) {
             String uri = vertxRequest.uri();
 

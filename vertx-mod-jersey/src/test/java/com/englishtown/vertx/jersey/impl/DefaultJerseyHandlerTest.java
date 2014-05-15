@@ -94,6 +94,8 @@ public class DefaultJerseyHandlerTest {
     Ref<Vertx> vertxRef;
     @Mock
     Ref<Container> containerRef;
+    @Mock
+    MultiMap headers;
     @Captor
     ArgumentCaptor<Handler<Buffer>> dataHandlerCaptor;
     @Captor
@@ -107,9 +109,11 @@ public class DefaultJerseyHandlerTest {
         when(configurator.getMaxBodySize()).thenReturn(1024);
         when(configurator.getVertx()).thenReturn(vertx);
         when(configurator.getContainer()).thenReturn(container);
+        when(configurator.getBaseUri()).thenReturn(URI.create("/test/"));
 
         when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
         when(request.response()).thenReturn(response);
+        when(request.headers()).thenReturn(headers);
 
         when(container.config()).thenReturn(config);
         when(container.logger()).thenReturn(logger);
@@ -233,12 +237,15 @@ public class DefaultJerseyHandlerTest {
     public void testGetAbsoluteURI() throws Exception {
         URI uri;
 
-        String goodUrl = "http://test.englishtown.com/test";
+        String absoluteUri = "http://0.0.0.0:80/test";
+        String host = "test.englishtown.com";
         String badUrl = "http://test.englishtown.com/test?a=b=c|d=e";
 
         HttpServerRequest request = mock(HttpServerRequest.class);
-        when(request.absoluteURI()).thenReturn(URI.create(goodUrl)).thenThrow(new IllegalArgumentException());
+        when(request.absoluteURI()).thenReturn(URI.create(absoluteUri)).thenThrow(new IllegalArgumentException());
         when(request.uri()).thenReturn(badUrl);
+        when(request.headers()).thenReturn(headers);
+        when(headers.get(eq(HttpHeaders.HOST))).thenReturn(host);
 
         jerseyHandler.init(configurator);
 
