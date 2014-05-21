@@ -91,9 +91,9 @@ public class VertxResponseWriterTest {
     public void testWriteResponseStatusAndHeaders() throws Exception {
 
         ContainerResponse cr = mock(ContainerResponse.class);
-        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
-        when(cr.getHeaders()).thenReturn(headers);
+        when(cr.getStringHeaders()).thenReturn(headers);
 
         VertxResponseProcessor processor1 = mock(VertxResponseProcessor.class);
         VertxResponseProcessor processor2 = mock(VertxResponseProcessor.class);
@@ -119,9 +119,9 @@ public class VertxResponseWriterTest {
     public void testWrite() throws Exception {
 
         ContainerResponse cr = mock(ContainerResponse.class);
-        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
-        when(cr.getHeaders()).thenReturn(headers);
+        when(cr.getStringHeaders()).thenReturn(headers);
 
         DefaultHttpHeaders httpHeaders = new DefaultHttpHeaders();
         MultiMap vertxHeaders = new HttpHeadersAdapter(httpHeaders);
@@ -160,9 +160,9 @@ public class VertxResponseWriterTest {
     public void testWrite_Chunked() throws Exception {
 
         ContainerResponse cr = mock(ContainerResponse.class);
-        MultivaluedMap<String, Object> headers = new MultivaluedHashMap<>();
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
         when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
-        when(cr.getHeaders()).thenReturn(headers);
+        when(cr.getStringHeaders()).thenReturn(headers);
         when(cr.isChunked()).thenReturn(true);
 
         OutputStream outputStream = writer.writeResponseStatusAndHeaders(-1, cr);

@@ -260,9 +260,9 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             response.putHeader(HttpHeaders.CONTENT_LENGTH, String.valueOf(contentLength));
         }
 
-        for (final Map.Entry<String, List<Object>> e : responseContext.getHeaders().entrySet()) {
-            for (final Object value : e.getValue()) {
-                response.putHeader(e.getKey(), String.valueOf(value));
+        for (final Map.Entry<String, List<String>> e : responseContext.getStringHeaders().entrySet()) {
+            for (final String value : e.getValue()) {
+                response.putHeader(e.getKey(), value);
             }
         }
 
