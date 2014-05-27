@@ -5,7 +5,7 @@
 
     <artifactId>vertx-jersey</artifactId>
     <packaging>pom</packaging>
-    <version>2.5.0-SNAPSHOT</version>
+    <version>2.5.0</version>
 
     <parent>
         <groupId>com.englishtown</groupId>
@@ -21,7 +21,7 @@
 
     <properties>
         <!--Dependency versions-->
-        <jersey.version>2.9</jersey.version>
+        <jersey.version>2.8</jersey.version>
         <asm.version>3.3.1</asm.version>
 
         <vertx.mod.hk2.version>1.6.0</vertx.mod.hk2.version>
