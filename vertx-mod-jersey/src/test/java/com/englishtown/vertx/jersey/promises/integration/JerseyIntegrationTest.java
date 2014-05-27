@@ -56,7 +56,7 @@ import static org.vertx.testtools.VertxAssert.*;
 /**
  * Integration test for
  */
-@TestVerticleInfo(includes = "com.englishtown~vertx-mod-jersey~2.5.0-SNAPSHOT")
+@TestVerticleInfo(includes = "com.englishtown~vertx-mod-jersey~2.5.0")
 public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
 
     String host = "localhost";
