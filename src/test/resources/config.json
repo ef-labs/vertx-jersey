@@ -1,8 +1,0 @@
-{
-    "hk2_binder": "com.englishtown.vertx.jersey.integration.IntegrationBinder",
-    "host": "localhost",
-    "port": 8080,
-    "base_path": "/rest",
-    "resources": ["com.englishtown.vertx.jersey.resources"],
-    "features": ["org.glassfish.jersey.jackson.JacksonFeature"]
-}

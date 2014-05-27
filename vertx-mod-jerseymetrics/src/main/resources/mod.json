@@ -1,0 +1,8 @@
+{
+    "includes": "com.englishtown~vertx-mod-jersey~2.5.0,com.englishtown~vertx-mod-metrics~1.0.0",
+    "description":"Adds metrics for vertx-mod-jersey requests",
+    "licenses": ["The MIT License"],
+    "author": "Englishtown",
+    "keywords": ["JAX-RS", "Jersey", "metrics", "REST", "RESTful", "JSR 339"],
+    "homepage": "https://github.com/englishtown/vertx-mod-jersey"
+}
