@@ -12,7 +12,7 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.mod.metrics.version>1.0.0-SNAPSHOT</vertx.mod.metrics.version>
+        <vertx.mod.metrics.version>1.0.0</vertx.mod.metrics.version>
     </properties>
 
     <dependencies>
