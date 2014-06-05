@@ -26,6 +26,7 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
+import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServer;
@@ -40,8 +41,9 @@ import javax.inject.Provider;
  */
 public class DefaultJerseyServer implements JerseyServer {
 
-    private final JerseyHandler jerseyHandler;
+    private JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
+    private HttpServer server;
 
     @Inject
     public DefaultJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider) {
@@ -62,7 +64,7 @@ public class DefaultJerseyServer implements JerseyServer {
             final Handler<AsyncResult<HttpServer>> doneHandler) {
 
         // Create http server
-        HttpServer server = configurator.getVertx().createHttpServer();
+        server = configurator.getVertx().createHttpServer();
 
         // Enable https
         if (configurator.getSSL()) {
@@ -130,5 +132,21 @@ public class DefaultJerseyServer implements JerseyServer {
     @Override
     public JerseyHandler getHandler() {
         return jerseyHandler;
+    }
+
+    /**
+     * Releases resources
+     */
+    @Override
+    public void close() {
+        // Destroy the jersey service locator
+        if (jerseyHandler != null && jerseyHandler.getDelegate() != null) {
+            ServiceLocatorFactory.getInstance().destroy(jerseyHandler.getDelegate().getServiceLocator());
+            jerseyHandler = null;
+        }
+        if (server != null) {
+            server.close();
+            server = null;
+        }
     }
 }

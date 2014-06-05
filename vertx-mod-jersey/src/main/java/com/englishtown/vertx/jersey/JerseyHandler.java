@@ -41,4 +41,6 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
 
     URI getBaseUri();
 
+    ApplicationHandlerDelegate getDelegate();
+
 }

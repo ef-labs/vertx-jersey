@@ -100,6 +100,11 @@ public class DefaultJerseyHandler implements JerseyHandler {
         return baseUri;
     }
 
+    @Override
+    public ApplicationHandlerDelegate getDelegate() {
+        return applicationHandlerDelegate;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -177,10 +182,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 int port = (parts.length > 1 ? Integer.valueOf(parts[1]) : -1);
 
                 if (!host.equalsIgnoreCase(absoluteUri.getHost()) || port != absoluteUri.getPort()) {
-                     absoluteUri = UriBuilder.fromUri(absoluteUri)
-                             .host(host)
-                             .port(port)
-                             .build();
+                    absoluteUri = UriBuilder.fromUri(absoluteUri)
+                            .host(host)
+                            .port(port)
+                            .build();
                 }
             }
 

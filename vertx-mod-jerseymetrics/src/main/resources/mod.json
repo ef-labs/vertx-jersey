@@ -1,5 +1,5 @@
 {
-    "includes": "com.englishtown~vertx-mod-jersey~2.5.0,com.englishtown~vertx-mod-metrics~1.0.0",
+    "includes": "com.englishtown~vertx-mod-jersey~2.6.0-SNAPSHOT,com.englishtown~vertx-mod-metrics~1.0.0",
     "description":"Adds metrics for vertx-mod-jersey requests",
     "licenses": ["The MIT License"],
     "author": "Englishtown",

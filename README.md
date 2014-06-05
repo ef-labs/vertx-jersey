@@ -101,7 +101,7 @@ Add vertx-mod-jersey as an include in your mod.json.
 
 ```json
 {
-    "includes": "com.englishtown~vertx-mod-jersey~2.5.0"
+    "includes": "com.englishtown~vertx-mod-jersey~2.6.0-SNAPSHOT"
 }
 ```
 
@@ -111,7 +111,7 @@ The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, j
 <dependency>
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
-    <version>2.5.0</version>
+    <version>2.6.0-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -129,10 +129,10 @@ Use #1 if you don't have anything else to do at application start.  Use #2 if yo
 The JerseyModule requires dependency injection.  An HK2 binder `com.englishtown.vertx.hk2.BootstrapBinder` is provided for use with the vertx-mod-hk2 module.
 
 If using HK2, ensure you have configured the HK2VerticleFactory in langs.properties:
-`java=com.englishtown~vertx-mod-hk2~1.6.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
+`java=com.englishtown~vertx-mod-hk2~1.7.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Or by setting a system property:
-`-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.6.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
+`-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.7.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 __Note: if you are using vertx-mod-hk2, ensure you are using 1.5.0-final or higher.__
 
