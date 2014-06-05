@@ -62,4 +62,9 @@ public interface JerseyServer {
      */
     JerseyHandler getHandler();
 
+    /**
+     * Release resources
+     */
+    void close();
+
 }

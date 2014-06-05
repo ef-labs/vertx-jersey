@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey;
 
+import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;
@@ -40,6 +41,7 @@ public class JerseyModule extends Verticle {
 
     private final Provider<JerseyConfigurator> configuratorProvider;
     private final Provider<JerseyServer> jerseyServerProvider;
+    private JerseyServer jerseyServer;
 
     @Inject
     public JerseyModule(Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider) {
@@ -55,7 +57,7 @@ public class JerseyModule extends Verticle {
         this.start();
 
         JsonObject config = container.config();
-        JerseyServer jerseyServer = jerseyServerProvider.get();
+        jerseyServer = jerseyServerProvider.get();
         JerseyConfigurator configurator = configuratorProvider.get();
 
         configurator.init(config, vertx, container);
@@ -73,4 +75,12 @@ public class JerseyModule extends Verticle {
 
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop() {
+        jerseyServer.close();
+        jerseyServer = null;
+    }
 }
