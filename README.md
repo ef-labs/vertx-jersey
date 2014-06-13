@@ -101,7 +101,7 @@ Add vertx-mod-jersey as an include in your mod.json.
 
 ```json
 {
-    "includes": "com.englishtown~vertx-mod-jersey~2.6.0-SNAPSHOT"
+    "includes": "com.englishtown~vertx-mod-jersey~2.6.0"
 }
 ```
 
@@ -111,7 +111,7 @@ The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, j
 <dependency>
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
-    <version>2.6.0-SNAPSHOT</version>
+    <version>2.6.0</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -134,7 +134,7 @@ If using HK2, ensure you have configured the HK2VerticleFactory in langs.propert
 Or by setting a system property:
 `-Dvertx.langs.java=com.englishtown~vertx-mod-hk2~1.7.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
-__Note: if you are using vertx-mod-hk2, ensure you are using 1.5.0-final or higher.__
+__Note: if you are using vertx-mod-hk2, ensure you are using 1.7.0 or higher.__
 
 
 ## Promises
