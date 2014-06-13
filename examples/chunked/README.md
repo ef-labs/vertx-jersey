@@ -20,7 +20,7 @@ mod.json instructs vert.x to include the vertx-mod-jersey module and to run `com
 ```json
 {
     "main": "com.englishtown.vertx.jersey.JerseyModule",
-    "includes": "com.englishtown~vertx-mod-jersey~2.6.0-SNAPSHOT"
+    "includes": "com.englishtown~vertx-mod-jersey~2.6.0"
 }
 ```
 
