@@ -19,6 +19,7 @@
         <module>inject-vertxrequesthandler</module>
         <module>inject-vertx</module>
         <module>jackson</module>
+        <module>guice</module>
     </modules>
 
     <build>

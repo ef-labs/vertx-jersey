@@ -41,16 +41,14 @@ import javax.inject.Provider;
  */
 public class DefaultJerseyServer implements JerseyServer {
 
+    private final Provider<JerseyHandler> jerseyHandlerProvider;
     private JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
     private HttpServer server;
 
     @Inject
     public DefaultJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider) {
-        this.jerseyHandler = jerseyHandlerProvider.get();
-        if (jerseyHandler == null) {
-            throw new IllegalStateException("The JerseyHandler provider returned null");
-        }
+        this.jerseyHandlerProvider = jerseyHandlerProvider;
     }
 
     @Override
@@ -62,6 +60,11 @@ public class DefaultJerseyServer implements JerseyServer {
     public void init(
             final JerseyConfigurator configurator,
             final Handler<AsyncResult<HttpServer>> doneHandler) {
+
+        this.jerseyHandler = jerseyHandlerProvider.get();
+        if (jerseyHandler == null) {
+            throw new IllegalStateException("The JerseyHandler provider returned null");
+        }
 
         // Create http server
         server = configurator.getVertx().createHttpServer();

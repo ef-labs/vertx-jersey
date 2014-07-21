@@ -32,6 +32,21 @@
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
+            <artifactId>vertx-mod-guice</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.hk2</groupId>
+            <artifactId>guice-bridge</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-multibindings</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown</groupId>
             <artifactId>when.java</artifactId>
             <scope>provided</scope>
         </dependency>
