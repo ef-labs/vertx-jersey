@@ -7,9 +7,7 @@ import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
-import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -41,16 +39,6 @@ public class CustomBinder extends AbstractModule {
         Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GuiceRequestFilter.class);
         Multibinder.newSetBinder(binder(), ContainerResponseFilter.class).addBinding().to(GuiceResponseFilter.class);
 
-    }
-
-    @Provides
-    List<ContainerRequestFilter> provideContainerRequestFilters(Set<ContainerRequestFilter> filters) {
-        return new ArrayList<>(filters);
-    }
-
-    @Provides
-    List<ContainerResponseFilter> provideContainerResponseFilters(Set<ContainerResponseFilter> filters) {
-        return new ArrayList<>(filters);
     }
 
 }

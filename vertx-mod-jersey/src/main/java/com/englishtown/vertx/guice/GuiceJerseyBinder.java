@@ -18,9 +18,15 @@ import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
+import org.glassfish.jersey.server.ContainerResponse;
+import org.glassfish.jersey.server.model.ModelProcessor;
 
 import javax.inject.Singleton;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -49,6 +55,12 @@ public class GuiceJerseyBinder extends AbstractModule {
         Multibinder.newSetBinder(binder(), VertxRequestProcessor.class);
         Multibinder.newSetBinder(binder(), VertxResponseProcessor.class);
         Multibinder.newSetBinder(binder(), VertxPostResponseProcessor.class);
+
+        Multibinder.newSetBinder(binder(), ContainerRequestFilter.class);
+        Multibinder.newSetBinder(binder(), ContainerResponseFilter.class);
+        Multibinder.newSetBinder(binder(), ReaderInterceptor.class);
+        Multibinder.newSetBinder(binder(), WriterInterceptor.class);
+        Multibinder.newSetBinder(binder(), ModelProcessor.class);
 
     }
 
