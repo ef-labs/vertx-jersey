@@ -126,9 +126,24 @@ You have 3 ways to start the Jersey Server:
 Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.
 
 #### Dependency Injection
-The JerseyModule requires dependency injection.  An HK2 binder `com.englishtown.vertx.hk2.BootstrapBinder` is provided for use with the vertx-mod-hk2 module.
+The JerseyModule requires dependency injection.  Guice and HK2 binders are provided:
 
-If using HK2, ensure you have configured the HK2VerticleFactory in langs.properties:
+* `com.englishtown.vertx.guice.BootstrapBinder`
+* `com.englishtown.vertx.hk2.BootstrapBinder`
+
+See the examples directory for working hk2 and guice samples.
+
+##### vertx-mod-guice
+If using vertx-mod-guice, ensure you have configured the GuiceVerticleFactory in langs.properties:
+`java=com.englishtown~vertx-mod-guice~1.3.0-final:com.englishtown.vertx.guice.GuiceVerticleFactory`
+
+Or by setting a system property:
+`-Dvertx.langs.java=com.englishtown~vertx-mod-guice~1.3.0-final:com.englishtown.vertx.guice.GuiceVerticleFactory`
+
+__Note: The Guice Multibindings extension is required.__
+
+##### vertx-mod-hk2
+If using vertx-mod-hk2, ensure you have configured the HK2VerticleFactory in langs.properties:
 `java=com.englishtown~vertx-mod-hk2~1.7.0:com.englishtown.vertx.hk2.HK2VerticleFactory`
 
 Or by setting a system property:

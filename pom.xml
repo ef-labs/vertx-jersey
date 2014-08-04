@@ -87,6 +87,12 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>org.glassfish.hk2</groupId>
+                <artifactId>hk2-locator</artifactId>
+                <version>${hk2.guice.bridge.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.englishtown</groupId>
                 <artifactId>when.java</artifactId>
                 <version>${when.java.version}</version>
