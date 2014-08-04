@@ -6,7 +6,7 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.core.http.HttpServerRequest;
 
 /**
- * Created by adriangonzalez on 7/21/14.
+ * Example guice implementation of {@link com.englishtown.vertx.jersey.inject.VertxRequestProcessor}
  */
 public class GuiceRequestProcessor implements VertxRequestProcessor {
     /**

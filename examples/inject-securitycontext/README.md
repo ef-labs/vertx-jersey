@@ -1,6 +1,6 @@
 # inject-securitycontext
 
-This sample shows running jersey inside vert.x using a SecurityContextProvider to provide a custom SeurityContext.
+This sample shows running jersey inside vert.x using a SecurityContextProvider to provide a custom SecurityContext.
 It also demonstrates using the JAX-RS `@RolesAllowed` security annotation.
 
 ## Run It

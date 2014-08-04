@@ -6,7 +6,7 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import java.io.IOException;
 
 /**
- * Created by adriangonzalez on 7/21/14.
+ * Example guice implementation of {@link javax.ws.rs.container.ContainerResponseFilter}
  */
 public class GuiceResponseFilter implements ContainerResponseFilter {
     /**

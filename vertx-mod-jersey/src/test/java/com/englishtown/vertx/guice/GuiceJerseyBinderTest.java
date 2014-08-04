@@ -32,6 +32,7 @@ public class GuiceJerseyBinderTest {
     AnnotatedBindingBuilder annotatedBindingBuilder;
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
 
         when(builder.skipSources(Matchers.<Class[]>anyVararg())).thenReturn(builder);

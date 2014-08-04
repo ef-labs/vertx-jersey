@@ -5,7 +5,7 @@ import org.glassfish.jersey.server.ContainerResponse;
 import org.vertx.java.core.http.HttpServerResponse;
 
 /**
- * Created by adriangonzalez on 7/21/14.
+ * Example guice implementation of {@link com.englishtown.vertx.jersey.inject.VertxResponseProcessor}
  */
 public class GuiceResponseProcessor implements VertxResponseProcessor {
     /**
