@@ -21,7 +21,7 @@
 
     <properties>
         <!--Dependency versions-->
-        <jersey.version>2.9.1</jersey.version>
+        <jersey.version>2.11</jersey.version>
         <asm.version>3.3.1</asm.version>
 
         <vertx.mod.hk2.version>1.7.0</vertx.mod.hk2.version>
