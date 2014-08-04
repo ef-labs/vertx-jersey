@@ -17,7 +17,7 @@ public interface WriteStreamOutput extends WriteStream<WriteStreamOutput> {
      *
      * @param response   the response object
      * @param endHandler the end handler called when writes are completed
-     * @return
+     * @return the current write stream output
      */
     WriteStreamOutput init(HttpServerResponse response, Handler<Void> endHandler);
 
@@ -25,14 +25,12 @@ public interface WriteStreamOutput extends WriteStream<WriteStreamOutput> {
      * Flag to indicate if the {@link org.vertx.java.core.http.HttpServerResponse} has been set yet.
      * The response must be set before you write.
      *
-     * @return
+     * @return boolean flag
      */
     boolean isResponseSet();
 
     /**
      * Ends the current http response
-     *
-     * @return
      */
     void end();
 }

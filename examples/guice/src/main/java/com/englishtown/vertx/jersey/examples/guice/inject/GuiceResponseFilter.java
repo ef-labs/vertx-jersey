@@ -10,17 +10,7 @@ import java.io.IOException;
  */
 public class GuiceResponseFilter implements ContainerResponseFilter {
     /**
-     * Filter method called after a response has been provided for a request
-     * (either by a {@link ContainerRequestFilter request filter} or by a
-     * matched resource method.
-     * <p>
-     * Filters in the filter chain are ordered according to their {@code javax.annotation.Priority}
-     * class-level annotation value.
-     * </p>
-     *
-     * @param requestContext  request context.
-     * @param responseContext response context.
-     * @throws java.io.IOException if an I/O exception occurs.
+     * {@inheritDoc}
      */
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {

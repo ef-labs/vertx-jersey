@@ -32,8 +32,6 @@ import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.inject.Inject;
 
-import static com.codahale.metrics.MetricRegistry.name;
-
 /**
  * Adds metrics for vert.x requests
  */

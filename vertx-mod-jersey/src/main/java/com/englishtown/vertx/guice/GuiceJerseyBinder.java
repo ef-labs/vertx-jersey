@@ -1,10 +1,8 @@
 package com.englishtown.vertx.guice;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyConfigurator;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.WriteStreamBodyWriter;
@@ -18,7 +16,6 @@ import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
-import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.model.ModelProcessor;
 
 import javax.inject.Singleton;
@@ -32,7 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Created by adriangonzalez on 7/21/14.
+ * Guice Jersey binder
  */
 public class GuiceJerseyBinder extends AbstractModule {
 

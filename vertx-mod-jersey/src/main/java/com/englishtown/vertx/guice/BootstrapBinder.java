@@ -3,7 +3,7 @@ package com.englishtown.vertx.guice;
 import com.google.inject.AbstractModule;
 
 /**
- * Created by adriangonzalez on 7/21/14.
+ * Guice bootstrap jersey binder
  */
 public class BootstrapBinder extends AbstractModule {
 

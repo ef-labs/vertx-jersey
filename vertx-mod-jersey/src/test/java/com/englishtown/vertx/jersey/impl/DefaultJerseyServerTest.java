@@ -114,6 +114,7 @@ public class DefaultJerseyServerTest {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Test
     public void testInit_No_Handler() throws Exception {
 

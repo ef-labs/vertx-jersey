@@ -37,6 +37,12 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
         injectMultiBindings(locator, injector);
     }
 
+    /**
+     * This is a workaround for the hk2 bridge limitations
+     *
+     * @param locator the HK2 locator
+     * @param injector the Guice injector
+     */
     private void injectMultiBindings(ServiceLocator locator, Injector injector) {
 
         injectMultiBindings(locator, injector, new Key<Set<ContainerRequestFilter>>() {

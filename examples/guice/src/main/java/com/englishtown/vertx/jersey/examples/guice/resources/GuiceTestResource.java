@@ -23,7 +23,7 @@ public class GuiceTestResource {
 
     @GET
     public String doGet() {
-        return "Hello world!";
+        return "Instance of " + myDependency.getClass().getName() + " injected!";
     }
 
 }

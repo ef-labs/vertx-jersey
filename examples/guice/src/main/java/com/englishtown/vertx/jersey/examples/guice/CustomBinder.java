@@ -11,9 +11,6 @@ import com.google.inject.multibindings.Multibinder;
 
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Custom guice binder

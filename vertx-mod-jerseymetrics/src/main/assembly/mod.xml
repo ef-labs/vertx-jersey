@@ -36,7 +36,7 @@
 
     <fileSets>
         <fileSet>
-            <outputDirectory></outputDirectory>
+            <outputDirectory/>
             <directory>target/mods/${module.name}</directory>
             <includes>
                 <include>**</include>

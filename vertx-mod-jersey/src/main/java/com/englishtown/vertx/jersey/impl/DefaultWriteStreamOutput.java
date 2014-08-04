@@ -26,7 +26,7 @@ public class DefaultWriteStreamOutput implements WriteStreamOutput {
     /**
      * Flag to indicate if the {@link org.vertx.java.core.http.HttpServerResponse} has been set yet.
      *
-     * @return
+     * @return boolean flag
      */
     @Override
     public boolean isResponseSet() {

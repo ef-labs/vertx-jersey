@@ -36,7 +36,7 @@ public interface WhenJerseyServer {
      * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}
      *
      * @param config the jersey json configuration
-     * @return
+     * @return a promise for the server
      */
     Promise<JerseyServer> createServer(JsonObject config);
 
@@ -45,7 +45,7 @@ public interface WhenJerseyServer {
      * The promise type matches the WhenContainer signature to facilitate parallel deployments.
      *
      * @param config the jersey json configuration
-     * @return
+     * @return a promise for an empty string
      */
     Promise<String> createServerSimple(JsonObject config);
 
