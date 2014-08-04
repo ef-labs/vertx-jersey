@@ -23,7 +23,7 @@
 
 package com.englishtown.vertx.jersey.metrics.integration;
 
-import com.englishtown.vertx.jersey.inject.VertxJerseyBinder;
+import com.englishtown.vertx.hk2.HK2JerseyBinder;
 import com.englishtown.vertx.jersey.metrics.hk2.JerseyMetricsBinder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
@@ -37,6 +37,6 @@ public class IntegrationTestBinder extends AbstractBinder {
      */
     @Override
     protected void configure() {
-        install(new VertxJerseyBinder(), new JerseyMetricsBinder());
+        install(new HK2JerseyBinder(), new JerseyMetricsBinder());
     }
 }

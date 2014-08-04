@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.hk2;
 
-import com.englishtown.vertx.jersey.inject.VertxJerseyBinder;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 /**
@@ -40,6 +39,6 @@ public class BootstrapBinder extends AbstractBinder {
      */
     @Override
     protected void configure() {
-        install(new VertxJerseyBinder());
+        install(new HK2JerseyBinder());
     }
 }
