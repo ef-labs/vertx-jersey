@@ -30,20 +30,26 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
         initBridge(locator, injector);
     }
 
-    private void initBridge(ServiceLocator locator, Injector injector) {
+    /**
+     * Initialize the hk2 bridge
+     *
+     * @param locator  the HK2 locator
+     * @param injector the Guice injector
+     */
+    protected void initBridge(ServiceLocator locator, Injector injector) {
         GuiceBridge.getGuiceBridge().initializeGuiceBridge(locator);
         GuiceIntoHK2Bridge guiceBridge = locator.getService(GuiceIntoHK2Bridge.class);
         guiceBridge.bridgeGuiceInjector(injector);
-        injectMultiBindings(locator, injector);
+        injectMultibindings(locator, injector);
     }
 
     /**
      * This is a workaround for the hk2 bridge limitations
      *
-     * @param locator the HK2 locator
+     * @param locator  the HK2 locator
      * @param injector the Guice injector
      */
-    private void injectMultiBindings(ServiceLocator locator, Injector injector) {
+    protected void injectMultibindings(ServiceLocator locator, Injector injector) {
 
         injectMultiBindings(locator, injector, new Key<Set<ContainerRequestFilter>>() {
         }, ContainerRequestFilter.class);
@@ -58,7 +64,7 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
 
     }
 
-    private void injectMultiBindings(ServiceLocator locator, Injector injector, Key<? extends Set<?>> key, Type type) {
+    protected void injectMultiBindings(ServiceLocator locator, Injector injector, Key<? extends Set<?>> key, Type type) {
 
         Set<?> set = injector.getInstance(key);
 
