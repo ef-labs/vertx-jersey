@@ -195,7 +195,7 @@ public class DefaultJerseyHandlerTest {
         boolean result;
 
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
-        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM);
 
         when(request.method()).thenReturn(HttpMethod.GET).thenReturn(HttpMethod.PUT);
         when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
@@ -205,6 +205,12 @@ public class DefaultJerseyHandlerTest {
 
         result = jerseyHandler.shouldReadData(request);
         assertFalse(result);
+
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+
+        result = jerseyHandler.shouldReadData(request);
+        assertTrue(result);
 
         headers.clear();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
