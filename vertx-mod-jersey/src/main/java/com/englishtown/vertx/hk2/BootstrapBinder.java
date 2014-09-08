@@ -27,7 +27,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 /**
  * Default HK2 bootstrap binder used by the HK2VerticleFactory.
- * <p/>
+ * <p>
  * Replace with your own bootstrap to configure {@link
  * com.englishtown.vertx.jersey.inject.VertxRequestProcessor} and
  * {@link com.englishtown.vertx.jersey.inject.VertxResponseProcessor} classes.

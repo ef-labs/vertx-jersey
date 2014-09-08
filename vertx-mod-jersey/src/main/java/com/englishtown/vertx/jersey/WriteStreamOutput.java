@@ -12,7 +12,7 @@ public interface WriteStreamOutput extends WriteStream<WriteStreamOutput> {
 
     /**
      * Sets the underlying vert.x {@link org.vertx.java.core.http.HttpServerResponse}
-     * <p/>
+     * <p>
      * For internal support, typically you don't need to call this.
      *
      * @param response   the response object

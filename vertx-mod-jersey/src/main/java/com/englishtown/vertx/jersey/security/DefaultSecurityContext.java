@@ -84,7 +84,7 @@ public class DefaultSecurityContext implements SecurityContext {
     /**
      * Returns the string value of the authentication scheme used to protect
      * the resource. If the resource is not authenticated, null is returned.
-     * <p/>
+     * <p>
      * Values are the same as the CGI variable AUTH_TYPE
      *
      * @return one of the static members BASIC_AUTH, FORM_AUTH,
