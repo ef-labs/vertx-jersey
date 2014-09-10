@@ -227,7 +227,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
         String[] resourceArr = new String[resources.size()];
         for (int i = 0; i < resources.size(); i++) {
-            resourceArr[i] = String.valueOf(resources.get(i));
+            resourceArr[i] = resources.get(i);
         }
 
         ResourceConfig rc = new ResourceConfig();
@@ -239,7 +239,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         if (features != null && features.size() > 0) {
             for (int i = 0; i < features.size(); i++) {
                 try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(features.get(i)));
+                    Class<?> clazz = cl.loadClass(features.get(i));
                     rc.register(clazz);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -255,7 +255,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         if (binders != null && binders.size() > 0) {
             for (int i = 0; i < binders.size(); i++) {
                 try {
-                    Class<?> clazz = cl.loadClass(String.valueOf(binders.get(i)));
+                    Class<?> clazz = cl.loadClass(binders.get(i));
                     rc.register(clazz.newInstance());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
