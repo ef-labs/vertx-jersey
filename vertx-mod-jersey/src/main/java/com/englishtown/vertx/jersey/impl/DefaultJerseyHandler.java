@@ -37,12 +37,11 @@ import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
 import org.vertx.java.core.http.HttpServerRequest;
 import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
+import org.vertx.java.core.logging.impl.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
@@ -61,15 +60,13 @@ import java.util.Map;
  */
 public class DefaultJerseyHandler implements JerseyHandler {
 
-    private Vertx vertx;
-    private Container container;
-    private Logger logger;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
     private URI baseUri;
     private int maxBodySize;
 
     private final ContainerResponseWriterProvider responseWriterProvider;
     private final List<VertxRequestProcessor> requestProcessors;
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyHandler.class);
 
     @Inject
     public DefaultJerseyHandler(
@@ -81,10 +78,6 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     @Override
     public void init(JerseyConfigurator configurator) {
-        this.vertx = configurator.getVertx();
-        this.container = configurator.getContainer();
-        logger = container.logger();
-
         baseUri = configurator.getBaseUri();
         maxBodySize = configurator.getMaxBodySize();
         applicationHandlerDelegate = configurator.getApplicationHandler();
@@ -114,7 +107,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
         // Wait for the body for jersey to handle form/json/xml params
         if (shouldReadData(vertxRequest)) {
             if (logger.isDebugEnabled()) {
-                container.logger().debug("DefaultJerseyHandler - handle request and read body: " + vertxRequest.uri());
+                logger.debug("DefaultJerseyHandler - handle request and read body: " + vertxRequest.method() + " " + vertxRequest.uri());
             }
             final Buffer body = new Buffer();
 
@@ -137,7 +130,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         } else {
             if (logger.isDebugEnabled()) {
-                container.logger().debug("DefaultJerseyHandler - handle request: " + vertxRequest.uri());
+                logger.debug("DefaultJerseyHandler - handle request: " + vertxRequest.method() + " " + vertxRequest.uri());
             }
             DefaultJerseyHandler.this.handle(vertxRequest, null);
         }
@@ -198,7 +191,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
             }
 
             try {
-                container.logger().warn("Invalid URI: " + uri + ".  Attempting to parse query string.", e);
+                logger.warn("Invalid URI: " + uri + ".  Attempting to parse query string.", e);
                 QueryStringDecoder decoder = new QueryStringDecoder(uri);
 
                 StringBuilder sb = new StringBuilder(decoder.path() + "?");
@@ -313,7 +306,12 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         MediaType mediaType = MediaType.valueOf(contentType);
 
-        // Only media type accepted is application (will check subtypes next)
+        // Allow text/plain
+        if (MediaType.TEXT_PLAIN_TYPE.equals(mediaType)) {
+            return true;
+        }
+
+        // Only other media types accepted are application (will check subtypes next)
         String applicationType = MediaType.APPLICATION_FORM_URLENCODED_TYPE.getType();
         if (!applicationType.equalsIgnoreCase(mediaType.getType())) {
             return false;

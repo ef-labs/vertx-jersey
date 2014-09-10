@@ -91,7 +91,7 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
      * The promise type matches the WhenContainer signature to facilitate parallel deployments.
      *
      * @param config the jersey json configuration
-     * @return
+     * @return a promise for an empty string
      */
     @Override
     public Promise<String> createServerSimple(JsonObject config) {

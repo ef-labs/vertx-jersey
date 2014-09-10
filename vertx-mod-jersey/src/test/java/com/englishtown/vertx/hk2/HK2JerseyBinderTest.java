@@ -21,10 +21,16 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey.inject;
+package com.englishtown.vertx.hk2;
 
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
+import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.hk2.api.IterableProvider;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Arrays;
 import java.util.List;
@@ -35,25 +41,31 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * {@link VertxJerseyBinder} unit tests
+ * {@link com.englishtown.vertx.hk2.HK2JerseyBinder} unit tests
  */
-@SuppressWarnings("unchecked")
-public class VertxJerseyBinderTest {
+@RunWith(MockitoJUnitRunner.class)
+public class HK2JerseyBinderTest {
+
+    @Mock
+    IterableProvider<VertxRequestProcessor> requestProcessorProviders;
+    @Mock
+    IterableProvider<VertxResponseProcessor> responseProcessorProviders;
+    @Mock
+    IterableProvider<VertxPostResponseProcessor> postResponseProcessorProviders;
 
     @Test
     public void testVertxRequestProcessorFactory() {
 
-        IterableProvider<VertxRequestProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxRequestProcessorFactory factory;
+        HK2JerseyBinder.VertxRequestProcessorFactory factory;
         List<VertxRequestProcessor> result;
 
         List<VertxRequestProcessor> list = Arrays.asList(
                 mock(VertxRequestProcessor.class),
                 mock(VertxRequestProcessor.class));
 
-        when(providers.iterator()).thenReturn(list.iterator());
+        when(requestProcessorProviders.iterator()).thenReturn(list.iterator());
 
-        factory = new VertxJerseyBinder.VertxRequestProcessorFactory(providers);
+        factory = new HK2JerseyBinder.VertxRequestProcessorFactory(requestProcessorProviders);
         result = factory.provide();
 
         assertNotNull(result);
@@ -66,17 +78,16 @@ public class VertxJerseyBinderTest {
     @Test
     public void testVertxResponseProcessorFactory() {
 
-        IterableProvider<VertxResponseProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxResponseProcessorFactory factory;
+        HK2JerseyBinder.VertxResponseProcessorFactory factory;
         List<VertxResponseProcessor> result;
 
         List<VertxResponseProcessor> list = Arrays.asList(
                 mock(VertxResponseProcessor.class),
                 mock(VertxResponseProcessor.class));
 
-        when(providers.iterator()).thenReturn(list.iterator());
+        when(responseProcessorProviders.iterator()).thenReturn(list.iterator());
 
-        factory = new VertxJerseyBinder.VertxResponseProcessorFactory(providers);
+        factory = new HK2JerseyBinder.VertxResponseProcessorFactory(responseProcessorProviders);
         result = factory.provide();
 
         assertNotNull(result);
@@ -89,17 +100,16 @@ public class VertxJerseyBinderTest {
     @Test
     public void testVertxPostResponseProcessorFactory() {
 
-        IterableProvider<VertxPostResponseProcessor> providers = mock(IterableProvider.class);
-        VertxJerseyBinder.VertxPostResponseProcessorFactory factory;
+        HK2JerseyBinder.VertxPostResponseProcessorFactory factory;
         List<VertxPostResponseProcessor> result;
 
         List<VertxPostResponseProcessor> list = Arrays.asList(
                 mock(VertxPostResponseProcessor.class),
                 mock(VertxPostResponseProcessor.class));
 
-        when(providers.iterator()).thenReturn(list.iterator());
+        when(postResponseProcessorProviders.iterator()).thenReturn(list.iterator());
 
-        factory = new VertxJerseyBinder.VertxPostResponseProcessorFactory(providers);
+        factory = new HK2JerseyBinder.VertxPostResponseProcessorFactory(postResponseProcessorProviders);
         result = factory.provide();
 
         assertNotNull(result);

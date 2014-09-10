@@ -33,7 +33,6 @@ import static org.mockito.Mockito.mock;
 /**
  * {@link InternalVertxJerseyBinder} unit tests
  */
-@SuppressWarnings("unchecked")
 public class InternalVertxJerseyBinderTest {
 
     @Test

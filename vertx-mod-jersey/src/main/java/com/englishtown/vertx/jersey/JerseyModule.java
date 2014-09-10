@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.vertx.java.core.AsyncResult;
 import org.vertx.java.core.Future;
 import org.vertx.java.core.Handler;

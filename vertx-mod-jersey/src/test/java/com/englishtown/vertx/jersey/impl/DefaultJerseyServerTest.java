@@ -116,11 +116,11 @@ public class DefaultJerseyServerTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testConstructor_No_Handler() throws Exception {
+    public void testInit_No_Handler() throws Exception {
 
         try {
             reset(jerseyHandlerProvider);
-            new DefaultJerseyServer(jerseyHandlerProvider);
+            new DefaultJerseyServer(jerseyHandlerProvider).init(configurator);
             fail();
         } catch (IllegalStateException e) {
             // Expected
@@ -194,6 +194,7 @@ public class DefaultJerseyServerTest {
 
     @Test
     public void testGetHandler() throws Exception {
+        jerseyServer.init(configurator);
         JerseyHandler handler = jerseyServer.getHandler();
         assertEquals(jerseyHandler, handler);
     }

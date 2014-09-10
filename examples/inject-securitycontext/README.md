@@ -1,6 +1,6 @@
 # inject-securitycontext
 
-This sample shows running jersey inside vert.x using a SecurityContextProvider to provide a custom SeurityContext.
+This sample shows running jersey inside vert.x using a SecurityContextProvider to provide a custom SecurityContext.
 It also demonstrates using the JAX-RS `@RolesAllowed` security annotation.
 
 ## Run It
@@ -22,7 +22,7 @@ mod.json instructs vert.x to include the vertx-mod-jersey module and to run `com
 ```json
 {
     "main": "com.englishtown.vertx.jersey.JerseyModule",
-    "includes": "com.englishtown~vertx-mod-jersey~2.6.0"
+    "includes": "com.englishtown~vertx-mod-jersey~2.7.0-SNAPSHOT"
 }
 ```
 
