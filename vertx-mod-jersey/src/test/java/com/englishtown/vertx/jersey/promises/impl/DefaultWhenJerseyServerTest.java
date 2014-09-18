@@ -23,7 +23,9 @@
 
 package com.englishtown.vertx.jersey.promises.impl;
 
-import com.englishtown.promises.Done2;
+import com.englishtown.promises.Done;
+import com.englishtown.promises.When;
+import com.englishtown.promises.WhenFactory;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyServer;
 import org.junit.Before;
@@ -54,7 +56,7 @@ public class DefaultWhenJerseyServerTest {
 
     private DefaultWhenJerseyServer whenJerseyServer;
     JsonObject config = new JsonObject();
-    private Done2<JerseyServer> done = new Done2<>();
+    private Done<JerseyServer> done = new Done<>();
 
     @Mock
     JerseyServer server;
@@ -75,9 +77,10 @@ public class DefaultWhenJerseyServerTest {
 
     @Before
     public void setUp() {
+        When when = WhenFactory.createSync();
         when(serverProvider.get()).thenReturn(server);
         when(configuratorProvider.get()).thenReturn(configurator);
-        whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider);
+        whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider, when);
     }
 
     @Test
@@ -86,13 +89,13 @@ public class DefaultWhenJerseyServerTest {
         when(result.succeeded()).thenReturn(true);
 
         whenJerseyServer.createServer(config)
-                .then(done.onSuccess, done.onFail);
+                .then(done.onFulfilled, done.onRejected);
 
         verify(configurator).init(eq(config), eq(vertx), eq(container));
         verify(server).init(eq(configurator), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
-        done.assertSuccess();
+        done.assertFulfilled();
 
     }
 
@@ -102,13 +105,13 @@ public class DefaultWhenJerseyServerTest {
         when(result.succeeded()).thenReturn(false);
 
         whenJerseyServer.createServer(config)
-                .then(done.onSuccess, done.onFail);
+                .then(done.onFulfilled, done.onRejected);
 
         verify(configurator).init(eq(config), eq(vertx), eq(container));
         verify(server).init(eq(configurator), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
-        done.assertFailed();
+        done.assertRejected();
 
     }
 

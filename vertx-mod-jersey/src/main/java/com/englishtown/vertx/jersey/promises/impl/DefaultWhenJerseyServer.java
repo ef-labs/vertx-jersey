@@ -23,14 +23,13 @@
 
 package com.englishtown.vertx.jersey.promises.impl;
 
-import com.englishtown.promises.*;
+import com.englishtown.promises.Deferred;
+import com.englishtown.promises.Promise;
+import com.englishtown.promises.When;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
 import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServer;
 import org.vertx.java.core.json.JsonObject;
 import org.vertx.java.platform.Container;
 
@@ -46,18 +45,20 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
     private final Container container;
     private final Provider<JerseyServer> jerseyServerProvider;
     private final Provider<JerseyConfigurator> configuratorProvider;
+    private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, Container container, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider) {
+    public DefaultWhenJerseyServer(Vertx vertx, Container container, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider, When when) {
         this.vertx = vertx;
         this.container = container;
         this.jerseyServerProvider = jerseyServerProvider;
         this.configuratorProvider = configuratorProvider;
+        this.when = when;
     }
 
     @Override
     public Promise<JerseyServer> createServer(JsonObject config) {
-        final Deferred<JerseyServer> d = new When<JerseyServer>().defer();
+        final Deferred<JerseyServer> d = when.defer();
 
         try {
             final JerseyServer jerseyServer = jerseyServerProvider.get();
@@ -65,22 +66,16 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
             configurator.init(config, vertx, container);
 
-            jerseyServer.init(configurator, new Handler<AsyncResult<HttpServer>>() {
-                @Override
-                public void handle(AsyncResult<HttpServer> result) {
-                    if (result.succeeded()) {
-                        d.getResolver().resolve(jerseyServer);
-                    } else {
-                        Value<JerseyServer> value = (result.cause() == null)
-                                ? new Value<>(jerseyServer)
-                                : new Value<>(jerseyServer, result.cause());
-                        d.getResolver().reject(value);
-                    }
+            jerseyServer.init(configurator, result -> {
+                if (result.succeeded()) {
+                    d.resolve(jerseyServer);
+                } else {
+                    d.reject(result.cause());
                 }
             });
 
         } catch (RuntimeException e) {
-            d.getResolver().reject(new Value<JerseyServer>(null, e));
+            d.reject(e);
         }
 
         return d.getPromise();
@@ -95,26 +90,9 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
      */
     @Override
     public Promise<String> createServerSimple(JsonObject config) {
-        final Deferred<String> d = new When<String>().defer();
 
-        createServer(config).then(
-                new FulfilledRunnable<JerseyServer>() {
-                    @Override
-                    public Promise<JerseyServer> run(JerseyServer jerseyServer) {
-                        d.getResolver().resolve("");
-                        return null;
-                    }
-                },
-                new RejectedRunnable<JerseyServer>() {
-                    @Override
-                    public Promise<JerseyServer> run(Value<JerseyServer> value) {
-                        d.getResolver().reject(value.getCause());
-                        return null;
-                    }
-                }
-        );
+        return createServer(config).then(jerseyServer -> when.resolve(""));
 
-        return d.getPromise();
     }
 
 }

@@ -24,8 +24,8 @@
 package com.englishtown.vertx.jersey.promises.integration;
 
 import com.englishtown.promises.Promise;
-import com.englishtown.promises.Runnable;
-import com.englishtown.promises.Value;
+import com.englishtown.promises.When;
+import com.englishtown.promises.WhenFactory;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
@@ -67,25 +67,12 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
                 .setHost("localhost")
                 .setPort(port)
                 .setConnectTimeout(300)
-                .exceptionHandler(new Handler<Throwable>() {
-                    @Override
-                    public void handle(Throwable t) {
-                        fail(t.getMessage());
-                    }
+                .exceptionHandler(t -> fail(t.getMessage()))
+                .get("/integration/test", response -> {
+                    assertEquals(200, response.statusCode());
+                    testComplete();
                 })
-                .get("/integration/test", new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        assertEquals(200, response.statusCode());
-                        testComplete();
-                    }
-                })
-                .exceptionHandler(new Handler<Throwable>() {
-                    @Override
-                    public void handle(Throwable t) {
-                        fail(t.getMessage());
-                    }
-                })
+                .exceptionHandler(t -> fail(t.getMessage()))
                 .end();
 
     }
@@ -118,8 +105,9 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
         JerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
         Provider<JerseyConfigurator> configuratorProvider = mock(Provider.class);
         when(configuratorProvider.get()).thenReturn(configurator);
+        When when = WhenFactory.createSync();
 
-        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider);
+        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider, when);
 
         JsonObject config = new JsonObject()
                 .putString("host", host)
@@ -127,20 +115,14 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
                 .putArray("resources", new JsonArray().addString("com.englishtown.vertx.jersey.promises.integration.resources"));
 
         whenJerseyServer.createServer(config).then(
-                new Runnable<Promise<JerseyServer>, JerseyServer>() {
-                    @Override
-                    public Promise<JerseyServer> run(JerseyServer value) {
-                        start();
-                        startedResult.setResult(null);
-                        return null;
-                    }
+                value -> {
+                    start();
+                    startedResult.setResult(null);
+                    return null;
                 },
-                new Runnable<Promise<JerseyServer>, Value<JerseyServer>>() {
-                    @Override
-                    public Promise<JerseyServer> run(Value<JerseyServer> value) {
-                        startedResult.setFailure(value.getCause());
-                        return null;
-                    }
+                value -> {
+                    startedResult.setFailure(value);
+                    return null;
                 }
         );
 
