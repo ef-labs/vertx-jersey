@@ -38,13 +38,15 @@ public interface JerseyServer {
      *
      * @param configurator http server and jersey configuration settings
      */
-    void init(JerseyConfigurator configurator);
+    default void init(JerseyConfigurator configurator) {
+        init(configurator, null);
+    }
 
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
      * @param configurator http server and jersey configuration settings
-     * @param doneHandler  the callback for when initialization has completed
+     * @param doneHandler  the optional callback for when initialization has completed
      */
     void init(JerseyConfigurator configurator, Handler<AsyncResult<HttpServer>> doneHandler);
 
@@ -61,6 +63,13 @@ public interface JerseyServer {
      * @return the JerseyHandler instance
      */
     JerseyHandler getHandler();
+
+    /**
+     * Returns the internal vert.x {@link org.vertx.java.core.http.HttpServer}
+     *
+     * @return the vert.x http server instance
+     */
+    HttpServer getHttpServer();
 
     /**
      * Release resources

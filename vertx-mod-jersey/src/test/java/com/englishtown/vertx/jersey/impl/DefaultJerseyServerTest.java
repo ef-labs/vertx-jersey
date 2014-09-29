@@ -199,4 +199,11 @@ public class DefaultJerseyServerTest {
         assertEquals(jerseyHandler, handler);
     }
 
+    @Test
+    public void testGetHttpServer() throws Exception {
+        jerseyServer.init(configurator);
+        HttpServer server = jerseyServer.getHttpServer();
+        assertEquals(httpServer, server);
+    }
+
 }

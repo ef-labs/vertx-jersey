@@ -52,11 +52,6 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     @Override
-    public void init(JerseyConfigurator configurator) {
-        init(configurator, null);
-    }
-
-    @Override
     public void init(
             final JerseyConfigurator configurator,
             final Handler<AsyncResult<HttpServer>> doneHandler) {
@@ -135,6 +130,16 @@ public class DefaultJerseyServer implements JerseyServer {
     @Override
     public JerseyHandler getHandler() {
         return jerseyHandler;
+    }
+
+    /**
+     * Returns the internal vert.x {@link org.vertx.java.core.http.HttpServer}
+     *
+     * @return the vert.x http server instance
+     */
+    @Override
+    public HttpServer getHttpServer() {
+        return server;
     }
 
     /**
