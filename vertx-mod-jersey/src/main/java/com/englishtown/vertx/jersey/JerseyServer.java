@@ -58,6 +58,13 @@ public interface JerseyServer {
     void routeMatcherHandler(Handler<RouteMatcher> handler);
 
     /**
+     * Allows custom setup during initialization before the http server is listening
+     *
+     * @param handler the handler invoked with the http server
+     */
+    void setupHandler(Handler<HttpServer> handler);
+
+    /**
      * Returns the JerseyHandler instance for the JerseyServer
      *
      * @return the JerseyHandler instance

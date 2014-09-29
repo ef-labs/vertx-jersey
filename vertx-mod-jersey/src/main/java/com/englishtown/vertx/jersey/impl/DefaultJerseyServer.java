@@ -44,6 +44,7 @@ public class DefaultJerseyServer implements JerseyServer {
     private final Provider<JerseyHandler> jerseyHandlerProvider;
     private JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
+    private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
@@ -95,6 +96,10 @@ public class DefaultJerseyServer implements JerseyServer {
             routeMatcherHandler.handle(rm);
         }
 
+        if (setupHandler != null) {
+            setupHandler.handle(server);
+        }
+
         final String host = configurator.getHost();
         final int port = configurator.getPort();
         final Container container = configurator.getContainer();
@@ -120,6 +125,16 @@ public class DefaultJerseyServer implements JerseyServer {
     @Override
     public void routeMatcherHandler(Handler<RouteMatcher> handler) {
         this.routeMatcherHandler = handler;
+    }
+
+    /**
+     * Allows custom setup during initialization before the http server is listening
+     *
+     * @param handler the handler invoked with the http server
+     */
+    @Override
+    public void setupHandler(Handler<HttpServer> handler) {
+     this.setupHandler = handler;
     }
 
     /**
