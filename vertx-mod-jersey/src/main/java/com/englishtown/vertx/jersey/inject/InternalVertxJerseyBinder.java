@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.jersey.inject;
 
-import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
@@ -84,14 +83,24 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         bind(container).to(Container.class);
 
         // Request and read stream
-        bindFactory(VertxRequestReferencingFactory.class).to(HttpServerRequest.class).in(PerLookup.class);
-        bindFactory(VertxRequestReferencingFactory.class).to(new TypeLiteral<ReadStream<HttpServerRequest>>() {
-        }).in(PerLookup.class);
+        bindFactory(VertxRequestReferencingFactory.class)
+                .to(HttpServerRequest.class)
+                .to(new TypeLiteral<ReadStream<HttpServerRequest>>() {
+                })
+                .proxy(true)
+                .proxyForSameScope(false)
+                .in(RequestScoped.class);
+
         bindFactory(ReferencingFactory.<HttpServerRequest>referenceFactory()).to(new TypeLiteral<Ref<HttpServerRequest>>() {
         }).in(RequestScoped.class);
 
         // Response
-        bindFactory(VertxResponseReferencingFactory.class).to(HttpServerResponse.class).in(PerLookup.class);
+        bindFactory(VertxResponseReferencingFactory.class)
+                .to(HttpServerResponse.class)
+                .proxy(true)
+                .proxyForSameScope(false)
+                .in(RequestScoped.class);
+
         bindFactory(ReferencingFactory.<HttpServerResponse>referenceFactory()).to(new TypeLiteral<Ref<HttpServerResponse>>() {
         }).in(RequestScoped.class);
 

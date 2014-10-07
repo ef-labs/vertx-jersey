@@ -6,6 +6,8 @@ import org.vertx.java.core.http.HttpServerResponse;
 import org.vertx.java.core.streams.ReadStream;
 import org.vertx.java.platform.Container;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -19,8 +21,16 @@ import javax.ws.rs.core.MediaType;
  * Time: 7:36 PM
  * To change this template use File | Settings | File Templates.
  */
+@Singleton
 @Path("test")
-public class TestResource {
+public class TestInjectResource {
+
+    private HttpServerRequest httpServerRequest;
+
+    @Inject
+    public TestInjectResource(HttpServerRequest httpServerRequest) {
+        this.httpServerRequest = httpServerRequest;
+    }
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)

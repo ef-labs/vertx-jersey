@@ -101,7 +101,7 @@ Add vertx-mod-jersey as an include in your mod.json.
 
 ```json
 {
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0"
+    "includes": "com.englishtown~vertx-mod-jersey~3.1.0-SNAPSHOT"
 }
 ```
 
