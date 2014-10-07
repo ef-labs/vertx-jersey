@@ -20,6 +20,7 @@
         <module>inject-vertx</module>
         <module>jackson</module>
         <module>guice</module>
+        <module>when.java</module>
     </modules>
 
     <build>
