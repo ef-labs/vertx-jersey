@@ -44,16 +44,12 @@ public class DefaultJerseyServer implements JerseyServer {
     private final Provider<JerseyHandler> jerseyHandlerProvider;
     private JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
+    private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
     public DefaultJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider) {
         this.jerseyHandlerProvider = jerseyHandlerProvider;
-    }
-
-    @Override
-    public void init(JerseyConfigurator configurator) {
-        init(configurator, null);
     }
 
     @Override
@@ -100,6 +96,10 @@ public class DefaultJerseyServer implements JerseyServer {
             routeMatcherHandler.handle(rm);
         }
 
+        if (setupHandler != null) {
+            setupHandler.handle(server);
+        }
+
         final String host = configurator.getHost();
         final int port = configurator.getPort();
         final Container container = configurator.getContainer();
@@ -128,6 +128,16 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     /**
+     * Allows custom setup during initialization before the http server is listening
+     *
+     * @param handler the handler invoked with the http server
+     */
+    @Override
+    public void setupHandler(Handler<HttpServer> handler) {
+     this.setupHandler = handler;
+    }
+
+    /**
      * Returns the JerseyHandler instance for the JerseyServer
      *
      * @return the JerseyHandler instance
@@ -135,6 +145,16 @@ public class DefaultJerseyServer implements JerseyServer {
     @Override
     public JerseyHandler getHandler() {
         return jerseyHandler;
+    }
+
+    /**
+     * Returns the internal vert.x {@link org.vertx.java.core.http.HttpServer}
+     *
+     * @return the vert.x http server instance
+     */
+    @Override
+    public HttpServer getHttpServer() {
+        return server;
     }
 
     /**

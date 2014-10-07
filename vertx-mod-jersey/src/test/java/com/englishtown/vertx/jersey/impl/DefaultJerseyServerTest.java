@@ -78,6 +78,8 @@ public class DefaultJerseyServerTest {
     Provider<JerseyHandler> jerseyHandlerProvider;
     @Mock
     JerseyConfigurator configurator;
+    @Mock
+    Handler<HttpServer> setupHandler;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
     @Captor
@@ -197,6 +199,20 @@ public class DefaultJerseyServerTest {
         jerseyServer.init(configurator);
         JerseyHandler handler = jerseyServer.getHandler();
         assertEquals(jerseyHandler, handler);
+    }
+
+    @Test
+    public void testSetupHandler() throws Exception {
+        jerseyServer.setupHandler(setupHandler);
+        jerseyServer.init(configurator);
+        verify(setupHandler).handle(eq(httpServer));
+    }
+
+    @Test
+    public void testGetHttpServer() throws Exception {
+        jerseyServer.init(configurator);
+        HttpServer server = jerseyServer.getHttpServer();
+        assertEquals(httpServer, server);
     }
 
 }

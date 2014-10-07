@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.englishtown</groupId>
         <artifactId>vertx-jersey</artifactId>
-        <version>3.0.0-RC1</version>
+        <version>3.0.0</version>
     </parent>
 
     <modules>
@@ -20,6 +20,7 @@
         <module>inject-vertx</module>
         <module>jackson</module>
         <module>guice</module>
+        <module>when.java</module>
     </modules>
 
     <build>

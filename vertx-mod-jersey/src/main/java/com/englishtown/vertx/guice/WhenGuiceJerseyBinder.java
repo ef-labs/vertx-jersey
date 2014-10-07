@@ -21,11 +21,22 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.hk2;
+package com.englishtown.vertx.guice;
+
+import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
+import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
+import com.google.inject.AbstractModule;
 
 /**
- * @deprecated Please use {@link com.englishtown.vertx.hk2.WhenHK2JerseyBinder} instead
+ * Guice binder for when.java jersey
  */
-@Deprecated
-public class WhenJerseyBinder extends WhenHK2JerseyBinder {
+public class WhenGuiceJerseyBinder extends AbstractModule {
+    /**
+     * Configures a {@link com.google.inject.Binder} via the exposed methods.
+     */
+    @Override
+    protected void configure() {
+        install(new GuiceJerseyBinder());
+        bind(WhenJerseyServer.class).to(DefaultWhenJerseyServer.class);
+    }
 }

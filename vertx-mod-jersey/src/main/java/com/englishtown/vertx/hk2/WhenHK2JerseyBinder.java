@@ -23,9 +23,21 @@
 
 package com.englishtown.vertx.hk2;
 
+import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
+import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+
 /**
- * @deprecated Please use {@link com.englishtown.vertx.hk2.WhenHK2JerseyBinder} instead
+ * HK2 binder for when.java jersey
  */
-@Deprecated
-public class WhenJerseyBinder extends WhenHK2JerseyBinder {
+public class WhenHK2JerseyBinder extends AbstractBinder {
+    /**
+     * Implement to provide binding definitions using the exposed binding
+     * methods.
+     */
+    @Override
+    protected void configure() {
+        install(new HK2JerseyBinder());
+        bind(DefaultWhenJerseyServer.class).to(WhenJerseyServer.class);
+    }
 }
