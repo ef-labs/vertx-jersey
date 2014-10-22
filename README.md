@@ -101,7 +101,7 @@ Add vertx-mod-jersey as an include in your mod.json.
 
 ```json
 {
-    "includes": "com.englishtown~vertx-mod-jersey~2.7.0-SNAPSHOT"
+    "includes": "com.englishtown~vertx-mod-jersey~2.7.1-SNAPSHOT"
 }
 ```
 
@@ -111,7 +111,7 @@ The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, j
 <dependency>
     <groupId>com.englishtown</groupId>
     <artifactId>vertx-mod-jersey</artifactId>
-    <version>2.7.0-SNAPSHOT</version>
+    <version>2.7.1-SNAPSHOT</version>
     <scope>provided</scope>
 </dependency>
 ```
