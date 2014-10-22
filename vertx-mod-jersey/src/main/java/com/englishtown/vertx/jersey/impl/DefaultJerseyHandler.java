@@ -301,13 +301,16 @@ public class DefaultJerseyHandler implements JerseyHandler {
         String contentType = vertxRequest.headers().get(HttpHeaders.CONTENT_TYPE);
 
         if (contentType == null || contentType.isEmpty()) {
-            return false;
+            // Special handling for IE8 XDomainRequest where content-type is missing
+            // http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx
+            return true;
         }
 
         MediaType mediaType = MediaType.valueOf(contentType);
 
         // Allow text/plain
-        if (MediaType.TEXT_PLAIN_TYPE.equals(mediaType)) {
+        if (MediaType.TEXT_PLAIN_TYPE.getType().equals(mediaType.getType())
+                && MediaType.TEXT_PLAIN_TYPE.getSubtype().equals(mediaType.getSubtype())) {
             return true;
         }
 
