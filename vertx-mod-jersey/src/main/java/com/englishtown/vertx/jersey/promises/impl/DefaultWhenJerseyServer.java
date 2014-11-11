@@ -23,18 +23,18 @@
 
 package com.englishtown.vertx.jersey.promises.impl;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Default implementation of {@link WhenJerseyServer}
@@ -42,15 +42,13 @@ import javax.inject.Provider;
 public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
     private final Vertx vertx;
-    private final Container container;
     private final Provider<JerseyServer> jerseyServerProvider;
     private final Provider<JerseyConfigurator> configuratorProvider;
     private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, Container container, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider, When when) {
+    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider, When when) {
         this.vertx = vertx;
-        this.container = container;
         this.jerseyServerProvider = jerseyServerProvider;
         this.configuratorProvider = configuratorProvider;
         this.when = when;
@@ -64,7 +62,7 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
             final JerseyServer jerseyServer = jerseyServerProvider.get();
             JerseyConfigurator configurator = configuratorProvider.get();
 
-            configurator.init(config, vertx, container);
+            configurator.init(config, vertx);
 
             jerseyServer.init(configurator, result -> {
                 if (result.succeeded()) {

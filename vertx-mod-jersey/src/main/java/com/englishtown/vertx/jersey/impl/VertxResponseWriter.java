@@ -23,22 +23,15 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.WriteStreamOutput;
-import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
-import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
-import org.glassfish.jersey.server.ContainerException;
-import org.glassfish.jersey.server.ContainerResponse;
-import org.glassfish.jersey.server.spi.ContainerResponseWriter;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.platform.Container;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferFactoryImpl;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.spi.BufferFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Arrays;
@@ -46,15 +39,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import org.glassfish.jersey.server.ContainerException;
+import org.glassfish.jersey.server.ContainerResponse;
+import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+
+import com.englishtown.vertx.jersey.WriteStreamOutput;
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+
 /**
  * A Jersey ContainerResponseWriter to write to the vertx response
  */
 public class VertxResponseWriter implements ContainerResponseWriter {
 
+    private static final Logger log = LoggerFactory.getLogger(VertxResponseWriter.class);
+
     private static class VertxOutputStream extends OutputStream {
 
         final HttpServerResponse response;
-        Buffer buffer = new Buffer();
+        Buffer buffer = new BufferFactoryImpl().buffer();
         boolean isClosed;
 
         private VertxOutputStream(HttpServerResponse response) {
@@ -101,7 +108,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             // Only flush to underlying very.x response if the content-length has been set
             if (buffer.length() > 0 && response.headers().contains(HttpHeaders.CONTENT_LENGTH)) {
                 response.write(buffer);
-                buffer = new Buffer();
+                buffer = new BufferFactoryImpl().buffer();
             }
         }
 
@@ -133,6 +140,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
         private final HttpServerResponse response;
         private boolean isClosed;
+        private final BufferFactory bufferFactory = new BufferFactoryImpl();
 
         private VertxChunkedOutputStream(HttpServerResponse response) {
             this.response = response;
@@ -144,7 +152,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         @Override
         public void write(int b) throws IOException {
             checkState();
-            Buffer buffer = new Buffer();
+            Buffer buffer = bufferFactory.buffer();
             buffer.appendByte((byte) b);
             response.write(buffer);
         }
@@ -155,7 +163,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         @Override
         public void write(byte[] b) throws IOException {
             checkState();
-            response.write(new Buffer(b));
+            response.write(bufferFactory.buffer(b));
         }
 
         /**
@@ -164,7 +172,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         @Override
         public void write(byte[] b, int off, int len) throws IOException {
             checkState();
-            Buffer buffer = new Buffer();
+            Buffer buffer = bufferFactory.buffer();
             if (off == 0 && len == b.length) {
                 buffer.appendBytes(b);
             } else {
@@ -220,7 +228,6 @@ public class VertxResponseWriter implements ContainerResponseWriter {
 
     private final HttpServerRequest vertxRequest;
     private final Vertx vertx;
-    private final Container container;
     private final List<VertxResponseProcessor> responseProcessors;
     private final List<VertxPostResponseProcessor> postResponseProcessors;
 
@@ -233,12 +240,10 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     public VertxResponseWriter(
             HttpServerRequest vertxRequest,
             Vertx vertx,
-            Container container,
             List<VertxResponseProcessor> responseProcessors,
             List<VertxPostResponseProcessor> postResponseProcessors) {
         this.vertxRequest = vertxRequest;
         this.vertx = vertx;
-        this.container = container;
         this.responseProcessors = responseProcessors;
         this.postResponseProcessors = postResponseProcessors;
     }
@@ -279,11 +284,8 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             return new VertxChunkedOutputStream(response);
         } else if (responseContext.hasEntity() && WriteStreamOutput.class.isAssignableFrom(responseContext.getEntityClass())) {
             WriteStreamOutput writeStreamOutput = (WriteStreamOutput) responseContext.getEntity();
-            writeStreamOutput.init(response, new Handler<Void>() {
-                @Override
-                public void handle(Void event) {
-                    end();
-                }
+            writeStreamOutput.init(response, event -> {
+                end();
             });
             isWriteStream = true;
             return new NOPOutputStream();
@@ -316,12 +318,9 @@ public class VertxResponseWriter implements ContainerResponseWriter {
         long ms = timeUnit.toMillis(timeOut);
 
         // Schedule timeout on the event loop
-        this.suspendTimerId = vertx.setTimer(ms, new Handler<Long>() {
-            @Override
-            public void handle(Long id) {
-                if (id == suspendTimerId) {
-                    VertxResponseWriter.this.timeoutHandler.onTimeout(VertxResponseWriter.this);
-                }
+        this.suspendTimerId = vertx.setTimer(ms, id -> {
+            if (id == suspendTimerId) {
+                VertxResponseWriter.this.timeoutHandler.onTimeout(VertxResponseWriter.this);
             }
         });
 
@@ -372,7 +371,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
     @Override
     public void failure(Throwable error) {
 
-        container.logger().error(error.getMessage(), error);
+        log.error(error.getMessage(), error);
         HttpServerResponse response = vertxRequest.response();
 
         // Set error status and end

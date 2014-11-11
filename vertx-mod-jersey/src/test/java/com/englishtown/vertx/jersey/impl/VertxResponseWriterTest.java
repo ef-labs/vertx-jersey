@@ -23,9 +23,39 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
-import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.http.impl.HeadersAdaptor;
+import io.vertx.core.logging.Logger;
+
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
@@ -33,27 +63,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.http.impl.HttpHeadersAdapter;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 
 /**
  * {@link VertxResponseWriter} unit tests
@@ -70,8 +82,6 @@ public class VertxResponseWriterTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
     Logger logger;
     @Mock
     HttpServerRequest request;
@@ -82,9 +92,8 @@ public class VertxResponseWriterTest {
     public void setUp() {
         when(request.response()).thenReturn(response);
         when(vertx.setTimer(anyLong(), any(Handler.class))).thenReturn(timerId);
-        when(container.logger()).thenReturn(logger);
 
-        writer = new VertxResponseWriter(request, vertx, container, responseProcessors, postResponseProcessors);
+        writer = new VertxResponseWriter(request, vertx, responseProcessors, postResponseProcessors);
     }
 
     @Test
@@ -124,7 +133,7 @@ public class VertxResponseWriterTest {
         when(cr.getStringHeaders()).thenReturn(headers);
 
         DefaultHttpHeaders httpHeaders = new DefaultHttpHeaders();
-        MultiMap vertxHeaders = new HttpHeadersAdapter(httpHeaders);
+        MultiMap vertxHeaders = new HeadersAdaptor(httpHeaders);
         vertxHeaders.add(HttpHeaders.CONTENT_LENGTH, "12");
         when(response.headers()).thenReturn(vertxHeaders);
 

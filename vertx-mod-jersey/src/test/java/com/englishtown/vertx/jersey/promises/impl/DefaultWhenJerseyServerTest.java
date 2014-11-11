@@ -23,11 +23,17 @@
 
 package com.englishtown.vertx.jersey.promises.impl;
 
-import com.englishtown.promises.Done;
-import com.englishtown.promises.When;
-import com.englishtown.promises.WhenFactory;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyServer;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,18 +41,12 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 
-import javax.inject.Provider;
-
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import com.englishtown.promises.Done;
+import com.englishtown.promises.When;
+import com.englishtown.promises.WhenFactory;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyServer;
 
 /**
  * Unit tests for {@link DefaultWhenJerseyServer}
@@ -69,8 +69,6 @@ public class DefaultWhenJerseyServerTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
     AsyncResult<HttpServer> result;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
@@ -80,7 +78,7 @@ public class DefaultWhenJerseyServerTest {
         When when = WhenFactory.createSync();
         when(serverProvider.get()).thenReturn(server);
         when(configuratorProvider.get()).thenReturn(configurator);
-        whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider, when);
+        whenJerseyServer = new DefaultWhenJerseyServer(vertx, serverProvider, configuratorProvider, when);
     }
 
     @Test
@@ -91,7 +89,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer(config)
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(configurator).init(eq(config), eq(vertx), eq(container));
+        verify(configurator).init(eq(config), eq(vertx));
         verify(server).init(eq(configurator), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
@@ -107,7 +105,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer(config)
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(configurator).init(eq(config), eq(vertx), eq(container));
+        verify(configurator).init(eq(config), eq(vertx));
         verify(server).init(eq(configurator), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);

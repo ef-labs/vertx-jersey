@@ -23,21 +23,28 @@
 
 package com.englishtown.vertx.jersey.resources;
 
-import com.englishtown.vertx.jersey.integration.MyObject;
-import org.glassfish.jersey.server.ChunkedOutput;
-import org.glassfish.jersey.server.JSONP;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 
-import javax.ws.rs.*;
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
+
+import org.glassfish.jersey.server.ChunkedOutput;
+import org.glassfish.jersey.server.JSONP;
+
+import com.englishtown.vertx.jersey.integration.MyObject;
 
 /**
  * Test jersey resource
@@ -80,16 +87,13 @@ public class TestResource {
             @Suspended final AsyncResponse response,
             @Context Vertx vertx) {
 
-        vertx.runOnContext(new Handler<Void>() {
-            @Override
-            public void handle(Void event) {
-                if (obj == null) {
-                    throw new RuntimeException();
-                }
-                MyObject obj2 = new MyObject();
-                obj2.setName("async response");
-                response.resume(obj2);
+        vertx.runOnContext((aVoid) -> {
+            if (obj == null) {
+                throw new RuntimeException();
             }
+            MyObject obj2 = new MyObject();
+            obj2.setName("async response");
+            response.resume(obj2);
         });
     }
 
@@ -100,17 +104,13 @@ public class TestResource {
             @Suspended final AsyncResponse response,
             @Context final Vertx vertx) {
 
-        vertx.runOnContext(new Handler<Void>() {
-            @Override
-            public void handle(Void aVoid) {
+        vertx.runOnContext((Void) -> {
 
                 final ChunkedOutput<String> chunkedOutput = new ChunkedOutput<>(String.class);
 
                 response.resume(chunkedOutput);
 
-                vertx.runOnContext(new Handler<Void>() {
-                    @Override
-                    public void handle(Void aVoid) {
+                vertx.runOnContext((aVoid) -> {
                         String s = "aaaaaaaaaa";
                         try {
                             chunkedOutput.write(s);
@@ -119,14 +119,8 @@ public class TestResource {
                             chunkedOutput.close();
                         } catch (IOException e) {
                         }
-                    }
                 });
-            }
         });
-
-    }
-
-    private void writeChunk(ChunkedOutput<String> chunkedOutput) {
 
     }
 

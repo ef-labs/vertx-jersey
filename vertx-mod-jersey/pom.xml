@@ -7,14 +7,18 @@
     <parent>
         <artifactId>vertx-jersey</artifactId>
         <groupId>com.englishtown</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
     <inceptionYear>2013</inceptionYear>
 
     <dependencies>
-
+        <dependency>
+            <artifactId>ext-routematcher</artifactId>
+            <groupId>io.vertx</groupId>
+            <version>3.0.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
@@ -28,30 +32,32 @@
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-hk2</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>vertx-mod-guice</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>guice-bridge</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>when.java</artifactId>
-            <scope>provided</scope>
         </dependency>
 
         <!--Test dependencies-->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-core</artifactId>
+            <version>${vertx.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
@@ -79,22 +85,4 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <!-- The vert.x Maven plugin -->
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <configuration>
-                    <configFile>src/test/resources/config.json</configFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>

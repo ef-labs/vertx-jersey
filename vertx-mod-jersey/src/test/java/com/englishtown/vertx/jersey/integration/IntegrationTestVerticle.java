@@ -23,36 +23,133 @@
 
 package com.englishtown.vertx.jersey.integration;
 
-import com.englishtown.vertx.jersey.JerseyModule;
-import org.junit.Test;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpClient;
-import org.vertx.java.core.http.HttpClientRequest;
-import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.testtools.TestVerticle;
+import static org.junit.Assert.fail;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonObject;
+import io.vertx.test.core.VertxTestBase;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-import static org.vertx.testtools.VertxAssert.*;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+
+import org.junit.Test;
+
+import com.englishtown.vertx.jersey.JerseyModule;
 
 /**
- * Created with IntelliJ IDEA.
  * User: adriangonzalez
- * Date: 6/28/13
- * Time: 4:06 PM
- * To change this template use File | Settings | File Templates.
  */
-public class IntegrationTestVerticle extends TestVerticle {
+public class IntegrationTestVerticle extends VertxTestBase {
 
+    private static final String BASEURL = "http://localhost:8080";
+
+    private HttpClient createHttpClient() {
+        HttpClientOptions options = new HttpClientOptions();
+        options.setConnectTimeout(1000);
+        HttpClient client = vertx.createHttpClient(options);
+        client.exceptionHandler(throwable -> {
+            fail();
+        });
+
+        return client;
+    }
+
+    private void verifyResponse(HttpClientResponse response, int status, String contentType, final String expected) {
+
+        assertEquals(status, response.statusCode());
+        assertEquals(contentType, response.headers().get(HttpHeaders.CONTENT_TYPE));
+
+        if (expected != null) {
+            response.bodyHandler((Buffer body) -> {
+                String result = body.toString("UTF-8");
+                assertEquals(expected, result);
+                testComplete();
+            });
+        } else {
+            testComplete();
+        }
+    }
+
+    @Test
+    public void test_getJson() throws Exception {
+
+        HttpClient client = createHttpClient();
+
+        HttpClientRequest request = client.request(HttpMethod.GET, BASEURL + "/rest/test/json", response -> {
+            verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{}");
+        });
+
+        request.end();
+    }
+
+    @Test
+    public void test_getJsonp() throws Exception {
+
+        HttpClient client = createHttpClient();
+        final String contentType = "application/javascript";
+
+        HttpClientRequest request = client.request(HttpMethod.GET, BASEURL + "/rest/test/json?cb=foo_cb", response -> {
+            verifyResponse(response, 200, contentType, "foo_cb({})");
+        });
+
+        request.headers().add(HttpHeaders.ACCEPT, contentType);
+        request.end();
+    }
+
+    @Test
+    public void test_getHtml() throws Exception {
+
+        HttpClient client = createHttpClient();
+
+        HttpClientRequest request = client.request(HttpMethod.GET, BASEURL + "/rest/test/html", response -> {
+            verifyResponse(response, 200, MediaType.TEXT_HTML, null);
+        });
+
+        request.end();
+    }
+
+    @Test
+    public void test_postJson() throws Exception {
+
+        HttpClient client = createHttpClient();
+
+        HttpClientRequest request = client.request(HttpMethod.POST, BASEURL + "/rest/test/json", response -> {
+            verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{\"name\":\"async response\"}");
+        });
+
+        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        request.end("{\"name\":\"post\"}");
+    }
+
+    @Test
+    public void test_getChunked() throws Exception {
+
+        HttpClient client = createHttpClient();
+
+        HttpClientRequest request = client.request(HttpMethod.GET, BASEURL + "/rest/test/chunked", response -> {
+            verifyResponse(response, 200, MediaType.TEXT_PLAIN, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+        });
+
+        request.end();
+    }
+
+}
+
+class IntegerationTestVericleImpl extends AbstractVerticle {
     /**
      * Override this method to signify that start is complete sometime _after_ the start() method has returned
      * This is useful if your verticle deploys other verticles or modules and you don't want this verticle to
@@ -61,20 +158,16 @@ public class IntegrationTestVerticle extends TestVerticle {
      * @param startedResult When you are happy your verticle is started set the result
      */
     @Override
-    public void start(final Future<Void> startedResult) {
+    public void start(final Future<Void> startedResult) throws Exception {
 
         JsonObject config = loadConfig();
 
-        container.deployVerticle(JerseyModule.class.getName(), config, new Handler<AsyncResult<String>>() {
-            @Override
-            public void handle(AsyncResult<String> result) {
-                if (result.succeeded()) {
-                    startedResult.setResult(null);
-                    IntegrationTestVerticle.super.start();
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
-
+        vertx.deployVerticle(JerseyModule.class.getName(), new DeploymentOptions(config), ar -> {
+            if (ar.succeeded()) {
+                startedResult.complete();
+//                    IntegrationTestVerticle.super.start();
+            } else {
+                startedResult.fail(ar.cause());
             }
         });
 
@@ -99,130 +192,5 @@ public class IntegrationTestVerticle extends TestVerticle {
             fail();
             return new JsonObject();
         }
-
     }
-
-    private HttpClient createHttpClient() {
-        HttpClient client = vertx.createHttpClient();
-
-        client.setHost("localhost")
-                .setPort(8080)
-                .setConnectTimeout(1000)
-                .exceptionHandler(new Handler<Throwable>() {
-                    @Override
-                    public void handle(Throwable event) {
-                        fail();
-                    }
-                });
-
-        return client;
-    }
-
-    private void verifyResponse(HttpClientResponse response, int status, String contentType, final String expected) {
-
-        assertEquals(status, response.statusCode());
-        assertEquals(contentType, response.headers().get(HttpHeaders.CONTENT_TYPE));
-
-        if (expected != null) {
-            response.bodyHandler(new Handler<Buffer>() {
-                @Override
-                public void handle(Buffer body) {
-                    String result = body.toString("UTF-8");
-                    assertEquals(expected, result);
-                    testComplete();
-                }
-            });
-        } else {
-            testComplete();
-        }
-    }
-
-    @Test
-    public void test_getJson() throws Exception {
-
-        HttpClient client = createHttpClient();
-
-        HttpClientRequest request = client.get("/rest/test/json",
-                new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{}");
-                    }
-                }
-        );
-
-        request.end();
-    }
-
-    @Test
-    public void test_getJsonp() throws Exception {
-
-        HttpClient client = createHttpClient();
-        final String contentType = "application/javascript";
-
-        HttpClientRequest request = client.get("/rest/test/json?cb=foo_cb",
-                new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        verifyResponse(response, 200, contentType, "foo_cb({})");
-                    }
-                }
-        );
-
-        request.headers().add(HttpHeaders.ACCEPT, contentType);
-        request.end();
-    }
-
-    @Test
-    public void test_getHtml() throws Exception {
-
-        HttpClient client = createHttpClient();
-
-        HttpClientRequest request = client.get("/rest/test/html",
-                new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        verifyResponse(response, 200, MediaType.TEXT_HTML, null);
-                    }
-                }
-        );
-
-        request.end();
-    }
-
-    @Test
-    public void test_postJson() throws Exception {
-
-        HttpClient client = createHttpClient();
-
-        HttpClientRequest request = client.post("/rest/test/json",
-                new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{\"name\":\"async response\"}");
-                    }
-                }
-        );
-
-        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
-        request.end("{\"name\":\"post\"}");
-    }
-
-    @Test
-    public void test_getChunked() throws Exception {
-
-        HttpClient client = createHttpClient();
-
-        HttpClientRequest request = client.get("/rest/test/chunked",
-                new Handler<HttpClientResponse>() {
-                    @Override
-                    public void handle(HttpClientResponse response) {
-                        verifyResponse(response, 200, MediaType.TEXT_PLAIN, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-                    }
-                }
-        );
-
-        request.end();
-    }
-
 }

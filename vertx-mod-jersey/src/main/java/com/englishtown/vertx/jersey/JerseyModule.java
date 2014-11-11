@@ -23,12 +23,9 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -36,7 +33,7 @@ import javax.inject.Provider;
 /**
  * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
-public class JerseyModule extends Verticle {
+public class JerseyModule extends AbstractVerticle {
 
     private final Provider<JerseyConfigurator> configuratorProvider;
     private final Provider<JerseyServer> jerseyServerProvider;
@@ -52,23 +49,20 @@ public class JerseyModule extends Verticle {
      * {@inheritDoc}
      */
     @Override
-    public void start(final Future<Void> startedResult) {
+    public void start(final Future<Void> startedResult) throws Exception {
         this.start();
 
-        JsonObject config = container.config();
+        JsonObject config = getVertx().context().config();
         jerseyServer = jerseyServerProvider.get();
         JerseyConfigurator configurator = configuratorProvider.get();
 
-        configurator.init(config, vertx, container);
+        configurator.init(config, getVertx());
 
-        jerseyServer.init(configurator, new Handler<AsyncResult<HttpServer>>() {
-            @Override
-            public void handle(AsyncResult<HttpServer> result) {
-                if (result.succeeded()) {
-                    startedResult.setResult(null);
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
+        jerseyServer.init(configurator, ar -> {
+            if (ar.succeeded()) {
+                startedResult.complete();
+            } else {
+                startedResult.fail(ar.cause());
             }
         });
 

@@ -31,6 +31,7 @@ import org.glassfish.jersey.server.ContainerRequest;
 /**
  * Default {@link com.englishtown.vertx.jersey.ApplicationHandlerDelegate} implementation
  */
+//TODO Migration: Rename to ApplicationHandlerDelegateImpl
 public class DefaultApplicationHandlerDelegate implements ApplicationHandlerDelegate {
 
     private final ApplicationHandler delegate;

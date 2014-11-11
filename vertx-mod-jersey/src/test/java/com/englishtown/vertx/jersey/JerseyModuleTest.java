@@ -23,6 +23,17 @@
 
 package com.englishtown.vertx.jersey;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServer;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,15 +41,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.platform.Container;
-
-import javax.inject.Provider;
-
-import static org.mockito.Mockito.*;
 
 /**
  * {@link JerseyModule} unit tests
@@ -60,8 +62,6 @@ public class JerseyModuleTest {
     Future<Void> startedResult;
     @Mock
     AsyncResult<HttpServer> asyncResult;
-    @Mock
-    Container container;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
 
@@ -70,7 +70,6 @@ public class JerseyModuleTest {
         when(jerseyServerProvider.get()).thenReturn(jerseyServer);
         when(configuratorProvider.get()).thenReturn(configurator);
         jerseyModule = new JerseyModule(jerseyServerProvider, configuratorProvider);
-        jerseyModule.setContainer(container);
     }
 
     @Test
@@ -78,20 +77,20 @@ public class JerseyModuleTest {
 
         jerseyModule.start(startedResult);
 
-        verify(startedResult, times(0)).setResult(null);
-        verify(startedResult, times(0)).setFailure(any(Throwable.class));
+        verify(startedResult, times(0)).complete();
+        verify(startedResult, times(0)).fail(any(Throwable.class));
 
         verify(jerseyServer).init(any(JerseyConfigurator.class), handlerCaptor.capture());
 
         when(asyncResult.succeeded()).thenReturn(true).thenReturn(false);
 
         handlerCaptor.getValue().handle(asyncResult);
-        verify(startedResult, times(1)).setResult(null);
-        verify(startedResult, times(0)).setFailure(any(Throwable.class));
+        verify(startedResult, times(1)).complete();
+        verify(startedResult, times(0)).fail(any(Throwable.class));
 
         handlerCaptor.getValue().handle(asyncResult);
-        verify(startedResult, times(1)).setResult(null);
-        verify(startedResult, times(1)).setFailure(any(Throwable.class));
+        verify(startedResult, times(1)).complete();
+        verify(startedResult, times(1)).fail(any(Throwable.class));
 
     }
 

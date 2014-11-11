@@ -1,9 +1,22 @@
 package com.englishtown.vertx.guice;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.TypeLiteral;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.inject.Provider;
+import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.ReaderInterceptor;
+import javax.ws.rs.ext.WriterInterceptor;
+
 import org.glassfish.hk2.api.DynamicConfiguration;
 import org.glassfish.hk2.api.DynamicConfigurationService;
 import org.glassfish.hk2.api.ServiceLocator;
@@ -12,21 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
-import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.inject.Provider;
-import javax.ws.rs.container.ContainerRequestFilter;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.ext.ReaderInterceptor;
-import javax.ws.rs.ext.WriterInterceptor;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.TypeLiteral;
 
 @RunWith(MockitoJUnitRunner.class)
 public class GuiceJerseyServerTest {
@@ -58,7 +64,8 @@ public class GuiceJerseyServerTest {
         Set<ContainerRequestFilter> set = new LinkedHashSet<>();
         set.add(mock(ContainerRequestFilter.class));
 
-        when(injector.getInstance(Matchers.any(key.getClass()))).thenReturn(set);
+        //TODO Migration: Fix generic type inference
+        Mockito.when(injector.getInstance((Key<?>)any(key.getClass()))).thenReturn(null);
 
         server = new GuiceJerseyServer(handlerProvider, locator, injector);
     }

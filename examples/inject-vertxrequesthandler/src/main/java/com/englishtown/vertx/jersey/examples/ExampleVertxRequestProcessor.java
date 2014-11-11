@@ -1,17 +1,10 @@
 package com.englishtown.vertx.jersey.examples;
 
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
-/**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/9/13
- * Time: 7:43 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExampleVertxRequestProcessor implements VertxRequestProcessor {
 
     /**

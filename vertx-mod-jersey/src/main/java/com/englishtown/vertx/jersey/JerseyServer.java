@@ -23,10 +23,10 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.RouteMatcher;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServer;
+import io.vertx.ext.routematcher.RouteMatcher;
 
 /**
  * Represents a jersey server running in vert.x
@@ -72,7 +72,7 @@ public interface JerseyServer {
     JerseyHandler getHandler();
 
     /**
-     * Returns the internal vert.x {@link org.vertx.java.core.http.HttpServer}
+     * Returns the internal vert.x {@link io.vertx.core.http.HttpServer}
      *
      * @return the vert.x http server instance
      */

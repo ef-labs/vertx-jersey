@@ -120,7 +120,7 @@ You have 3 ways to start the Jersey Server:
 
 1. In your mod.json file, make the start Verticle JerseyModule (`"main": "com.englishtown.vertx.jersey.JerseyModule"`).
 2. In your own Verticle specified in mod.json `"main"`, create an instance of the JerseyServer and initialize similarly to how JerseyModule does.
-3. Use when.java and `com.englishtown.vertx.jersey.promises.WhenJerseyServer` to simplify the process.  See the [promises](#promises) section below.
+3. Use when.java and `com.englishtown.vertx.jersey.promises.WhenJerseyServer` to simplify the process.  See the [promises](#Promises) section below.
 
 
 Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.

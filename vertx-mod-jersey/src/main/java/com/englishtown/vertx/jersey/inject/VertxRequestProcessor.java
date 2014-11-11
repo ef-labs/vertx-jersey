@@ -23,9 +23,10 @@
 
 package com.englishtown.vertx.jersey.inject;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+
 import org.glassfish.jersey.server.ContainerRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
 
 /**
  * Injectable interface to provide additional async vert.x request processing before Jersey

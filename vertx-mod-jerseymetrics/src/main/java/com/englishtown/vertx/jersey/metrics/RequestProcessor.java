@@ -23,14 +23,16 @@
 
 package com.englishtown.vertx.jersey.metrics;
 
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+
+import javax.inject.Inject;
+
+import org.glassfish.jersey.server.ContainerRequest;
+
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServerRequest;
-
-import javax.inject.Inject;
 
 /**
  * Adds metrics for vert.x requests

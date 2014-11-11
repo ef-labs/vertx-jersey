@@ -1,16 +1,9 @@
 package com.englishtown.vertx.jersey.examples;
 
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+import io.vertx.core.http.HttpServerResponse;
 import org.glassfish.jersey.server.ContainerResponse;
-import org.vertx.java.core.http.HttpServerResponse;
 
-/**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/24/13
- * Time: 11:15 AM
- * To change this template use File | Settings | File Templates.
- */
 public class OtherVertxResponseProcessor implements VertxResponseProcessor {
     /**
      * <p>

@@ -23,12 +23,12 @@
 
 package com.englishtown.vertx.jersey;
 
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 
 import java.net.URI;
+
+import org.glassfish.jersey.server.ApplicationHandler;
 
 /**
  * Provides configuration for a {@link JerseyHandler}
@@ -40,9 +40,8 @@ public interface JerseyConfigurator {
      *
      * @param config    the underlying configuration settings
      * @param vertx     the vertx instance
-     * @param container the container instance
      */
-    void init(JsonObject config, Vertx vertx, Container container);
+    void init(JsonObject config, Vertx vertx);
 
     /**
      * Returns the current vertx instance
@@ -50,13 +49,6 @@ public interface JerseyConfigurator {
      * @return the {@link Vertx} instance
      */
     Vertx getVertx();
-
-    /**
-     * Returns the current container instance
-     *
-     * @return the {@link Container} instance
-     */
-    Container getContainer();
 
     /**
      * The http web server host

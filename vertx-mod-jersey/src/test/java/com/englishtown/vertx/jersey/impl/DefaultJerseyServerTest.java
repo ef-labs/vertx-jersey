@@ -23,8 +23,30 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyHandler;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.ext.routematcher.RouteMatcher;
+
+import java.net.URI;
+
+import javax.inject.Provider;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,21 +55,9 @@ import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
 
-import javax.inject.Provider;
-import java.net.URI;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyHandler;
 
 /**
  * {@link com.englishtown.vertx.jersey.JerseyModule} unit tests
@@ -61,11 +71,9 @@ public class DefaultJerseyServerTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
-    Logger logger;
-    @Mock
     HttpServer httpServer;
+    @Mock
+    HttpServerOptions serverOptions;
     @Mock
     AsyncResult<HttpServer> asyncResult;
     @Mock
@@ -88,13 +96,14 @@ public class DefaultJerseyServerTest {
     @Before
     public void setUp() {
 
-        when(container.logger()).thenReturn(logger);
-        when(vertx.createHttpServer()).thenReturn(httpServer);
+        // TODO Migration: check KeyStoreOptions 
+//      when(httpServer.setKeyStorePassword(anyString())).thenReturn(httpServer);
+//      when(httpServer.setKeyStorePath(anyString())).thenReturn(httpServer);
+//      when(serverOptions.setKeyStoreOptions(keyStoreOptions));
+        when(serverOptions.setSsl(anyBoolean())).thenReturn(serverOptions);
+        when(vertx.createHttpServer(any(HttpServerOptions.class))).thenReturn(httpServer);
+        
         when(configurator.getVertx()).thenReturn(vertx);
-        when(configurator.getContainer()).thenReturn(container);
-        when(httpServer.setSSL(anyBoolean())).thenReturn(httpServer);
-        when(httpServer.setKeyStorePassword(anyString())).thenReturn(httpServer);
-        when(httpServer.setKeyStorePath(anyString())).thenReturn(httpServer);
 
         when(jerseyHandler.getBaseUri()).thenReturn(baseUri);
         when(jerseyHandlerProvider.get()).thenReturn(jerseyHandler);
@@ -102,9 +111,9 @@ public class DefaultJerseyServerTest {
 
     }
 
-    private void verifyResults(int port, String host) {
+    private void verifyResults() {
 
-        verify(vertx).createHttpServer();
+        verify(vertx).createHttpServer(any(HttpServerOptions.class));
         verify(jerseyHandler).init(any(JerseyConfigurator.class));
 
         verify(httpServer).requestHandler(requestHandlerCaptor.capture());
@@ -112,7 +121,7 @@ public class DefaultJerseyServerTest {
         assertNotNull(handler);
         assertThat(handler, is(RouteMatcher.class));
 
-        verify(httpServer).listen(eq(port), eq(host), Matchers.<Handler<AsyncResult<HttpServer>>>any());
+        verify(httpServer).listen(Matchers.<Handler<AsyncResult<HttpServer>>>any());
 
     }
 
@@ -136,7 +145,7 @@ public class DefaultJerseyServerTest {
         when(configurator.getHost()).thenReturn("0.0.0.0");
         when(configurator.getPort()).thenReturn(80);
         jerseyServer.init(configurator);
-        verifyResults(80, "0.0.0.0");
+        verifyResults();
     }
 
     @Test
@@ -151,13 +160,12 @@ public class DefaultJerseyServerTest {
         when(configurator.getPort()).thenReturn(port);
         when(configurator.getReceiveBufferSize()).thenReturn(bufferSize);
         when(configurator.getVertx()).thenReturn(vertx);
-        when(configurator.getContainer()).thenReturn(container);
         when(configurator.getSSL()).thenReturn(ssl);
 
         jerseyServer.init(configurator);
-        verifyResults(port, host);
+        verifyResults();
 
-        verify(httpServer).setReceiveBufferSize(bufferSize);
+        verify(serverOptions).setReceiveBufferSize(bufferSize);
     }
 
     @Test
@@ -165,18 +173,18 @@ public class DefaultJerseyServerTest {
 
         jerseyServer.init(configurator, doneHandler);
 
-        verify(httpServer).listen(anyInt(), anyString(), handlerCaptor.capture());
+        verify(httpServer).listen(handlerCaptor.capture());
         Handler<AsyncResult<HttpServer>> handler = handlerCaptor.getValue();
 
         when(asyncResult.succeeded()).thenReturn(true).thenReturn(false);
 
         handler.handle(asyncResult);
-        verify(logger).info(anyString());
-        verify(logger, times(0)).error(anyString());
+//        verify(logger).info(anyString());
+//        verify(logger, times(0)).error(anyString());
 
         handler.handle(asyncResult);
-        verify(logger).info(anyString());
-        verify(logger).error(anyString(), any(Throwable.class));
+//        verify(logger).info(anyString());
+//        verify(logger).error(anyString(), any(Throwable.class));
 
         verify(doneHandler, times(2)).handle(eq(asyncResult));
     }
