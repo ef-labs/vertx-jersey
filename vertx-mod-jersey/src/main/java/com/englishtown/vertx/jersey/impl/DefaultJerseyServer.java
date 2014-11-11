@@ -23,23 +23,30 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyServer;
-import org.glassfish.hk2.api.ServiceLocatorFactory;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.core.http.RouteMatcher;
-import org.vertx.java.platform.Container;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.routematcher.impl.RouteMatcherImpl;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+
+import org.glassfish.hk2.api.ServiceLocatorFactory;
+
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyServer;
 
 /**
  * Default implementation of {@link JerseyServer}
  */
 public class DefaultJerseyServer implements JerseyServer {
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyServer.class);
 
     private final Provider<JerseyHandler> jerseyHandlerProvider;
     private JerseyHandler jerseyHandler;
@@ -62,31 +69,36 @@ public class DefaultJerseyServer implements JerseyServer {
             throw new IllegalStateException("The JerseyHandler provider returned null");
         }
 
-        // Create http server
-        server = configurator.getVertx().createHttpServer();
+        HttpServerOptions serverOptions = new HttpServerOptions();
+        serverOptions.setHost(configurator.getHost());
+        serverOptions.setPort(configurator.getPort());
+        server = configurator.getVertx().createHttpServer(serverOptions);
 
         // Enable https
         if (configurator.getSSL()) {
-            server.setSSL(true)
-                    .setKeyStorePassword(configurator.getKeyStorePassword())
-                    .setKeyStorePath(configurator.getKeyStorePath());
+            serverOptions.setSsl(true);
+//          TODO Migration: Vert.x Interface for options not yet finished?
+//          .setKeyStorePassword(configurator.getKeyStorePassword())
+//          .setKeyStorePath(configurator.getKeyStorePath());
         }
 
         // Performance tweak
-        server.setAcceptBacklog(configurator.getAcceptBacklog());
+        serverOptions.setAcceptBacklog(configurator.getAcceptBacklog());
 
         Integer receiveBufferSize = configurator.getReceiveBufferSize();
         if (receiveBufferSize != null && receiveBufferSize > 0) {
             // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
-            server.setReceiveBufferSize(receiveBufferSize);
+            serverOptions.setReceiveBufferSize(receiveBufferSize);
         }
 
         // Init jersey handler
         jerseyHandler.init(configurator);
 
         // Set request handler for the baseUri
-        RouteMatcher rm = new RouteMatcher();
-        server.requestHandler(rm);
+        RouteMatcher rm = new RouteMatcherImpl();
+        server.requestHandler(request -> {
+            rm.accept(request);
+        });
         // regex pattern will be: "^base_path/.*"
         String pattern = "^" + jerseyHandler.getBaseUri().getPath() + ".*";
         rm.all(pattern, jerseyHandler);
@@ -100,23 +112,16 @@ public class DefaultJerseyServer implements JerseyServer {
             setupHandler.handle(server);
         }
 
-        final String host = configurator.getHost();
-        final int port = configurator.getPort();
-        final Container container = configurator.getContainer();
-
         // Start listening and log success/failure
-        server.listen(port, host, new Handler<AsyncResult<HttpServer>>() {
-            @Override
-            public void handle(AsyncResult<HttpServer> result) {
-                final String listenPath = (configurator.getSSL() ? "https" : "http") + "://" + host + ":" + port;
-                if (result.succeeded()) {
-                    container.logger().info("Http server listening for " + listenPath);
-                } else {
-                    container.logger().error("Failed to start http server listening for " + listenPath, result.cause());
-                }
-                if (doneHandler != null) {
-                    doneHandler.handle(result);
-                }
+        server.listen(ar -> {
+            final String listenPath = (configurator.getSSL() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
+            if (ar.succeeded()) {
+                logger.info("Http server listening for " + listenPath);
+            } else {
+                logger.error("Failed to start http server listening for " + listenPath, ar.cause());
+            }
+            if (doneHandler != null) {
+                doneHandler.handle(ar);
             }
         });
 
@@ -148,7 +153,7 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     /**
-     * Returns the internal vert.x {@link org.vertx.java.core.http.HttpServer}
+     * Returns the internal vert.x {@link io.vertx.core.http.HttpServer}
      *
      * @return the vert.x http server instance
      */

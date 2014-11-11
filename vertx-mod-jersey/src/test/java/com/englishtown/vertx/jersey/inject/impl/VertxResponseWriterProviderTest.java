@@ -23,23 +23,24 @@
 
 package com.englishtown.vertx.jersey.inject.impl;
 
-import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
-import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+import static org.junit.Assert.assertNotNull;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.platform.Container;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertNotNull;
+import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
+import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 
 /**
  * {@link VertxResponseWriterProvider} unit tests
@@ -70,7 +71,7 @@ public class VertxResponseWriterProviderTest {
         responseProcessors.add(responseProcessor);
         postResponseProcessors.add(postResponseProcessor);
 
-        provider = new VertxResponseWriterProvider(vertx, container, responseProcessors, postResponseProcessors);
+        provider = new VertxResponseWriterProvider(vertx, responseProcessors, postResponseProcessors);
 
     }
 

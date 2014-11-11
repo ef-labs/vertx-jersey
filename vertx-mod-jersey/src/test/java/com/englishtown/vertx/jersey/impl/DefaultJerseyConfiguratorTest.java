@@ -23,7 +23,16 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+
+import java.net.URI;
+
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.junit.Before;
@@ -32,16 +41,8 @@ import org.junit.runner.RunWith;
 import org.jvnet.hk2.internal.ServiceLocatorImpl;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
 
-import java.net.URI;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 
 /**
  * {@link DefaultJerseyConfigurator} unit tests
@@ -52,8 +53,6 @@ public class DefaultJerseyConfiguratorTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
     Logger logger;
 
     JsonObject config;
@@ -63,12 +62,10 @@ public class DefaultJerseyConfiguratorTest {
     public void setUp() throws Exception {
 
         config = new JsonObject();
-        when(container.config()).thenReturn(config);
-        when(container.logger()).thenReturn(logger);
 
         ServiceLocator locator = new ServiceLocatorImpl("test", null);
         configurator = new DefaultJerseyConfigurator(locator);
-        configurator.init(config, vertx, container);
+        configurator.init(config, vertx);
 
     }
 
@@ -78,7 +75,7 @@ public class DefaultJerseyConfiguratorTest {
         DefaultJerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
 
         try {
-            configurator.init(null, null, null);
+            configurator.init(null, null);
             fail();
         } catch (IllegalStateException e) {
             // Expected
@@ -103,7 +100,7 @@ public class DefaultJerseyConfiguratorTest {
         assertEquals(expected, uri.getPath());
 
         expected = "test/base/path";
-        config.putString(DefaultJerseyConfigurator.CONFIG_BASE_PATH, expected);
+        config.put(DefaultJerseyConfigurator.CONFIG_BASE_PATH, expected);
         expected += "/";
 
         uri = configurator.getBaseUri();
@@ -114,8 +111,8 @@ public class DefaultJerseyConfiguratorTest {
     @Test
     public void testGetApplicationHandler() throws Exception {
 
-        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.resources");
-        config.putArray(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+        JsonArray resources = new JsonArray().add("com.englishtown.vertx.resources");
+        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
 
         ApplicationHandlerDelegate applicationHandlerDelegate;
         applicationHandlerDelegate = configurator.getApplicationHandler();
@@ -134,7 +131,7 @@ public class DefaultJerseyConfiguratorTest {
         assertEquals(expected, maxBodySize);
 
         expected = 12;
-        config.putNumber(DefaultJerseyConfigurator.CONFIG_MAX_BODY_SIZE, expected);
+        config.put(DefaultJerseyConfigurator.CONFIG_MAX_BODY_SIZE, expected);
 
         maxBodySize = configurator.getMaxBodySize();
         assertEquals(expected, maxBodySize);
@@ -168,30 +165,30 @@ public class DefaultJerseyConfiguratorTest {
             // Expected
         }
 
-        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.jersey.resources");
-        config.putArray(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+        JsonArray resources = new JsonArray().add("com.englishtown.vertx.jersey.resources");
+        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
         resourceConfig = configurator.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
         assertEquals(1, resourceConfig.getInstances().size());
 
-        JsonArray features = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestFeature");
-        config.putArray(DefaultJerseyConfigurator.CONFIG_FEATURES, features);
+        JsonArray features = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestFeature");
+        config.put(DefaultJerseyConfigurator.CONFIG_FEATURES, features);
         resourceConfig = configurator.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
 
-        JsonArray binders = new JsonArray().addString("com.englishtown.vertx.jersey.inject.TestBinder2");
-        config.putArray(DefaultJerseyConfigurator.CONFIG_BINDERS, binders);
+        JsonArray binders = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestBinder2");
+        config.put(DefaultJerseyConfigurator.CONFIG_BINDERS, binders);
         resourceConfig = configurator.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
         assertEquals(2, resourceConfig.getInstances().size());
 
-        binders.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
+        binders.add("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {
             configurator.getResourceConfig();
             fail();
@@ -199,7 +196,7 @@ public class DefaultJerseyConfiguratorTest {
             // Expected
         }
 
-        features.addString("com.englishtown.vertx.jersey.inject.ClassNotFoundFeature");
+        features.add("com.englishtown.vertx.jersey.inject.ClassNotFoundFeature");
         try {
             configurator.getResourceConfig();
             fail();

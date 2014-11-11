@@ -23,15 +23,41 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
-import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
+import io.vertx.core.Vertx;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferFactoryImpl;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.http.impl.HeadersAdaptor;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,29 +66,11 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.MultiMap;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.http.impl.HttpHeadersAdapter;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.platform.Container;
 
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import java.io.InputStream;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
+import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 
 /**
  * {@link DefaultJerseyHandler} unit tests
@@ -87,8 +95,6 @@ public class DefaultJerseyHandlerTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
     Logger logger;
     @Mock
     Ref<Vertx> vertxRef;
@@ -108,18 +114,14 @@ public class DefaultJerseyHandlerTest {
         when(configurator.getApplicationHandler()).thenReturn(applicationHandlerDelegate);
         when(configurator.getMaxBodySize()).thenReturn(1024);
         when(configurator.getVertx()).thenReturn(vertx);
-        when(configurator.getContainer()).thenReturn(container);
         when(configurator.getBaseUri()).thenReturn(URI.create("/test/"));
 
-        when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test"));
+        when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test").toString());
         when(request.response()).thenReturn(response);
         when(request.headers()).thenReturn(headers);
 
-        when(container.config()).thenReturn(config);
-        when(container.logger()).thenReturn(logger);
-
-        JsonArray resources = new JsonArray().addString("com.englishtown.vertx.jersey.resources");
-        config.putArray(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+        JsonArray resources = new JsonArray().add("com.englishtown.vertx.jersey.resources");
+        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
 
         ContainerResponseWriterProvider provider = mock(ContainerResponseWriterProvider.class);
         when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class))).thenReturn(mock(ContainerResponseWriter.class));
@@ -150,15 +152,15 @@ public class DefaultJerseyHandlerTest {
         DefaultHttpHeaders headers = new DefaultHttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
         when(request.method()).thenReturn(HttpMethod.POST);
-        when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
+        when(request.headers()).thenReturn(new HeadersAdaptor(headers));
 
         jerseyHandler.init(configurator);
         jerseyHandler.handle(request);
 
-        verify(request).dataHandler(dataHandlerCaptor.capture());
+        verify(request).handler(dataHandlerCaptor.capture());
         verify(request).endHandler(endHandlerCaptor.capture());
 
-        Buffer data = new Buffer("{}");
+        Buffer data = new BufferFactoryImpl().buffer("{}");
         dataHandlerCaptor.getValue().handle(data);
         endHandlerCaptor.getValue().handle(null);
 
@@ -170,6 +172,7 @@ public class DefaultJerseyHandlerTest {
     public void testHandle_RequestProcessors() throws Exception {
 
         when(request.headers()).thenReturn(mock(MultiMap.class));
+        when(request.method()).thenReturn(HttpMethod.GET);
         InputStream inputStream = null;
 
         VertxRequestProcessor rp1 = mock(VertxRequestProcessor.class);
@@ -198,7 +201,7 @@ public class DefaultJerseyHandlerTest {
         headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_OCTET_STREAM);
 
         when(request.method()).thenReturn(HttpMethod.GET).thenReturn(HttpMethod.PUT);
-        when(request.headers()).thenReturn(new HttpHeadersAdapter(headers));
+        when(request.headers()).thenReturn(new HeadersAdaptor(headers));
 
         result = jerseyHandler.shouldReadData(request);
         assertFalse(result);
@@ -248,7 +251,7 @@ public class DefaultJerseyHandlerTest {
         String badUrl = "http://test.englishtown.com/test?a=b=c|d=e";
 
         HttpServerRequest request = mock(HttpServerRequest.class);
-        when(request.absoluteURI()).thenReturn(URI.create(absoluteUri)).thenThrow(new IllegalArgumentException());
+        when(request.absoluteURI()).thenReturn(absoluteUri).thenThrow(new IllegalArgumentException());
         when(request.uri()).thenReturn(badUrl);
         when(request.headers()).thenReturn(headers);
         when(headers.get(eq(HttpHeaders.HOST))).thenReturn(host);

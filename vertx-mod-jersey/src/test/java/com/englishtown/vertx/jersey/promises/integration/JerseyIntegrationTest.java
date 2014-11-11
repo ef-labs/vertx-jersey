@@ -23,7 +23,22 @@
 
 package com.englishtown.vertx.jersey.promises.integration;
 
-import com.englishtown.promises.Promise;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+import io.vertx.test.core.VertxTestBase;
+
+import java.util.ArrayList;
+
+import javax.inject.Provider;
+
+import org.junit.Test;
+
 import com.englishtown.promises.When;
 import com.englishtown.promises.WhenFactory;
 import com.englishtown.vertx.jersey.JerseyConfigurator;
@@ -38,37 +53,23 @@ import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
-import org.junit.Test;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.http.HttpClientResponse;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-
-import javax.inject.Provider;
-import java.util.ArrayList;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import static org.vertx.testtools.VertxAssert.*;
 
 /**
  * Integration test for
  */
-public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
+public class JerseyIntegrationTest extends VertxTestBase {
 
-    String host = "localhost";
-    int port = 8080;
+    private static String host = "localhost";
+    private static int port = 8080;
 
     @Test
     public void testCreateServer() throws Exception {
 
-        vertx.createHttpClient()
-                .setHost("localhost")
-                .setPort(port)
-                .setConnectTimeout(300)
+        HttpClientOptions options = new HttpClientOptions();
+        options.setConnectTimeout(300);
+        vertx.createHttpClient(options)
                 .exceptionHandler(t -> fail(t.getMessage()))
-                .get("/integration/test", response -> {
+                .request(HttpMethod.GET, port, host, "/integration/test", response -> {
                     assertEquals(200, response.statusCode());
                     testComplete();
                 })
@@ -76,6 +77,13 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
                 .end();
 
     }
+
+}
+
+class JerseyIntegrationTestImpl extends AbstractVerticle {
+    
+    String host = "localhost";
+    int port = 8080;
 
     /**
      * Override this method to signify that start is complete sometime _after_ the start() method has returned
@@ -89,8 +97,7 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
     public void start(final Future<Void> startedResult) {
 
         ContainerResponseWriterProvider provider = new VertxResponseWriterProvider(
-                vertx,
-                container,
+                getVertx(),
                 new ArrayList<VertxResponseProcessor>(),
                 new ArrayList<VertxPostResponseProcessor>());
 
@@ -107,21 +114,21 @@ public class JerseyIntegrationTest extends org.vertx.testtools.TestVerticle {
         when(configuratorProvider.get()).thenReturn(configurator);
         When when = WhenFactory.createSync();
 
-        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, container, serverProvider, configuratorProvider, when);
+        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, serverProvider, configuratorProvider, when);
 
         JsonObject config = new JsonObject()
-                .putString("host", host)
-                .putNumber("port", port)
-                .putArray("resources", new JsonArray().addString("com.englishtown.vertx.jersey.promises.integration.resources"));
+                .put("host", host)
+                .put("port", port)
+                .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.promises.integration.resources"));
 
         whenJerseyServer.createServer(config).then(
                 value -> {
-                    start();
-                    startedResult.setResult(null);
+//                    start();
+                    startedResult.complete();
                     return null;
                 },
                 value -> {
-                    startedResult.setFailure(value);
+                    startedResult.fail(value);
                     return null;
                 }
         );

@@ -1,9 +1,11 @@
 package com.englishtown.vertx.jersey.impl;
 
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.streams.WriteStream;
+
 import com.englishtown.vertx.jersey.WriteStreamOutput;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerResponse;
 
 /**
  * Default implementation of {@link com.englishtown.vertx.jersey.WriteStreamOutput}
@@ -24,7 +26,7 @@ public class DefaultWriteStreamOutput implements WriteStreamOutput {
     }
 
     /**
-     * Flag to indicate if the {@link org.vertx.java.core.http.HttpServerResponse} has been set yet.
+     * Flag to indicate if the {@link io.vertx.core.http.HttpServerResponse} has been set yet.
      *
      * @return boolean flag
      */
@@ -44,16 +46,6 @@ public class DefaultWriteStreamOutput implements WriteStreamOutput {
         } else {
             response.end();
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public WriteStreamOutput write(Buffer data) {
-        checkResponseSet();
-        response.write(data);
-        return this;
     }
 
     /**
@@ -96,7 +88,19 @@ public class DefaultWriteStreamOutput implements WriteStreamOutput {
     }
 
     private void checkResponseSet() {
-        if (response == null) throw new IllegalStateException("The HttpServerResponse has not been set yet.");
+        if (response == null) {
+            throw new IllegalStateException("The HttpServerResponse has not been set yet.");
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public WriteStream<Buffer> write(Buffer data) {
+        checkResponseSet();
+        response.write(data);
+        return this;
     }
 
 }

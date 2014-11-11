@@ -23,8 +23,7 @@
 
 package com.englishtown.vertx.jersey.resources;
 
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
+import io.vertx.core.Vertx;
 
 import javax.inject.Singleton;
 import javax.ws.rs.GET;
@@ -43,11 +42,8 @@ public class TestResource {
     @GET
     public void getString(@Context Vertx vertx, @Suspended final AsyncResponse asyncResponse) {
 
-        vertx.setTimer(100, new Handler<Long>() {
-            @Override
-            public void handle(Long event) {
-                asyncResponse.resume("OK");
-            }
+        vertx.setTimer(100, event -> {
+            asyncResponse.resume("OK");
         });
 
     }

@@ -23,37 +23,41 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
-import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
-import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.TypeLiteral;
-import org.glassfish.jersey.internal.MapPropertiesDelegate;
-import org.glassfish.jersey.internal.util.collection.Ref;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.spi.RequestScopedInitializer;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.buffer.Buffer;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.logging.Logger;
-import org.vertx.java.core.logging.impl.LoggerFactory;
+import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.buffer.impl.BufferFactoryImpl;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.impl.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.HttpMethod;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.UriBuilder;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
+
+import javax.inject.Inject;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+
+import org.glassfish.hk2.api.ServiceLocator;
+import org.glassfish.hk2.api.TypeLiteral;
+import org.glassfish.jersey.internal.MapPropertiesDelegate;
+import org.glassfish.jersey.internal.util.collection.Ref;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.spi.RequestScopedInitializer;
+
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
+import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
 
 /**
  * The Vertx {@link HttpServerRequest} handler that delegates handling to Jersey
@@ -109,23 +113,18 @@ public class DefaultJerseyHandler implements JerseyHandler {
             if (logger.isDebugEnabled()) {
                 logger.debug("DefaultJerseyHandler - handle request and read body: " + vertxRequest.method() + " " + vertxRequest.uri());
             }
-            final Buffer body = new Buffer();
+            final Buffer body = new BufferFactoryImpl().buffer();
 
-            vertxRequest.dataHandler(new Handler<Buffer>() {
-                public void handle(Buffer buff) {
-                    body.appendBuffer(buff);
-                    if (body.length() > maxBodySize) {
-                        throw new RuntimeException("The input stream has exceeded the max allowed body size "
-                                + maxBodySize + ".");
-                    }
+            vertxRequest.handler(buffer -> {
+                body.appendBuffer(buffer);
+                if (body.length() > maxBodySize) {
+                    throw new RuntimeException("The input stream has exceeded the max allowed body size "
+                            + maxBodySize + ".");
                 }
             });
-            vertxRequest.endHandler(new Handler<Void>() {
-                @Override
-                public void handle(Void event) {
-                    InputStream inputStream = new ByteArrayInputStream(body.getBytes());
-                    DefaultJerseyHandler.this.handle(vertxRequest, inputStream);
-                }
+            vertxRequest.endHandler((Void) -> {
+                InputStream inputStream = new ByteArrayInputStream(body.getBytes());
+                DefaultJerseyHandler.this.handle(vertxRequest, inputStream);
             });
 
         } else {
@@ -150,10 +149,11 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 .replaceQuery(null);
 
         // Create the jersey request
+        //TODO Migration: ContainerRequest should use the new HttpMethod enum
         final ContainerRequest jerseyRequest = new ContainerRequest(
                 baseUriBuilder.build(),
                 uri,
-                vertxRequest.method(),
+                vertxRequest.method().name(),
                 new DefaultSecurityContext(isSecure),
                 new MapPropertiesDelegate());
 
@@ -167,7 +167,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
         String hostAndPort = vertxRequest.headers().get(HttpHeaders.HOST);
 
         try {
-            absoluteUri = vertxRequest.absoluteURI();
+            absoluteUri = UriBuilder.fromUri(vertxRequest.absoluteURI()).build();
 
             if (hostAndPort != null && !hostAndPort.isEmpty()) {
                 String[] parts = hostAndPort.split(":");
@@ -276,14 +276,11 @@ public class DefaultJerseyHandler implements JerseyHandler {
         VertxRequestProcessor processor = requestProcessors.get(index);
         final int next = index + 1;
 
-        processor.process(vertxRequest, jerseyRequest, new Handler<Void>() {
-            @Override
-            public void handle(Void aVoid) {
-                if (next >= requestProcessors.size()) {
-                    done.handle(null);
-                } else {
-                    callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
-                }
+        processor.process(vertxRequest, jerseyRequest, (Void) -> {
+            if (next >= requestProcessors.size()) {
+                done.handle(null);
+            } else {
+                callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
             }
         });
 
@@ -291,10 +288,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     protected boolean shouldReadData(HttpServerRequest vertxRequest) {
 
-        String method = vertxRequest.method();
+        HttpMethod method = vertxRequest.method();
 
         // Only read input stream data for post/put methods
-        if (!(HttpMethod.POST.equalsIgnoreCase(method) || HttpMethod.PUT.equalsIgnoreCase(method))) {
+        if (!(HttpMethod.POST == method || HttpMethod.PUT == method)) {
             return false;
         }
 

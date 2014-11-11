@@ -23,10 +23,12 @@
 
 package com.englishtown.vertx.jersey.metrics;
 
+import io.vertx.core.http.HttpServerResponse;
+
+import org.glassfish.jersey.server.ContainerResponse;
+
 import com.codahale.metrics.Timer;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
-import org.glassfish.jersey.server.ContainerResponse;
-import org.vertx.java.core.http.HttpServerResponse;
 
 /**
  * Marks the timer context as complete

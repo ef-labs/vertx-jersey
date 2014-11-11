@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.englishtown</groupId>
         <artifactId>vertx-jersey</artifactId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
 
     <modules>
@@ -42,7 +42,6 @@
                 <groupId>com.englishtown</groupId>
                 <artifactId>vertx-mod-jersey</artifactId>
                 <version>${project.version}</version>
-                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

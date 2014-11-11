@@ -23,20 +23,20 @@
 
 package com.englishtown.vertx.jersey.inject;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.streams.ReadStream;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+
 import org.glassfish.hk2.api.PerLookup;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.inject.ReferencingFactory;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.process.internal.RequestScoped;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.core.http.HttpServerResponse;
-import org.vertx.java.core.streams.ReadStream;
-import org.vertx.java.platform.Container;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * HK2 binder to configure the minimum interfaces required for the {@link com.englishtown.vertx.jersey.JerseyModule}
@@ -45,7 +45,6 @@ import javax.inject.Provider;
 public class InternalVertxJerseyBinder extends AbstractBinder {
 
     private final Vertx vertx;
-    private final Container container;
 
     /**
      * Referencing factory for vert.x request.
@@ -67,9 +66,8 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
         }
     }
 
-    public InternalVertxJerseyBinder(Vertx vertx, Container container) {
+    public InternalVertxJerseyBinder(Vertx vertx) {
         this.vertx = vertx;
-        this.container = container;
     }
 
     /**
@@ -81,7 +79,6 @@ public class InternalVertxJerseyBinder extends AbstractBinder {
 
         // Bind the vertx and container instances
         bind(vertx).to(Vertx.class);
-        bind(container).to(Container.class);
 
         // Request and read stream
         bindFactory(VertxRequestReferencingFactory.class).to(HttpServerRequest.class).in(PerLookup.class);

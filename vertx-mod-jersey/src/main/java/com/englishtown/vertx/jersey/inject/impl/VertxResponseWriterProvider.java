@@ -23,19 +23,21 @@
 
 package com.englishtown.vertx.jersey.inject.impl;
 
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
+
+import java.util.List;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+
 import com.englishtown.vertx.jersey.impl.VertxResponseWriter;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.spi.ContainerResponseWriter;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
-import org.vertx.java.platform.Container;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import java.util.List;
 
 /**
  * Default implementation of ContainerResponseWriterProvider
@@ -44,18 +46,15 @@ import java.util.List;
 public class VertxResponseWriterProvider implements ContainerResponseWriterProvider {
 
     private final Vertx vertx;
-    private final Container container;
     private final List<VertxResponseProcessor> responseProcessors;
     private final List<VertxPostResponseProcessor> postResponseProcessors;
 
     @Inject
     public VertxResponseWriterProvider(
             Vertx vertx,
-            Container container,
             List<VertxResponseProcessor> responseProcessors,
             List<VertxPostResponseProcessor> postResponseProcessors) {
         this.vertx = vertx;
-        this.container = container;
         this.responseProcessors = responseProcessors;
         this.postResponseProcessors = postResponseProcessors;
     }
@@ -64,7 +63,7 @@ public class VertxResponseWriterProvider implements ContainerResponseWriterProvi
     public ContainerResponseWriter get(
             HttpServerRequest vertxRequest,
             ContainerRequest jerseyRequest) {
-        return new VertxResponseWriter(vertxRequest, vertx, container, responseProcessors, postResponseProcessors);
+        return new VertxResponseWriter(vertxRequest, vertx, responseProcessors, postResponseProcessors);
     }
 
 }

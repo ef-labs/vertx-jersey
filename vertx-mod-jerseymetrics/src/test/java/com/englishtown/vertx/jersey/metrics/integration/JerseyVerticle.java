@@ -23,21 +23,20 @@
 
 package com.englishtown.vertx.jersey.metrics.integration;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyServer;
-import org.vertx.java.core.AsyncResult;
-import org.vertx.java.core.AsyncResultHandler;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.http.HttpServer;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyServer;
+
 /**
  * Test verticle to start jersey
  */
-public class JerseyVerticle extends Verticle {
+public class JerseyVerticle extends AbstractVerticle {
 
     private final Provider<JerseyServer> serverProvider;
     private final Provider<JerseyConfigurator> configuratorProvider;
@@ -59,18 +58,16 @@ public class JerseyVerticle extends Verticle {
     public void start(final Future<Void> startedResult) {
 
         JerseyConfigurator configurator = configuratorProvider.get();
-        configurator.init(container.config(), vertx, container);
+        configurator.init(getVertx().context().config(), getVertx());
 
         JerseyServer server = serverProvider.get();
-        server.init(configurator, new AsyncResultHandler<HttpServer>() {
-            @Override
-            public void handle(AsyncResult<HttpServer> result) {
-                if (result.succeeded()) {
-                    start();
-                    startedResult.setResult(null);
-                } else {
-                    startedResult.setFailure(result.cause());
-                }
+        server.init(configurator, ar -> { 
+            if (ar.succeeded()) {
+                //TODO Migration: Start unnessary?
+                //start();
+                startedResult.complete();
+            } else {
+                startedResult.fail(ar.cause());
             }
         });
 

@@ -23,9 +23,10 @@
 
 package com.englishtown.vertx.jersey.promises;
 
+import io.vertx.core.json.JsonObject;
+
 import com.englishtown.promises.Promise;
 import com.englishtown.vertx.jersey.JerseyServer;
-import org.vertx.java.core.json.JsonObject;
 
 /**
  * When.java wrapper over a {@link com.englishtown.vertx.jersey.JerseyServer}

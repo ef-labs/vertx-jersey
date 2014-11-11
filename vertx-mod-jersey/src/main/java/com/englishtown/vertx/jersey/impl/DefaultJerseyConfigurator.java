@@ -23,24 +23,27 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
+
+import java.net.URI;
+
+import javax.inject.Inject;
+
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.jvnet.hk2.annotations.Optional;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.json.JsonArray;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Container;
 
-import javax.inject.Inject;
-import java.net.URI;
+import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
+import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 
 /**
  * Default {@link com.englishtown.vertx.jersey.JerseyConfigurator} implementation
  */
+//TODO Migration: Rename to JerseyConfiguratorImpl
 public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
     final static String CONFIG_HOST = "host";
@@ -61,7 +64,6 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     private final ServiceLocator locator;
 
     private Vertx vertx;
-    private Container container;
     private JsonObject config;
 
     /**
@@ -75,9 +77,8 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     }
 
     @Override
-    public void init(JsonObject config, Vertx vertx, Container container) {
+    public void init(JsonObject config, Vertx vertx) {
         this.vertx = vertx;
-        this.container = container;
 
         if (config == null) {
             throw new IllegalStateException("The provided configuration was null");
@@ -88,21 +89,11 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     /**
      * Returns the current vertx instance
      *
-     * @return the {@link org.vertx.java.core.Vertx} instance
+     * @return the {@link io.vertx.core.Vertx} instance
      */
     @Override
     public Vertx getVertx() {
         return vertx;
-    }
-
-    /**
-     * Returns the current container instance
-     *
-     * @return the {@link org.vertx.java.platform.Container} instance
-     */
-    @Override
-    public Container getContainer() {
-        return container;
     }
 
     /**
@@ -213,12 +204,12 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     @Override
     public int getMaxBodySize() {
         checkState();
-        return config.getNumber(CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE).intValue();
+        return config.getInteger(CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE);
     }
 
     protected ResourceConfig getResourceConfig() {
         checkState();
-        JsonArray resources = config.getArray(CONFIG_RESOURCES, null);
+        JsonArray resources = config.getJsonArray(CONFIG_RESOURCES, null);
 
         if (resources == null || resources.size() == 0) {
             throw new RuntimeException("At least one resource package name must be specified in the config " +
@@ -227,7 +218,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
         String[] resourceArr = new String[resources.size()];
         for (int i = 0; i < resources.size(); i++) {
-            resourceArr[i] = resources.get(i);
+            resourceArr[i] = resources.getString(i);
         }
 
         ResourceConfig rc = new ResourceConfig();
@@ -235,11 +226,11 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-        JsonArray features = config.getArray(CONFIG_FEATURES, null);
+        JsonArray features = config.getJsonArray(CONFIG_FEATURES, null);
         if (features != null && features.size() > 0) {
             for (int i = 0; i < features.size(); i++) {
                 try {
-                    Class<?> clazz = cl.loadClass(features.get(i));
+                    Class<?> clazz = cl.loadClass(features.getString(i));
                     rc.register(clazz);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException(e);
@@ -248,14 +239,14 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
         }
 
         // Always register the InternalVertxJerseyBinder
-        rc.register(new InternalVertxJerseyBinder(vertx, container));
+        rc.register(new InternalVertxJerseyBinder(vertx));
 
         // Register configured binders
-        JsonArray binders = config.getArray(CONFIG_BINDERS, null);
+        JsonArray binders = config.getJsonArray(CONFIG_BINDERS, null);
         if (binders != null && binders.size() > 0) {
             for (int i = 0; i < binders.size(); i++) {
                 try {
-                    Class<?> clazz = cl.loadClass(binders.get(i));
+                    Class<?> clazz = cl.loadClass(binders.getString(i));
                     rc.register(clazz.newInstance());
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);

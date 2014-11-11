@@ -36,7 +36,7 @@ public class GuiceJerseyBinderTest {
     public void setUp() throws Exception {
 
         when(builder.skipSources(Matchers.<Class[]>anyVararg())).thenReturn(builder);
-        when(builder.bind(any(Class.class))).thenReturn(annotatedBindingBuilder);
+        when(builder.bind((Class<?>)any(Class.class))).thenReturn(annotatedBindingBuilder);
         when(annotatedBindingBuilder.to(any(Class.class))).thenReturn(mock(ScopedBindingBuilder.class));
 
         binder = new GuiceJerseyBinder();
@@ -48,7 +48,7 @@ public class GuiceJerseyBinderTest {
         binder.configure(builder);
 
         // 6 types are explicitly bound
-        verify(builder, times(6)).bind(any(Class.class));
+        verify(builder, times(6)).bind((Class<?>)any(Class.class));
 
         // 8 multi-bindings are installed
         verify(builder, times(8)).install(any(Module.class));

@@ -1,12 +1,14 @@
 package com.englishtown.vertx.jersey.integration;
 
-import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
-import org.glassfish.jersey.server.ContainerRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
 
 import javax.inject.Inject;
+
+import org.glassfish.jersey.server.ContainerRequest;
+
+import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 
 /**
  *
