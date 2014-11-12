@@ -13,12 +13,12 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
+            <artifactId>vertx-ext-hk2</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <artifactId>vertx-ext-jersey</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

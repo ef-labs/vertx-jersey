@@ -40,7 +40,7 @@
         <dependencies>
             <dependency>
                 <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-jersey</artifactId>
+                <artifactId>vertx-ext-jersey</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

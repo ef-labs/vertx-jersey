@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>vertx-mod-jerseymetrics</artifactId>
+    <artifactId>vertx-ext-jerseymetrics</artifactId>
 
     <parent>
         <groupId>com.englishtown</groupId>
@@ -12,32 +12,32 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.mod.metrics.version>1.0.0</vertx.mod.metrics.version>
+        <vertx.ext.metrics.version>2.0.0-SNAPSHOT</vertx.ext.metrics.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <artifactId>vertx-ext-jersey</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
+            <artifactId>vertx-ext-hk2</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-metrics</artifactId>
-            <version>${vertx.mod.metrics.version}</version>
+            <artifactId>vertx-ext-metrics</artifactId>
+            <version>${vertx.ext.metrics.version}</version>
             <scope>provided</scope>
         </dependency>
 
         <!--Test dependencies-->
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
+            <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

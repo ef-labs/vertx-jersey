@@ -14,8 +14,8 @@
     </parent>
 
     <modules>
-        <module>vertx-mod-jersey</module>
-        <module>vertx-mod-jerseymetrics</module>
+        <module>vertx-ext-jersey</module>
+        <module>vertx-ext-jerseymetrics</module>
         <module>examples</module>
     </modules>
 
@@ -24,8 +24,8 @@
         <jersey.version>2.13</jersey.version>
         <asm.version>3.3.1</asm.version>
 
-        <vertx.mod.hk2.version>2.0.0-SNAPSHOT</vertx.mod.hk2.version>
-        <vertx.mod.guice.version>2.0.0-SNAPSHOT</vertx.mod.guice.version>
+        <vertx.ext.hk2.version>2.0.0-SNAPSHOT</vertx.ext.hk2.version>
+        <vertx.ext.guice.version>2.0.0-SNAPSHOT</vertx.ext.guice.version>
         <hk2.guice.bridge.version>2.3.0-b05</hk2.guice.bridge.version>
         <guice.version>3.0</guice.version>
         <when.java.version>3.0.0</when.java.version>
@@ -68,13 +68,13 @@
             </dependency>
             <dependency>
                 <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-hk2</artifactId>
-                <version>${vertx.mod.hk2.version}</version>
+                <artifactId>vertx-ext-hk2</artifactId>
+                <version>${vertx.ext.hk2.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-guice</artifactId>
-                <version>${vertx.mod.guice.version}</version>
+                <artifactId>vertx-ext-guice</artifactId>
+                <version>${vertx.ext.guice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.inject.extensions</groupId>

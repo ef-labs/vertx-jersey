@@ -11,24 +11,24 @@
     </parent>
 
     <properties>
-        <vertx.mod.when.version>3.0.0</vertx.mod.when.version>
+        <vertx.ext.when.version>3.0.0</vertx.ext.when.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
+            <artifactId>vertx-ext-hk2</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <artifactId>vertx-ext-jersey</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-when</artifactId>
-            <version>${vertx.mod.when.version}</version>
+            <artifactId>vertx-ext-when</artifactId>
+            <version>${vertx.ext.when.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

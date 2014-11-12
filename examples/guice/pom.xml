@@ -12,11 +12,11 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <artifactId>vertx-ext-jersey</artifactId>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-guice</artifactId>
+            <artifactId>vertx-ext-guice</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
