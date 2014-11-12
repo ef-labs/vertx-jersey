@@ -1,22 +1,16 @@
 package com.englishtown.vertx.jersey.examples;
 
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
+import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerRequest;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
-import org.vertx.java.core.http.HttpServerRequest;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 
-/**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/9/13
- * Time: 7:43 PM
- * To change this template use File | Settings | File Templates.
- */
+
 public class CustomSecurityContextProvider implements VertxRequestProcessor {
 
 

@@ -7,36 +7,20 @@
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
         <groupId>com.englishtown</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
+            <artifactId>vertx-ext-hk2</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <artifactId>vertx-ext-jersey</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <configuration>
-                    <configFile>src/test/resources/config.json</configFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
+

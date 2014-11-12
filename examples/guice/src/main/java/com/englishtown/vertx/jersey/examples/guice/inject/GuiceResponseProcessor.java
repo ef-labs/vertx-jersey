@@ -1,8 +1,8 @@
 package com.englishtown.vertx.jersey.examples.guice.inject;
 
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
+import io.vertx.core.http.HttpServerResponse;
 import org.glassfish.jersey.server.ContainerResponse;
-import org.vertx.java.core.http.HttpServerResponse;
 
 /**
  * Example guice implementation of {@link com.englishtown.vertx.jersey.inject.VertxResponseProcessor}

@@ -3,7 +3,7 @@
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
         <groupId>com.englishtown</groupId>
-        <version>3.1.0-SNAPSHOT</version>
+        <version>5.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -12,13 +12,11 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
-            <scope>provided</scope>
+            <artifactId>vertx-ext-jersey</artifactId>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-guice</artifactId>
-            <scope>provided</scope>
+            <artifactId>vertx-ext-guice</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
@@ -36,17 +34,4 @@
             <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <configuration>
-                    <configFile>config.json</configFile>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
 </project>
