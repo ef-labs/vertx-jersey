@@ -1,4 +1,4 @@
-# Guice DI with vertx-mod-jersey
+# Guice DI with ext-jersey
 
 This is an example of using guice with the hk2 bridge for DI.  The following dependencies must be on the class path:
 

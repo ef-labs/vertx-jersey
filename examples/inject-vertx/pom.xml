@@ -6,18 +6,15 @@
 
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
-        <groupId>com.englishtown</groupId>
-        <version>5.0.0-SNAPSHOT</version>
+        <groupId>com.englishtown.vertx</groupId>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-hk2</artifactId>
         </dependency>
     </dependencies>
+
 </project>

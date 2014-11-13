@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-mod-jersey.png)](https://travis-ci.org/englishtown/vertx-mod-jersey)
+[![Build Status](https://travis-ci.org/englishtown/vertx-jersey.png)](https://travis-ci.org/englishtown/vertx-jersey)
 
-# vertx-mod-jersey
+# ext-jersey
 
 Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
 
@@ -40,7 +40,7 @@ public void getQuery(
 
 ## Configuration
 
-The vertx-mod-jersey module configuration is as follows:
+The ext-jersey module configuration is as follows:
 
 ```json
 {
@@ -97,22 +97,13 @@ Default is `0.0.0.0`
 
 ## How to use
 
-Add vertx-mod-jersey as an include in your mod.json.
-
-```json
-{
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0"
-}
-```
-
-The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, jersey-server, etc.) should be added to your project with scope "provided".
+Add the ext-jersey dependency to your project
 
 ```xml
 <dependency>
-    <groupId>com.englishtown</groupId>
-    <artifactId>vertx-mod-jersey</artifactId>
-    <version>3.0.0</version>
-    <scope>provided</scope>
+    <groupId>com.englishtown.vertx</groupId>
+    <artifactId>ext-jersey</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
 </dependency>
 ```
 

@@ -5,30 +5,31 @@
 
     <artifactId>vertx-jersey</artifactId>
     <packaging>pom</packaging>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>4.0.0-SNAPSHOT</version>
 
     <parent>
-        <groupId>com.englishtown</groupId>
+        <groupId>com.englishtown.vertx</groupId>
         <artifactId>oss-parent-vertx</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <modules>
-        <module>vertx-mod-jersey</module>
-        <module>vertx-mod-jerseymetrics</module>
+        <module>ext-jersey</module>
+        <module>ext-jersey-metrics</module>
         <module>examples</module>
     </modules>
 
     <properties>
         <!--Dependency versions-->
         <jersey.version>2.13</jersey.version>
+        <jackson.version>2.4.3</jackson.version>
         <asm.version>3.3.1</asm.version>
 
-        <vertx.mod.hk2.version>2.0.0-SNAPSHOT</vertx.mod.hk2.version>
-        <vertx.mod.guice.version>2.0.0-SNAPSHOT</vertx.mod.guice.version>
-        <hk2.guice.bridge.version>2.3.0-b05</hk2.guice.bridge.version>
+        <vertx.ext.hk2.version>2.0.0-SNAPSHOT</vertx.ext.hk2.version>
+        <vertx.ext.guice.version>2.0.0-SNAPSHOT</vertx.ext.guice.version>
+        <hk2.guice.bridge.version>2.3.0</hk2.guice.bridge.version>
         <guice.version>3.0</guice.version>
-        <when.java.version>3.0.0</when.java.version>
+        <when.java.version>3.0.1</when.java.version>
     </properties>
 
     <dependencyManagement>
@@ -37,29 +38,29 @@
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-server</artifactId>
                 <version>${jersey.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2.external</groupId>
-                        <artifactId>java'x.inject</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2</groupId>
-                        <artifactId>hk2-locator</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2</groupId>
-                        <artifactId>hk2-api</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.glassfish.hk2</groupId>
-                        <artifactId>osgi-resource-locator</artifactId>
-                    </exclusion>
-                </exclusions>
+                <!--<exclusions>-->
+                <!--<exclusion>-->
+                <!--<groupId>org.glassfish.hk2.external</groupId>-->
+                <!--<artifactId>javax.inject</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                <!--<groupId>org.glassfish.hk2</groupId>-->
+                <!--<artifactId>hk2-locator</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                <!--<groupId>org.glassfish.hk2</groupId>-->
+                <!--<artifactId>hk2-api</artifactId>-->
+                <!--</exclusion>-->
+                <!--<exclusion>-->
+                <!--<groupId>org.glassfish.hk2</groupId>-->
+                <!--<artifactId>osgi-resource-locator</artifactId>-->
+                <!--</exclusion>-->
+                <!--</exclusions>-->
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
-                <version>2.4.3</version>
+                <version>${jackson.version}</version>
             </dependency>
             <dependency>
                 <groupId>asm</groupId>
@@ -67,14 +68,19 @@
                 <version>${asm.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-hk2</artifactId>
-                <version>${vertx.mod.hk2.version}</version>
+                <groupId>com.englishtown.vertx</groupId>
+                <artifactId>ext-hk2</artifactId>
+                <version>${vertx.ext.hk2.version}</version>
             </dependency>
             <dependency>
-                <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-guice</artifactId>
-                <version>${vertx.mod.guice.version}</version>
+                <groupId>com.englishtown.vertx</groupId>
+                <artifactId>ext-guice</artifactId>
+                <version>${vertx.ext.guice.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.inject</groupId>
+                <artifactId>guice</artifactId>
+                <version>${guice.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.inject.extensions</groupId>
@@ -86,11 +92,12 @@
                 <artifactId>guice-bridge</artifactId>
                 <version>${hk2.guice.bridge.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.glassfish.hk2</groupId>
-                <artifactId>hk2-locator</artifactId>
-                <version>${hk2.guice.bridge.version}</version>
-            </dependency>
+            <!--<dependency>-->
+            <!--<groupId>org.glassfish.hk2</groupId>-->
+            <!--<artifactId>hk2-locator</artifactId>-->
+            <!--<version>${hk2.guice.bridge.version}</version>-->
+            <!--<scope>provided</scope>-->
+            <!--</dependency>-->
             <dependency>
                 <groupId>com.englishtown</groupId>
                 <artifactId>when.java</artifactId>

@@ -28,16 +28,10 @@ public class StartupVerticle extends AbstractVerticle {
         JsonObject jerseyConfig = vertx.context().config().getJsonObject("jersey");
 
         jerseyServer.createServer(jerseyConfig)
-                .then(
-                        server -> {
-                            //TODO Migration: Handle exception correctly
-                            try {
-                                super.start(startedResult);
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                            return null;
-                        })
+                .then(server -> {
+                    startedResult.complete();
+                    return null;
+                })
                 .otherwise(t -> {
                     startedResult.fail(t);
                     return null;

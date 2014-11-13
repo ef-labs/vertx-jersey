@@ -2,10 +2,8 @@ package com.englishtown.vertx.jersey.examples.resources;
 
 import com.englishtown.vertx.jersey.WriteStreamOutput;
 import com.englishtown.vertx.jersey.impl.DefaultWriteStreamOutput;
-import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.buffer.impl.BufferFactoryImpl;
 import org.glassfish.jersey.server.ChunkedOutput;
 
 import javax.ws.rs.GET;
@@ -116,8 +114,8 @@ public class ChunkedResource {
             @Suspended final AsyncResponse asyncResponse) {
 
         final WriteStreamOutput writeStreamOutput = new DefaultWriteStreamOutput();
-        final Buffer buffer1 = new BufferFactoryImpl().buffer().appendString("abcdefghijklmnopqrstuvwxyz");
-        final Buffer buffer2 = new BufferFactoryImpl().buffer().appendString("0123456789");
+        final Buffer buffer1 = Buffer.buffer().appendString("abcdefghijklmnopqrstuvwxyz");
+        final Buffer buffer2 = Buffer.buffer().appendString("0123456789");
         int length = buffer1.length() + buffer2.length();
 
         asyncResponse.resume(Response
@@ -125,10 +123,10 @@ public class ChunkedResource {
                 .header(HttpHeaders.CONTENT_LENGTH, length)
                 .build());
 
-        vertx.runOnContext((Void) -> {
+        vertx.runOnContext(aVoid1 -> {
             writeStreamOutput.write(buffer1);
 
-            vertx.runOnContext((aVoid) -> {
+            vertx.runOnContext(aVoid2 -> {
                 writeStreamOutput.write(buffer2);
                 writeStreamOutput.end();
             });

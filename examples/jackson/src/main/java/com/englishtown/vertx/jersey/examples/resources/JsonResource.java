@@ -41,7 +41,7 @@ public class JsonResource {
     @Path("async")
     @Produces(MediaType.APPLICATION_JSON)
     public void getJsonAsync(@Suspended final AsyncResponse asyncResponse, @Context Vertx vertx) {
-        vertx.runOnContext((Void) -> {
+        vertx.runOnContext(aVoid -> {
             MyObject o = new MyObject();
             o.setName("Andy");
             asyncResponse.resume(o);

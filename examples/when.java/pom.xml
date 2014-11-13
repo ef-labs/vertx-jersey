@@ -6,30 +6,24 @@
 
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
-        <groupId>com.englishtown</groupId>
-        <version>5.0.0-SNAPSHOT</version>
+        <groupId>com.englishtown.vertx</groupId>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <properties>
-        <vertx.mod.when.version>3.0.0</vertx.mod.when.version>
+        <vertx.mod.when.version>4.0.0-SNAPSHOT</vertx.mod.when.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
-            <scope>provided</scope>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-hk2</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-when</artifactId>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-when</artifactId>
             <version>${vertx.mod.when.version}</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
+
 </project>

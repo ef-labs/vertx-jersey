@@ -7,9 +7,9 @@
     <packaging>pom</packaging>
 
     <parent>
-        <groupId>com.englishtown</groupId>
+        <groupId>com.englishtown.vertx</groupId>
         <artifactId>vertx-jersey</artifactId>
-        <version>5.0.0-SNAPSHOT</version>
+        <version>4.0.0-SNAPSHOT</version>
     </parent>
 
     <modules>
@@ -36,14 +36,12 @@
         </plugins>
     </build>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.englishtown</groupId>
-                <artifactId>vertx-mod-jersey</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
 
 </project>
