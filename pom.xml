@@ -27,9 +27,11 @@
 
         <vertx.ext.hk2.version>2.0.0-SNAPSHOT</vertx.ext.hk2.version>
         <vertx.ext.guice.version>2.0.0-SNAPSHOT</vertx.ext.guice.version>
+        <vertx.ext.when.version>4.0.0-SNAPSHOT</vertx.ext.when.version>
         <hk2.guice.bridge.version>2.3.0</hk2.guice.bridge.version>
         <guice.version>3.0</guice.version>
         <when.java.version>3.0.1</when.java.version>
+        <maven.jar.plugin.version>2.4</maven.jar.plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -38,24 +40,6 @@
                 <groupId>org.glassfish.jersey.core</groupId>
                 <artifactId>jersey-server</artifactId>
                 <version>${jersey.version}</version>
-                <!--<exclusions>-->
-                <!--<exclusion>-->
-                <!--<groupId>org.glassfish.hk2.external</groupId>-->
-                <!--<artifactId>javax.inject</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                <!--<groupId>org.glassfish.hk2</groupId>-->
-                <!--<artifactId>hk2-locator</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                <!--<groupId>org.glassfish.hk2</groupId>-->
-                <!--<artifactId>hk2-api</artifactId>-->
-                <!--</exclusion>-->
-                <!--<exclusion>-->
-                <!--<groupId>org.glassfish.hk2</groupId>-->
-                <!--<artifactId>osgi-resource-locator</artifactId>-->
-                <!--</exclusion>-->
-                <!--</exclusions>-->
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -92,12 +76,6 @@
                 <artifactId>guice-bridge</artifactId>
                 <version>${hk2.guice.bridge.version}</version>
             </dependency>
-            <!--<dependency>-->
-            <!--<groupId>org.glassfish.hk2</groupId>-->
-            <!--<artifactId>hk2-locator</artifactId>-->
-            <!--<version>${hk2.guice.bridge.version}</version>-->
-            <!--<scope>provided</scope>-->
-            <!--</dependency>-->
             <dependency>
                 <groupId>com.englishtown</groupId>
                 <artifactId>when.java</artifactId>
@@ -109,8 +87,33 @@
                 <version>${when.java.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>com.englishtown.vertx</groupId>
+                <artifactId>ext-when</artifactId>
+                <version>${vertx.ext.when.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${maven.jar.plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>test-jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <distributionManagement>
         <site>

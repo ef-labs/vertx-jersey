@@ -23,6 +23,7 @@
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>ext-when</artifactId>
             <version>${vertx.mod.when.version}</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 

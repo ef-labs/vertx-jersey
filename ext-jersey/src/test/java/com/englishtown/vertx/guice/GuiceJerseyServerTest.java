@@ -34,7 +34,7 @@ public class GuiceJerseyServerTest {
     GuiceJerseyServer server;
 
     @Mock
-    Provider<JerseyHandler> handlerProvider;
+    JerseyHandler handler;
     @Mock
     ServiceLocator locator;
     @Mock
@@ -60,7 +60,7 @@ public class GuiceJerseyServerTest {
 
         when(injector.getInstance(Matchers.any(key.getClass()))).thenReturn(set);
 
-        server = new GuiceJerseyServer(handlerProvider, locator, injector);
+        server = new GuiceJerseyServer(handler, locator, injector);
     }
 
     @Test

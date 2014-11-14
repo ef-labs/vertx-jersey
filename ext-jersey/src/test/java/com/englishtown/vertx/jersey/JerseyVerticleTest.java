@@ -39,12 +39,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 /**
- * {@link JerseyModule} unit tests
+ * {@link JerseyVerticle} unit tests
  */
 @RunWith(MockitoJUnitRunner.class)
-public class JerseyModuleTest {
+public class JerseyVerticleTest {
 
-    JerseyModule jerseyModule;
+    JerseyVerticle jerseyVerticle;
 
     @Mock
     Vertx vertx;
@@ -53,11 +53,7 @@ public class JerseyModuleTest {
     @Mock
     JerseyServer jerseyServer;
     @Mock
-    Provider<JerseyServer> jerseyServerProvider;
-    @Mock
-    JerseyConfigurator configurator;
-    @Mock
-    Provider<JerseyConfigurator> configuratorProvider;
+    JerseyOptions options;
     @Mock
     Future<Void> startedResult;
     @Mock
@@ -68,21 +64,19 @@ public class JerseyModuleTest {
     @Before
     public void setUp() {
         when(vertx.context()).thenReturn(context);
-        when(jerseyServerProvider.get()).thenReturn(jerseyServer);
-        when(configuratorProvider.get()).thenReturn(configurator);
-        jerseyModule = new JerseyModule(jerseyServerProvider, configuratorProvider);
-        jerseyModule.init(vertx, context);
+        jerseyVerticle = new JerseyVerticle(jerseyServer, options);
+        jerseyVerticle.init(vertx, context);
     }
 
     @Test
     public void testStart() throws Exception {
 
-        jerseyModule.start(startedResult);
+        jerseyVerticle.start(startedResult);
 
         verify(startedResult, never()).complete();
         verify(startedResult, never()).fail(any(Throwable.class));
 
-        verify(jerseyServer).init(any(JerseyConfigurator.class), handlerCaptor.capture());
+        verify(jerseyServer).init(any(JerseyOptions.class), handlerCaptor.capture());
 
         when(asyncResult.succeeded()).thenReturn(true).thenReturn(false);
 

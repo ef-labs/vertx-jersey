@@ -25,8 +25,8 @@ import java.util.Set;
 public class GuiceJerseyServer extends DefaultJerseyServer {
 
     @Inject
-    public GuiceJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider, ServiceLocator locator, Injector injector) {
-        super(jerseyHandlerProvider);
+    public GuiceJerseyServer(JerseyHandler jerseyHandler, ServiceLocator locator, Injector injector) {
+        super(jerseyHandler);
         initBridge(locator, injector);
     }
 

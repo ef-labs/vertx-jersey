@@ -42,10 +42,10 @@ import java.net.URI;
 import static org.junit.Assert.*;
 
 /**
- * {@link DefaultJerseyConfigurator} unit tests
+ * {@link DefaultJerseyOptions} unit tests
  */
 @RunWith(MockitoJUnitRunner.class)
-public class DefaultJerseyConfiguratorTest {
+public class DefaultJerseyOptionsTest {
 
     @Mock
     Vertx vertx;
@@ -53,7 +53,7 @@ public class DefaultJerseyConfiguratorTest {
     Logger logger;
 
     JsonObject config;
-    DefaultJerseyConfigurator configurator;
+    DefaultJerseyOptions options;
 
     @Before
     public void setUp() throws Exception {
@@ -61,25 +61,25 @@ public class DefaultJerseyConfiguratorTest {
         config = new JsonObject();
 
         ServiceLocator locator = new ServiceLocatorImpl("test", null);
-        configurator = new DefaultJerseyConfigurator(locator);
-        configurator.init(config, vertx);
+        options = new DefaultJerseyOptions(locator);
+        options.init(config, vertx);
 
     }
 
     @Test
     public void testInit_No_Config() throws Exception {
 
-        DefaultJerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
+        DefaultJerseyOptions options = new DefaultJerseyOptions(null);
 
         try {
-            configurator.init(null, null);
+            options.init(null, null);
             fail();
         } catch (IllegalStateException e) {
             // Expected
         }
 
         try {
-            configurator.getMaxBodySize();
+            options.getMaxBodySize();
             fail();
         } catch (IllegalStateException e) {
             // Expected
@@ -93,14 +93,14 @@ public class DefaultJerseyConfiguratorTest {
         URI uri;
         String expected = "/";
 
-        uri = configurator.getBaseUri();
+        uri = options.getBaseUri();
         assertEquals(expected, uri.getPath());
 
         expected = "test/base/path";
-        config.put(DefaultJerseyConfigurator.CONFIG_BASE_PATH, expected);
+        config.put(DefaultJerseyOptions.CONFIG_BASE_PATH, expected);
         expected += "/";
 
-        uri = configurator.getBaseUri();
+        uri = options.getBaseUri();
         assertEquals(expected, uri.getPath());
 
     }
@@ -109,10 +109,10 @@ public class DefaultJerseyConfiguratorTest {
     public void testGetApplicationHandler() throws Exception {
 
         JsonArray resources = new JsonArray().add("com.englishtown.vertx.resources");
-        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, resources);
 
         ApplicationHandlerDelegate applicationHandlerDelegate;
-        applicationHandlerDelegate = configurator.getApplicationHandler();
+        applicationHandlerDelegate = options.getApplicationHandler();
 
         assertNotNull(applicationHandlerDelegate);
 
@@ -121,16 +121,16 @@ public class DefaultJerseyConfiguratorTest {
     @Test
     public void testGetMaxBodySize() throws Exception {
 
-        int expected = DefaultJerseyConfigurator.DEFAULT_MAX_BODY_SIZE;
+        int expected = DefaultJerseyOptions.DEFAULT_MAX_BODY_SIZE;
         int maxBodySize;
 
-        maxBodySize = configurator.getMaxBodySize();
+        maxBodySize = options.getMaxBodySize();
         assertEquals(expected, maxBodySize);
 
         expected = 12;
-        config.put(DefaultJerseyConfigurator.CONFIG_MAX_BODY_SIZE, expected);
+        config.put(DefaultJerseyOptions.CONFIG_MAX_BODY_SIZE, expected);
 
-        maxBodySize = configurator.getMaxBodySize();
+        maxBodySize = options.getMaxBodySize();
         assertEquals(expected, maxBodySize);
 
     }
@@ -139,7 +139,7 @@ public class DefaultJerseyConfiguratorTest {
     public void testGetResourceConfig_Missing_Resources() throws Exception {
 
         try {
-            configurator.getResourceConfig();
+            options.getResourceConfig();
             fail();
 
         } catch (RuntimeException e) {
@@ -156,30 +156,30 @@ public class DefaultJerseyConfiguratorTest {
         ResourceConfig resourceConfig;
 
         try {
-            configurator.getResourceConfig();
+            options.getResourceConfig();
             fail();
         } catch (RuntimeException e) {
             // Expected
         }
 
         JsonArray resources = new JsonArray().add("com.englishtown.vertx.jersey.resources");
-        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
-        resourceConfig = configurator.getResourceConfig();
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, resources);
+        resourceConfig = options.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(1, resourceConfig.getClasses().size());
         assertEquals(1, resourceConfig.getInstances().size());
 
         JsonArray features = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestFeature");
-        config.put(DefaultJerseyConfigurator.CONFIG_FEATURES, features);
-        resourceConfig = configurator.getResourceConfig();
+        config.put(DefaultJerseyOptions.CONFIG_FEATURES, features);
+        resourceConfig = options.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
 
         JsonArray binders = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestBinder2");
-        config.put(DefaultJerseyConfigurator.CONFIG_BINDERS, binders);
-        resourceConfig = configurator.getResourceConfig();
+        config.put(DefaultJerseyOptions.CONFIG_BINDERS, binders);
+        resourceConfig = options.getResourceConfig();
 
         assertNotNull(resourceConfig);
         assertEquals(2, resourceConfig.getClasses().size());
@@ -187,7 +187,7 @@ public class DefaultJerseyConfiguratorTest {
 
         binders.add("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
         try {
-            configurator.getResourceConfig();
+            options.getResourceConfig();
             fail();
         } catch (RuntimeException e) {
             // Expected
@@ -195,7 +195,7 @@ public class DefaultJerseyConfiguratorTest {
 
         features.add("com.englishtown.vertx.jersey.inject.ClassNotFoundFeature");
         try {
-            configurator.getResourceConfig();
+            options.getResourceConfig();
             fail();
         } catch (RuntimeException e) {
             // Expected

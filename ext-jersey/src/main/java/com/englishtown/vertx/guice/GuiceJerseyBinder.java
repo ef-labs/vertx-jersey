@@ -1,9 +1,9 @@
 package com.englishtown.vertx.guice;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyConfigurator;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.WriteStreamBodyWriter;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
@@ -45,7 +45,7 @@ public class GuiceJerseyBinder extends AbstractModule {
 
         bind(JerseyServer.class).to(GuiceJerseyServer.class);
         bind(JerseyHandler.class).to(DefaultJerseyHandler.class);
-        bind(JerseyConfigurator.class).to(DefaultJerseyConfigurator.class);
+        bind(JerseyOptions.class).to(DefaultJerseyOptions.class);
         bind(ContainerResponseWriterProvider.class).to(VertxResponseWriterProvider.class);
         bind(MessageBodyWriter.class).to(WriteStreamBodyWriter.class).in(Singleton.class);
 

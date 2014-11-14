@@ -25,13 +25,14 @@ package com.englishtown.vertx.jersey.metrics.integration;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.englishtown.vertx.jersey.JerseyVerticle;
+import com.englishtown.vertx.jersey.integration.JerseyIntegrationTestBase;
 import com.englishtown.vertx.jersey.metrics.RequestProcessor;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.test.core.VertxTestBase;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -42,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Integration tests for jersey metrics
  */
-public class BasicIntegrationTest extends VertxTestBase {
+public class BasicIntegrationTest extends JerseyIntegrationTestBase {
 
     // Had to mark this test as ignored now that SharedMetricRegistries is no longer used.
     // Not sure it is possible to get at the HK2 container's instance of MetricRegistry from here...
@@ -50,10 +51,7 @@ public class BasicIntegrationTest extends VertxTestBase {
     @Test
     public void testJerseyMetrics() throws Exception {
 
-        HttpClientOptions clientOptions = new HttpClientOptions().setConnectTimeout(300);
-
-        vertx.createHttpClient(clientOptions)
-                .exceptionHandler(t -> fail(t.getMessage()))
+        httpClient
                 .request(HttpMethod.GET, 8080, "localhost", "/", response -> {
                     assertEquals(200, response.statusCode());
 
@@ -70,31 +68,19 @@ public class BasicIntegrationTest extends VertxTestBase {
                     assertEquals(1, lastByteTimer.getCount());
 
                     testComplete();
-                });
+                })
+                .exceptionHandler(t -> fail(t.getMessage()))
+                .end();
 
         await();
     }
 
     @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        JsonObject config = new JsonObject()
+    protected JsonObject loadConfig() {
+        return new JsonObject()
                 .put("hk2_binder", "com.englishtown.vertx.jersey.metrics.integration.IntegrationTestBinder")
                 .put("port", 8080)
                 .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.resources"));
-
-        DeploymentOptions options = new DeploymentOptions().setConfig(config);
-        CountDownLatch latch = new CountDownLatch(1);
-
-        vertx.deployVerticle("java-hk2:" + JerseyVerticle.class.getName(), options, ar -> {
-            latch.countDown();
-            if (!ar.succeeded()) {
-                ar.cause().printStackTrace();
-                fail();
-            }
-        });
-
-        latch.await(10, TimeUnit.SECONDS);
     }
+
 }

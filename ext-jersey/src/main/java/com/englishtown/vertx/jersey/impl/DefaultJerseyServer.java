@@ -23,7 +23,7 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
 import io.vertx.core.AsyncResult;
@@ -45,52 +45,47 @@ public class DefaultJerseyServer implements JerseyServer {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyServer.class);
 
-    private final Provider<JerseyHandler> jerseyHandlerProvider;
     private JerseyHandler jerseyHandler;
     private Handler<RouteMatcher> routeMatcherHandler;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
-    public DefaultJerseyServer(Provider<JerseyHandler> jerseyHandlerProvider) {
-        this.jerseyHandlerProvider = jerseyHandlerProvider;
+    public DefaultJerseyServer(JerseyHandler jerseyHandler) {
+        this.jerseyHandler = jerseyHandler;
     }
 
     @Override
     public void init(
-            final JerseyConfigurator configurator,
+            final JerseyOptions options,
             final Handler<AsyncResult<HttpServer>> doneHandler) {
 
-        this.jerseyHandler = jerseyHandlerProvider.get();
-        if (jerseyHandler == null) {
-            throw new IllegalStateException("The JerseyHandler provider returned null");
-        }
 
         // Setup the http server options
         HttpServerOptions serverOptions = new HttpServerOptions()
-                .setHost(configurator.getHost())
-                .setPort(configurator.getPort())
-                .setAcceptBacklog(configurator.getAcceptBacklog()); // Performance tweak
+                .setHost(options.getHost())
+                .setPort(options.getPort())
+                .setAcceptBacklog(options.getAcceptBacklog()); // Performance tweak
 
         // Enable https
-        if (configurator.getSSL()) {
+        if (options.getSSL()) {
             serverOptions.setSsl(true);
 //          TODO Migration: Vert.x Interface for options not yet finished?
-//          .setKeyStorePassword(configurator.getKeyStorePassword())
-//          .setKeyStorePath(configurator.getKeyStorePath());
+//          .setKeyStorePassword(options.getKeyStorePassword())
+//          .setKeyStorePath(options.getKeyStorePath());
         }
 
-        Integer receiveBufferSize = configurator.getReceiveBufferSize();
+        Integer receiveBufferSize = options.getReceiveBufferSize();
         if (receiveBufferSize != null && receiveBufferSize > 0) {
             // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
             serverOptions.setReceiveBufferSize(receiveBufferSize);
         }
 
         // Create the http server
-        server = configurator.getVertx().createHttpServer(serverOptions);
+        server = options.getVertx().createHttpServer(serverOptions);
 
         // Init jersey handler
-        jerseyHandler.init(configurator);
+        jerseyHandler.init(options);
 
         // Set request handler for the baseUri
         RouteMatcher rm = RouteMatcher.routeMatcher();
@@ -111,7 +106,7 @@ public class DefaultJerseyServer implements JerseyServer {
 
         // Start listening and log success/failure
         server.listen(ar -> {
-            final String listenPath = (configurator.getSSL() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
+            final String listenPath = (options.getSSL() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
             if (ar.succeeded()) {
                 logger.info("Http server listening for " + listenPath);
             } else {

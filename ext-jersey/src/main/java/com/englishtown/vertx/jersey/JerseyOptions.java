@@ -32,10 +32,10 @@ import java.net.URI;
 /**
  * Provides configuration for a {@link JerseyHandler}
  */
-public interface JerseyConfigurator {
+public interface JerseyOptions {
 
     /**
-     * Initializes the configurator
+     * Initializes the jersey options
      *
      * @param config the underlying configuration settings
      * @param vertx  the vertx instance

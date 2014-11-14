@@ -21,45 +21,40 @@
  * THE SOFTWARE.
  */
 
-package com.englishtown.vertx.jersey.metrics.integration;
+package com.englishtown.vertx.jersey;
 
-import com.englishtown.vertx.jersey.JerseyConfigurator;
-import com.englishtown.vertx.jersey.JerseyServer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
- * Test verticle to start jersey
+ * The Vertx Module to enable Jersey to handle JAX-RS resources
  */
 public class JerseyVerticle extends AbstractVerticle {
 
-    private final Provider<JerseyServer> serverProvider;
-    private final Provider<JerseyConfigurator> configuratorProvider;
+    private JerseyServer jerseyServer;
+    private JerseyOptions options;
 
     @Inject
-    public JerseyVerticle(Provider<JerseyServer> serverProvider, Provider<JerseyConfigurator> configuratorProvider) {
-        this.serverProvider = serverProvider;
-        this.configuratorProvider = configuratorProvider;
+    public JerseyVerticle(JerseyServer jerseyServer, JerseyOptions options) {
+        this.jerseyServer = jerseyServer;
+        this.options = options;
     }
 
     /**
-     * Override this method to signify that start is complete sometime _after_ the start() method has returned
-     * This is useful if your verticle deploys other verticles or modules and you don't want this verticle to
-     * be considered started until the other modules and verticles have been started.
-     *
-     * @param startedResult When you are happy your verticle is started set the result
+     * {@inheritDoc}
      */
     @Override
-    public void start(final Future<Void> startedResult) {
+    public void start(final Future<Void> startedResult) throws Exception {
+        this.start();
 
-        JerseyConfigurator configurator = configuratorProvider.get();
-        configurator.init(getVertx().context().config(), getVertx());
+        JsonObject config = getVertx().context().config();
+        options.init(config, getVertx());
 
-        JerseyServer server = serverProvider.get();
-        server.init(configurator, ar -> {
+        jerseyServer.init(options, ar -> {
             if (ar.succeeded()) {
                 startedResult.complete();
             } else {
@@ -67,5 +62,14 @@ public class JerseyVerticle extends AbstractVerticle {
             }
         });
 
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void stop() {
+        jerseyServer.close();
+        jerseyServer = null;
     }
 }

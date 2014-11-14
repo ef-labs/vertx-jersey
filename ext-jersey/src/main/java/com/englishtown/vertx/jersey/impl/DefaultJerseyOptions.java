@@ -24,7 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
@@ -38,9 +38,9 @@ import javax.inject.Inject;
 import java.net.URI;
 
 /**
- * Default {@link com.englishtown.vertx.jersey.JerseyConfigurator} implementation
+ * Default {@link com.englishtown.vertx.jersey.JerseyOptions} implementation
  */
-public class DefaultJerseyConfigurator implements JerseyConfigurator {
+public class DefaultJerseyOptions implements JerseyOptions {
 
     final static String CONFIG_HOST = "host";
     final static String CONFIG_PORT = "port";
@@ -68,7 +68,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
      * @param locator an optional ServiceLocator instance to be the Jersey parent locator
      */
     @Inject
-    public DefaultJerseyConfigurator(@Optional ServiceLocator locator) {
+    public DefaultJerseyOptions(@Optional ServiceLocator locator) {
         this.locator = locator;
     }
 
@@ -255,7 +255,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
 
     private void checkState() {
         if (config == null) {
-            throw new IllegalStateException("The configurator has not been initialized.");
+            throw new IllegalStateException("The jersey options have not been initialized.");
         }
     }
 

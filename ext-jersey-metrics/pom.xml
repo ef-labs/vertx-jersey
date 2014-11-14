@@ -36,5 +36,17 @@
             <artifactId>mockito-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-jersey</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-when</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 </project>

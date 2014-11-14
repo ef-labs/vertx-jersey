@@ -24,7 +24,7 @@
 package com.englishtown.vertx.hk2;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.impl.*;
@@ -140,7 +140,7 @@ public class HK2JerseyBinder extends AbstractBinder {
         bind(DefaultApplicationHandlerDelegate.class).to(ApplicationHandlerDelegate.class);
         bind(DefaultJerseyServer.class).to(JerseyServer.class);
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
-        bind(DefaultJerseyConfigurator.class).to(JerseyConfigurator.class);
+        bind(DefaultJerseyOptions.class).to(JerseyOptions.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
         bind(WriteStreamBodyWriter.class).to(MessageBodyWriter.class).in(Singleton.class);
 

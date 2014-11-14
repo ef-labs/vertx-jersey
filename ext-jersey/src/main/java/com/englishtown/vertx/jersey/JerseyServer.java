@@ -36,19 +36,19 @@ public interface JerseyServer {
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @param configurator http server and jersey configuration settings
+     * @param options http server and jersey configuration settings
      */
-    default void init(JerseyConfigurator configurator) {
-        init(configurator, null);
+    default void init(JerseyOptions options) {
+        init(options, null);
     }
 
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @param configurator http server and jersey configuration settings
+     * @param options http server and jersey configuration settings
      * @param doneHandler  the optional callback for when initialization has completed
      */
-    void init(JerseyConfigurator configurator, Handler<AsyncResult<HttpServer>> doneHandler);
+    void init(JerseyOptions options, Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
      * Allows adding additional routes

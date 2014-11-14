@@ -35,9 +35,9 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
     /**
      * Initialize the handler with vertx and container instances
      *
-     * @param configurator contains configuration details
+     * @param options contains configuration details
      */
-    void init(JerseyConfigurator configurator);
+    void init(JerseyOptions options);
 
     URI getBaseUri();
 

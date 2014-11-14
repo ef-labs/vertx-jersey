@@ -67,16 +67,6 @@
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
-            <!--<exclusions>-->
-            <!--<exclusion>-->
-            <!--<groupId>org.glassfish.hk2</groupId>-->
-            <!--<artifactId>hk2-locator</artifactId>-->
-            <!--</exclusion>-->
-            <!--<exclusion>-->
-            <!--<groupId>org.glassfish.jersey.core</groupId>-->
-            <!--<artifactId>jersey-common</artifactId>-->
-            <!--</exclusion>-->
-            <!--</exclusions>-->
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -89,5 +79,20 @@
             <artifactId>when.java-testtools</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>ext-when</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
 </project>

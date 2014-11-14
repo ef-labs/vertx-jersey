@@ -25,16 +25,13 @@ package com.englishtown.vertx.jersey.promises.integration;
 
 import com.englishtown.promises.When;
 import com.englishtown.promises.WhenFactory;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyConfigurator;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
-import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
-import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
-import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
 import io.vertx.core.http.HttpClientOptions;
@@ -87,19 +84,11 @@ public class JerseyIntegrationTest extends VertxTestBase {
                 new ArrayList<>());
 
         JerseyHandler handler = new DefaultJerseyHandler(provider, new ArrayList<>());
-        Provider<JerseyHandler> handlerProvider = mock(Provider.class);
-        when(handlerProvider.get()).thenReturn(handler);
-
-        JerseyServer server = new DefaultJerseyServer(handlerProvider);
-        Provider<JerseyServer> serverProvider = mock(Provider.class);
-        when(serverProvider.get()).thenReturn(server);
-
-        JerseyConfigurator configurator = new DefaultJerseyConfigurator(null);
-        Provider<JerseyConfigurator> configuratorProvider = mock(Provider.class);
-        when(configuratorProvider.get()).thenReturn(configurator);
+        JerseyServer server = new DefaultJerseyServer(handler);
+        JerseyOptions options = new DefaultJerseyOptions(null);
         When when = WhenFactory.createSync();
 
-        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, serverProvider, configuratorProvider, when);
+        DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, server, options, when);
 
         JsonObject config = new JsonObject()
                 .put("host", host)

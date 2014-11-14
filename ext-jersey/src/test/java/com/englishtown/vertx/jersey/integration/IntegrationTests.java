@@ -23,81 +23,23 @@
 
 package com.englishtown.vertx.jersey.integration;
 
-import com.englishtown.vertx.jersey.JerseyModule;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.buffer.Buffer;
-import io.vertx.core.http.*;
-import io.vertx.core.json.JsonObject;
-import io.vertx.test.core.VertxTestBase;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpClientResponse;
+import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  *
  *
  */
-public class IntegrationTestVerticle extends VertxTestBase {
+public class IntegrationTests extends JerseyIntegrationTestBase {
 
     private String host = "localhost";
     private int port = 8080;
-
-    private HttpClient client;
-
-    @Override
-    public void setUp() throws Exception {
-        super.setUp();
-
-        JsonObject config = loadConfig();
-        DeploymentOptions deploymentOptions = new DeploymentOptions().setConfig(config);
-        CountDownLatch latch = new CountDownLatch(1);
-
-        vertx.deployVerticle("java-hk2:" + JerseyModule.class.getName(), deploymentOptions, result -> {
-            latch.countDown();
-            if (!result.succeeded()) {
-                result.cause().printStackTrace();
-                fail();
-            }
-        });
-
-        latch.await(10, TimeUnit.SECONDS);
-
-        HttpClientOptions clientOptions = new HttpClientOptions()
-                .setConnectTimeout(1000);
-
-        client = vertx.createHttpClient(clientOptions)
-                .exceptionHandler(t -> fail(t.getMessage()));
-
-    }
-
-    private JsonObject loadConfig() {
-
-        try (InputStream stream = this.getClass().getResourceAsStream("/config.json")) {
-            StringBuilder sb = new StringBuilder();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(stream, "UTF-8"));
-
-            String line = reader.readLine();
-            while (line != null) {
-                sb.append(line).append('\n');
-                line = reader.readLine();
-            }
-
-            return new JsonObject(sb.toString());
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            fail();
-            return new JsonObject();
-        }
-
-    }
 
     private void verifyResponse(HttpClientResponse response, int status, String contentType, final String expected) {
 
@@ -118,7 +60,7 @@ public class IntegrationTestVerticle extends VertxTestBase {
     @Test
     public void test_getJson() throws Exception {
 
-        HttpClientRequest request = client.request(HttpMethod.GET, port, host, "/rest/test/json", response -> {
+        HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/json", response -> {
             verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{}");
         });
 
@@ -131,7 +73,7 @@ public class IntegrationTestVerticle extends VertxTestBase {
 
         final String contentType = "application/javascript";
 
-        HttpClientRequest request = client.request(HttpMethod.GET, port, host, "/rest/test/json?cb=foo_cb", response -> {
+        HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/json?cb=foo_cb", response -> {
             verifyResponse(response, 200, contentType, "foo_cb({})");
         });
 
@@ -143,7 +85,7 @@ public class IntegrationTestVerticle extends VertxTestBase {
     @Test
     public void test_getHtml() throws Exception {
 
-        HttpClientRequest request = client.request(HttpMethod.GET, port, host, "/rest/test/html", response -> {
+        HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/html", response -> {
             verifyResponse(response, 200, MediaType.TEXT_HTML, null);
         });
 
@@ -154,7 +96,7 @@ public class IntegrationTestVerticle extends VertxTestBase {
     @Test
     public void test_postJson() throws Exception {
 
-        HttpClientRequest request = client.request(HttpMethod.POST, port, host, "/rest/test/json", response -> {
+        HttpClientRequest request = httpClient.request(HttpMethod.POST, port, host, "/rest/test/json", response -> {
             verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{\"name\":\"async response\"}");
         });
 
@@ -166,7 +108,7 @@ public class IntegrationTestVerticle extends VertxTestBase {
     @Test
     public void test_getChunked() throws Exception {
 
-        HttpClientRequest request = client.request(HttpMethod.GET, port, host, "/rest/test/chunked", response -> {
+        HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/chunked", response -> {
             verifyResponse(response, 200, MediaType.TEXT_PLAIN, "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
         });
 

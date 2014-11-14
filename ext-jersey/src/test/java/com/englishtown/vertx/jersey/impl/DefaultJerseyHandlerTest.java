@@ -24,7 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
@@ -76,7 +76,7 @@ public class DefaultJerseyHandlerTest {
     List<VertxRequestProcessor> requestProcessors = new ArrayList<>();
 
     @Mock
-    JerseyConfigurator configurator;
+    JerseyOptions options;
     @Mock
     ApplicationHandlerDelegate applicationHandlerDelegate;
     @Mock
@@ -104,17 +104,17 @@ public class DefaultJerseyHandlerTest {
     public void setUp() {
 
         when(applicationHandlerDelegate.getServiceLocator()).thenReturn(serviceLocator);
-        when(configurator.getApplicationHandler()).thenReturn(applicationHandlerDelegate);
-        when(configurator.getMaxBodySize()).thenReturn(1024);
-        when(configurator.getVertx()).thenReturn(vertx);
-        when(configurator.getBaseUri()).thenReturn(URI.create("/test/"));
+        when(options.getApplicationHandler()).thenReturn(applicationHandlerDelegate);
+        when(options.getMaxBodySize()).thenReturn(1024);
+        when(options.getVertx()).thenReturn(vertx);
+        when(options.getBaseUri()).thenReturn(URI.create("/test/"));
 
         when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test").toString());
         when(request.response()).thenReturn(response);
         when(request.headers()).thenReturn(headers);
 
         JsonArray resources = new JsonArray().add("com.englishtown.vertx.jersey.resources");
-        config.put(DefaultJerseyConfigurator.CONFIG_RESOURCES, resources);
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, resources);
 
         ContainerResponseWriterProvider provider = mock(ContainerResponseWriterProvider.class);
         when(provider.get(any(HttpServerRequest.class), any(ContainerRequest.class))).thenReturn(mock(ContainerResponseWriter.class));
@@ -133,7 +133,7 @@ public class DefaultJerseyHandlerTest {
         when(request.method()).thenReturn(HttpMethod.GET);
         when(request.headers()).thenReturn(mock(MultiMap.class));
 
-        jerseyHandler.init(configurator);
+        jerseyHandler.init(options);
         jerseyHandler.handle(request);
         verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
 
@@ -147,7 +147,7 @@ public class DefaultJerseyHandlerTest {
         when(request.method()).thenReturn(HttpMethod.POST);
         when(request.headers()).thenReturn(new HeadersAdaptor(headers));
 
-        jerseyHandler.init(configurator);
+        jerseyHandler.init(options);
         jerseyHandler.handle(request);
 
         verify(request).handler(dataHandlerCaptor.capture());
@@ -174,7 +174,7 @@ public class DefaultJerseyHandlerTest {
         requestProcessors.add(rp1);
         requestProcessors.add(rp2);
 
-        jerseyHandler.init(configurator);
+        jerseyHandler.init(options);
         jerseyHandler.handle(request, inputStream);
 
         verify(rp1).process(any(HttpServerRequest.class), any(ContainerRequest.class), endHandlerCaptor.capture());
@@ -249,7 +249,7 @@ public class DefaultJerseyHandlerTest {
         when(request.headers()).thenReturn(headers);
         when(headers.get(eq(HttpHeaders.HOST))).thenReturn(host);
 
-        jerseyHandler.init(configurator);
+        jerseyHandler.init(options);
 
         uri = jerseyHandler.getAbsoluteURI(request);
         assertEquals("http://test.englishtown.com/test", uri.toString());
@@ -262,8 +262,8 @@ public class DefaultJerseyHandlerTest {
     @Test
     public void testGetBaseURI() throws Exception {
         URI baseUri = URI.create("http://test.englishtown.com");
-        when(configurator.getBaseUri()).thenReturn(baseUri);
-        jerseyHandler.init(configurator);
+        when(options.getBaseUri()).thenReturn(baseUri);
+        jerseyHandler.init(options);
 
         URI result = jerseyHandler.getBaseUri();
         assertEquals(baseUri, result);

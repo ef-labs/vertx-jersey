@@ -24,7 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
@@ -77,10 +77,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
     }
 
     @Override
-    public void init(JerseyConfigurator configurator) {
-        baseUri = configurator.getBaseUri();
-        maxBodySize = configurator.getMaxBodySize();
-        applicationHandlerDelegate = configurator.getApplicationHandler();
+    public void init(JerseyOptions options) {
+        baseUri = options.getBaseUri();
+        maxBodySize = options.getMaxBodySize();
+        applicationHandlerDelegate = options.getApplicationHandler();
 
         logger.debug("DefaultJerseyHandler - initialized");
     }

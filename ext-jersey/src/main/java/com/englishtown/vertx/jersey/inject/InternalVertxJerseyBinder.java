@@ -38,7 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 
 /**
- * HK2 binder to configure the minimum interfaces required for the {@link com.englishtown.vertx.jersey.JerseyModule}
+ * HK2 binder to configure the minimum interfaces required for the {@link com.englishtown.vertx.jersey.JerseyVerticle}
  * to start.
  */
 public class InternalVertxJerseyBinder extends AbstractBinder {

@@ -26,7 +26,7 @@ package com.englishtown.vertx.jersey.promises.impl;
 import com.englishtown.promises.Deferred;
 import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
-import com.englishtown.vertx.jersey.JerseyConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import io.vertx.core.Vertx;
@@ -41,15 +41,15 @@ import javax.inject.Provider;
 public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
     private final Vertx vertx;
-    private final Provider<JerseyServer> jerseyServerProvider;
-    private final Provider<JerseyConfigurator> configuratorProvider;
+    private final JerseyServer jerseyServer;
+    private final JerseyOptions options;
     private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyConfigurator> configuratorProvider, When when) {
+    public DefaultWhenJerseyServer(Vertx vertx, JerseyServer jerseyServer, JerseyOptions options, When when) {
         this.vertx = vertx;
-        this.jerseyServerProvider = jerseyServerProvider;
-        this.configuratorProvider = configuratorProvider;
+        this.jerseyServer = jerseyServer;
+        this.options = options;
         this.when = when;
     }
 
@@ -58,12 +58,9 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
-            final JerseyServer jerseyServer = jerseyServerProvider.get();
-            JerseyConfigurator configurator = configuratorProvider.get();
+            options.init(config, vertx);
 
-            configurator.init(config, vertx);
-
-            jerseyServer.init(configurator, result -> {
+            jerseyServer.init(options, result -> {
                 if (result.succeeded()) {
                     d.resolve(jerseyServer);
                 } else {
