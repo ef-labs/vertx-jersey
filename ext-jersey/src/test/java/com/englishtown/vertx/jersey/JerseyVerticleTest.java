@@ -63,7 +63,7 @@ public class JerseyVerticleTest {
 
     @Before
     public void setUp() {
-        when(vertx.context()).thenReturn(context);
+        when(vertx.getOrCreateContext()).thenReturn(context);
         jerseyVerticle = new JerseyVerticle(jerseyServer, options);
         jerseyVerticle.init(vertx, context);
     }

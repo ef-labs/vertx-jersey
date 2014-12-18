@@ -48,12 +48,7 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
         HttpClientOptions clientOptions = new HttpClientOptions()
                 .setConnectTimeout(1000);
 
-        httpClient = vertx.createHttpClient(clientOptions)
-                .exceptionHandler(t -> {
-                    t.printStackTrace();
-                    fail(t.getMessage());
-                });
-
+        httpClient = vertx.createHttpClient(clientOptions);
 
         CountDownLatch latch = new CountDownLatch(1);
 

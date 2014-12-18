@@ -51,7 +51,7 @@ public class JerseyVerticle extends AbstractVerticle {
     public void start(final Future<Void> startedResult) throws Exception {
         this.start();
 
-        JsonObject config = getVertx().context().config();
+        JsonObject config = getVertx().getOrCreateContext().config();
         options.init(config, getVertx());
 
         jerseyServer.init(options, ar -> {

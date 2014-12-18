@@ -63,7 +63,6 @@ public class JerseyIntegrationTest extends VertxTestBase {
         HttpClientOptions options = new HttpClientOptions().setConnectTimeout(300);
 
         vertx.createHttpClient(options)
-                .exceptionHandler(t -> fail(t.getMessage()))
                 .request(HttpMethod.GET, port, host, "/integration/test", response -> {
                     assertEquals(200, response.statusCode());
                     testComplete();

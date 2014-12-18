@@ -25,7 +25,7 @@ public class StartupVerticle extends AbstractVerticle {
     @Override
     public void start(Future<Void> startedResult) throws Exception {
 
-        JsonObject jerseyConfig = vertx.context().config().getJsonObject("jersey");
+        JsonObject jerseyConfig = vertx.getOrCreateContext().config().getJsonObject("jersey");
 
         jerseyServer.createServer(jerseyConfig)
                 .then(server -> {
