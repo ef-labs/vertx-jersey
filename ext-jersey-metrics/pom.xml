@@ -21,13 +21,11 @@
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>ext-jersey</artifactId>
             <version>${project.version}</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-metrics</artifactId>
-            <version>${vertx.ext.metrics.version}</version>
-            <scope>provided</scope>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-metrics</artifactId>
+            <version>${vertx.version}</version>
         </dependency>
 
         <!--Test dependencies-->

@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.KeyStoreOptions;
 import org.glassfish.jersey.server.ApplicationHandler;
 
 import java.net.URI;
@@ -71,18 +72,11 @@ public interface JerseyOptions {
     boolean getSSL();
 
     /**
-     * The key store password when using ssl
+     * Vert.x http server key store options
      *
-     * @return the key store password
+     * @return
      */
-    String getKeyStorePassword();
-
-    /**
-     * The key store path when using ssl
-     *
-     * @return the key store path
-     */
-    String getKeyStorePath();
+    KeyStoreOptions getKeyStoreOptions();
 
     /**
      * The TCP receive buffer size for connections in bytes

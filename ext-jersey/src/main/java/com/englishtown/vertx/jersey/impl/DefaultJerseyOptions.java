@@ -29,6 +29,7 @@ import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.net.KeyStoreOptions;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -125,23 +126,13 @@ public class DefaultJerseyOptions implements JerseyOptions {
     }
 
     /**
-     * The key store password when using ssl
+     * Vert.x http server key store options
      *
-     * @return the key store password
+     * @return
      */
     @Override
-    public String getKeyStorePassword() {
-        return config.getString(CONFIG_KEY_STORE_PASSWORD, "wibble");
-    }
-
-    /**
-     * The key store path when using ssl
-     *
-     * @return the key store path
-     */
-    @Override
-    public String getKeyStorePath() {
-        return config.getString(CONFIG_KEY_STORE_PATH, "server-keystore.jks");
+    public KeyStoreOptions getKeyStoreOptions() {
+        return null;
     }
 
     /**

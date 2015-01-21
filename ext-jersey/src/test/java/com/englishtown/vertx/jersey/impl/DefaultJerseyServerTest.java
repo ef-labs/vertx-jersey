@@ -31,7 +31,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.apex.core.Router;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,7 +68,7 @@ public class DefaultJerseyServerTest {
     @Mock
     Handler<AsyncResult<HttpServer>> doneHandler;
     @Mock
-    Handler<RouteMatcher> routeMatcherHandler;
+    Handler<Router> routeMatcherHandler;
     @Mock
     JerseyOptions options;
     @Mock
@@ -171,10 +171,10 @@ public class DefaultJerseyServerTest {
         URI uri = URI.create("/test/");
         when(jerseyHandler.getBaseUri()).thenReturn(uri);
 
-        jerseyServer.routeMatcherHandler(routeMatcherHandler);
+        jerseyServer.routerHandler(routeMatcherHandler);
         jerseyServer.init(options);
 
-        verify(routeMatcherHandler).handle(any(RouteMatcher.class));
+        verify(routeMatcherHandler).handle(any(Router.class));
 
     }
 

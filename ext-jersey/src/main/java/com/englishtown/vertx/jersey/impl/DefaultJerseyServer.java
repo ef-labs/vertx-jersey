@@ -23,8 +23,8 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -32,11 +32,10 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
-import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.apex.core.Router;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Default implementation of {@link JerseyServer}
@@ -46,7 +45,7 @@ public class DefaultJerseyServer implements JerseyServer {
     private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyServer.class);
 
     private JerseyHandler jerseyHandler;
-    private Handler<RouteMatcher> routeMatcherHandler;
+    private Handler<Router> routerHandler;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
@@ -70,9 +69,9 @@ public class DefaultJerseyServer implements JerseyServer {
         // Enable https
         if (options.getSSL()) {
             serverOptions.setSsl(true);
-//          TODO Migration: Vert.x Interface for options not yet finished?
-//          .setKeyStorePassword(options.getKeyStorePassword())
-//          .setKeyStorePath(options.getKeyStorePath());
+        }
+        if (options.getKeyStoreOptions() != null) {
+            serverOptions.setKeyStoreOptions(options.getKeyStoreOptions());
         }
 
         Integer receiveBufferSize = options.getReceiveBufferSize();
@@ -88,16 +87,16 @@ public class DefaultJerseyServer implements JerseyServer {
         jerseyHandler.init(options);
 
         // Set request handler for the baseUri
-        RouteMatcher rm = RouteMatcher.routeMatcher();
-        server.requestHandler(rm::accept);
+        Router router = Router.router(options.getVertx());
+        server.requestHandler(router::accept);
 
         // regex pattern will be: "^base_path/.*"
         String pattern = "^" + jerseyHandler.getBaseUri().getPath() + ".*";
-        rm.all(pattern, jerseyHandler);
+        router.routeWithRegex(pattern).handler(rc -> jerseyHandler.handle(rc.request()));
 
         // Add any additional routes if handler is provided
-        if (routeMatcherHandler != null) {
-            routeMatcherHandler.handle(rm);
+        if (routerHandler != null) {
+            routerHandler.handle(router);
         }
 
         if (setupHandler != null) {
@@ -120,8 +119,8 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     @Override
-    public void routeMatcherHandler(Handler<RouteMatcher> handler) {
-        this.routeMatcherHandler = handler;
+    public void routerHandler(Handler<Router> handler) {
+        this.routerHandler = handler;
     }
 
     /**

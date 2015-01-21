@@ -26,7 +26,7 @@ package com.englishtown.vertx.jersey;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
-import io.vertx.ext.routematcher.RouteMatcher;
+import io.vertx.ext.apex.core.Router;
 
 /**
  * Represents a jersey server running in vert.x
@@ -55,7 +55,7 @@ public interface JerseyServer {
      *
      * @param handler the callback to add routes
      */
-    void routeMatcherHandler(Handler<RouteMatcher> handler);
+    void routerHandler(Handler<Router> handler);
 
     /**
      * Allows custom setup during initialization before the http server is listening

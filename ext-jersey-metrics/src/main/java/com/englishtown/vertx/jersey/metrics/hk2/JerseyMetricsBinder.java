@@ -23,7 +23,6 @@
 
 package com.englishtown.vertx.jersey.metrics.hk2;
 
-import com.englishtown.vertx.hk2.MetricsBinder;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
@@ -42,9 +41,6 @@ public class JerseyMetricsBinder extends AbstractBinder {
      */
     @Override
     protected void configure() {
-
-        // Ensure the metrics binder has run (safe to run multiple times)
-        install(new MetricsBinder());
 
         // Run request processor first so give it a high rank
         bind(RequestProcessor.class).to(VertxRequestProcessor.class).ranked(999);
