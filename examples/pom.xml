@@ -8,7 +8,7 @@
 
     <parent>
         <groupId>com.englishtown.vertx</groupId>
-        <artifactId>vertx-jersey</artifactId>
+        <artifactId>vertx-jersey-parent</artifactId>
         <version>4.0.0-SNAPSHOT</version>
     </parent>
 
@@ -26,19 +26,19 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-jersey</artifactId>
+            <artifactId>vertx-jersey</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-jersey</artifactId>
+            <artifactId>vertx-jersey</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-when</artifactId>
+            <artifactId>vertx-when</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

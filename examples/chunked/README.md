@@ -17,7 +17,7 @@ Try the following urls in your browser:
 
 ## The Configuration
 
-config.json sets up the ext-jersey module with the following settings:
+config.json sets up the vertx-jersey module with the following settings:
 ```json
 {
     "host": "localhost",

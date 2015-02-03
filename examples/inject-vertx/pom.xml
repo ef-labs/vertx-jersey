@@ -13,7 +13,7 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-hk2</artifactId>
+            <artifactId>vertx-hk2</artifactId>
         </dependency>
     </dependencies>
 

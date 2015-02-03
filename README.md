@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/englishtown/vertx-jersey.png)](https://travis-ci.org/englishtown/vertx-jersey)
 
-# ext-jersey
+# vertx-jersey
 
 Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
 
@@ -40,7 +40,7 @@ public void getQuery(
 
 ## Configuration
 
-The ext-jersey module configuration is as follows:
+The vertx-jersey configuration is as follows:
 
 ```json
 {
@@ -97,12 +97,12 @@ Default is `0.0.0.0`
 
 ## How to use
 
-Add the ext-jersey dependency to your project
+Add the vertx-jersey dependency to your project
 
 ```xml
 <dependency>
     <groupId>com.englishtown.vertx</groupId>
-    <artifactId>ext-jersey</artifactId>
+    <artifactId>vertx-jersey</artifactId>
     <version>4.0.0-SNAPSHOT</version>
 </dependency>
 ```

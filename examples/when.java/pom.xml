@@ -11,17 +11,17 @@
     </parent>
 
     <properties>
-        <vertx.mod.when.version>4.0.0-SNAPSHOT</vertx.mod.when.version>
+        <vertx.mod.when.version>4.0.0-RC1</vertx.mod.when.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-hk2</artifactId>
+            <artifactId>vertx-hk2</artifactId>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-when</artifactId>
+            <artifactId>vertx-when</artifactId>
             <version>${vertx.mod.when.version}</version>
             <scope>compile</scope>
         </dependency>

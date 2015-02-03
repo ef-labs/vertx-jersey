@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
-            <artifactId>ext-guice</artifactId>
+            <artifactId>vertx-guice</artifactId>
         </dependency>
         <!--<dependency>-->
         <!--<groupId>org.glassfish.hk2</groupId>-->
