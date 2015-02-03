@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>vertx-jersey-metrics</artifactId>
+
+    <parent>
+        <groupId>com.englishtown.vertx</groupId>
+        <artifactId>vertx-jersey-parent</artifactId>
+        <version>4.0.0-RC1</version>
+    </parent>
+
+    <properties>
+        <!--Dependency versions-->
+        <vertx.ext.metrics.version>2.0.0-SNAPSHOT</vertx.ext.metrics.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-jersey</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-metrics</artifactId>
+            <version>${vertx.version}</version>
+        </dependency>
+
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-jersey</artifactId>
+            <version>${project.version}</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-when</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

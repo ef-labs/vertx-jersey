@@ -1,16 +1,16 @@
 package com.englishtown.vertx.jersey.examples;
 
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
-import org.vertx.java.core.Future;
-import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.platform.Verticle;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 
 /**
  * {@link com.englishtown.vertx.jersey.promises.WhenJerseyServer} example
  */
-public class StartupVerticle extends Verticle {
+public class StartupVerticle extends AbstractVerticle {
 
     private final WhenJerseyServer jerseyServer;
 
@@ -23,18 +23,17 @@ public class StartupVerticle extends Verticle {
      * {@inheritDoc}
      */
     @Override
-    public void start(Future<Void> startedResult) {
+    public void start(Future<Void> startedResult) throws Exception {
 
-        JsonObject jerseyConfig = container.config().getObject("jersey");
+        JsonObject jerseyConfig = vertx.getOrCreateContext().config().getJsonObject("jersey");
 
         jerseyServer.createServer(jerseyConfig)
-                .then(
-                        server -> {
-                            super.start(startedResult);
-                            return null;
-                        })
+                .then(server -> {
+                    startedResult.complete();
+                    return null;
+                })
                 .otherwise(t -> {
-                    startedResult.setFailure(t);
+                    startedResult.fail(t);
                     return null;
                 });
 

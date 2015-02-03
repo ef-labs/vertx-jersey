@@ -1,4 +1,0 @@
-{
-    "main": "com.englishtown.vertx.jersey.examples.StartupVerticle",
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0,com.englishtown~vertx-mod-when~3.0.0"
-}

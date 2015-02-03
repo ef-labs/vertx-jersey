@@ -6,47 +6,25 @@
 
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
-        <groupId>com.englishtown</groupId>
-        <version>3.0.0</version>
+        <groupId>com.englishtown.vertx</groupId>
+        <version>4.0.0-RC1</version>
     </parent>
 
     <properties>
-        <vertx.mod.when.version>3.0.0</vertx.mod.when.version>
+        <vertx.mod.when.version>4.0.0-RC1</vertx.mod.when.version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-hk2</artifactId>
-            <scope>provided</scope>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-hk2</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-jersey</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown</groupId>
-            <artifactId>vertx-mod-when</artifactId>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-when</artifactId>
             <version>${vertx.mod.when.version}</version>
-            <scope>provided</scope>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>io.vertx</groupId>
-                <artifactId>vertx-maven-plugin</artifactId>
-                <configuration>
-                    <configFile>src/test/resources/config.json</configFile>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

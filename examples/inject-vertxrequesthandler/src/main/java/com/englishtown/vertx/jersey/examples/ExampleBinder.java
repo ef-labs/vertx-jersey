@@ -4,13 +4,6 @@ import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
-/**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/9/13
- * Time: 7:38 PM
- * To change this template use File | Settings | File Templates.
- */
 public class ExampleBinder extends AbstractBinder {
     @Override
     protected void configure() {

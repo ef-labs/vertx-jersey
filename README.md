@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-mod-jersey.png)](https://travis-ci.org/englishtown/vertx-mod-jersey)
+[![Build Status](https://travis-ci.org/englishtown/vertx-jersey.png)](https://travis-ci.org/englishtown/vertx-jersey)
 
-# vertx-mod-jersey
+# vertx-jersey
 
 Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
 
@@ -40,7 +40,7 @@ public void getQuery(
 
 ## Configuration
 
-The vertx-mod-jersey module configuration is as follows:
+The vertx-jersey configuration is as follows:
 
 ```json
 {
@@ -97,22 +97,13 @@ Default is `0.0.0.0`
 
 ## How to use
 
-Add vertx-mod-jersey as an include in your mod.json.
-
-```json
-{
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0"
-}
-```
-
-The vertx-mod-jersey jar (plus its dependencies javax.ws.rs-api, javax.inject, jersey-server, etc.) should be added to your project with scope "provided".
+Add the vertx-jersey dependency to your project
 
 ```xml
 <dependency>
-    <groupId>com.englishtown</groupId>
-    <artifactId>vertx-mod-jersey</artifactId>
-    <version>3.0.0</version>
-    <scope>provided</scope>
+    <groupId>com.englishtown.vertx</groupId>
+    <artifactId>vertx-jersey</artifactId>
+    <version>4.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -120,7 +111,7 @@ You have 3 ways to start the Jersey Server:
 
 1. In your mod.json file, make the start Verticle JerseyModule (`"main": "com.englishtown.vertx.jersey.JerseyModule"`).
 2. In your own Verticle specified in mod.json `"main"`, create an instance of the JerseyServer and initialize similarly to how JerseyModule does.
-3. Use when.java and `com.englishtown.vertx.jersey.promises.WhenJerseyServer` to simplify the process.  See the [promises](#promises) section below.
+3. Use when.java and `com.englishtown.vertx.jersey.promises.WhenJerseyServer` to simplify the process.  See the [promises](#Promises) section below.
 
 
 Use #1 if you don't have anything else to do at application start.  Use #2 if you need to deploy other modules at start.

@@ -1,8 +1,7 @@
 package com.englishtown.vertx.jersey.examples.resources;
 
+import io.vertx.core.Vertx;
 import org.glassfish.jersey.server.JSONP;
-import org.vertx.java.core.Handler;
-import org.vertx.java.core.Vertx;
 
 import javax.ws.rs.*;
 import javax.ws.rs.container.AsyncResponse;
@@ -10,13 +9,6 @@ import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-/**
- * Created with IntelliJ IDEA.
- * User: adriangonzalez
- * Date: 4/8/13
- * Time: 6:44 PM
- * To change this template use File | Settings | File Templates.
- */
 @Path("json")
 public class JsonResource {
 
@@ -49,16 +41,11 @@ public class JsonResource {
     @Path("async")
     @Produces(MediaType.APPLICATION_JSON)
     public void getJsonAsync(@Suspended final AsyncResponse asyncResponse, @Context Vertx vertx) {
-
-        vertx.runOnContext(new Handler<Void>() {
-            @Override
-            public void handle(Void aVoid) {
-                MyObject o = new MyObject();
-                o.setName("Andy");
-                asyncResponse.resume(o);
-            }
+        vertx.runOnContext(aVoid -> {
+            MyObject o = new MyObject();
+            o.setName("Andy");
+            asyncResponse.resume(o);
         });
-
     }
 
     public static class MyObject {
