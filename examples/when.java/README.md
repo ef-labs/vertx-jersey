@@ -18,7 +18,7 @@ mod.json instructs vert.x to include the vertx-mod-jersey and vertx-mod-when mod
 ```json
 {
     "main": "com.englishtown.vertx.jersey.examples.StartupVerticle",
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0,com.englishtown~vertx-mod-when~3.0.0"
+    "includes": "com.englishtown~vertx-mod-jersey~3.0.1-SNAPSHOT,com.englishtown~vertx-mod-when~3.0.0"
 }
 ```
 
