@@ -1,4 +1,4 @@
 {
     "main": "com.englishtown.vertx.jersey.JerseyModule",
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.1-SNAPSHOT"
+    "includes": "com.englishtown~vertx-mod-jersey~3.0.1"
 }
