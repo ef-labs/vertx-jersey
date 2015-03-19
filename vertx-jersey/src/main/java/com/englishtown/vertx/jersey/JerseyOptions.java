@@ -25,7 +25,7 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.KeyStoreOptions;
+import io.vertx.core.net.JksOptions;
 import org.glassfish.jersey.server.ApplicationHandler;
 
 import java.net.URI;
@@ -76,7 +76,7 @@ public interface JerseyOptions {
      *
      * @return
      */
-    KeyStoreOptions getKeyStoreOptions();
+    JksOptions getKeyStoreOptions();
 
     /**
      * The TCP receive buffer size for connections in bytes

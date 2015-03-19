@@ -31,47 +31,44 @@ public class CustomSecurityContextProvider implements VertxRequestProcessor {
     @Override
     public void process(final HttpServerRequest vertxRequest, final ContainerRequest jerseyRequest, final Handler<Void> done) {
 
-        vertx.runOnContext(new Handler<Void>() {
-            @Override
-            public void handle(Void event) {
-                SecurityContext securityContext = new SecurityContext() {
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public Principal getUserPrincipal() {
-                        return null;
-                    }
+        vertx.runOnContext(aVoid -> {
+            SecurityContext securityContext = new SecurityContext() {
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public Principal getUserPrincipal() {
+                    return null;
+                }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public boolean isUserInRole(String role) {
-                        String param = vertxRequest.params().get("role");
-                        return role.equalsIgnoreCase(param);
-                    }
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public boolean isUserInRole(String role) {
+                    String param = vertxRequest.params().get("role");
+                    return role.equalsIgnoreCase(param);
+                }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public boolean isSecure() {
-                        return false;
-                    }
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public boolean isSecure() {
+                    return false;
+                }
 
-                    /**
-                     * {@inheritDoc}
-                     */
-                    @Override
-                    public String getAuthenticationScheme() {
-                        return null;
-                    }
-                };
+                /**
+                 * {@inheritDoc}
+                 */
+                @Override
+                public String getAuthenticationScheme() {
+                    return null;
+                }
+            };
 
-                jerseyRequest.setSecurityContext(securityContext);
-                done.handle(null);
-            }
+            jerseyRequest.setSecurityContext(securityContext);
+            done.handle(null);
         });
 
     }

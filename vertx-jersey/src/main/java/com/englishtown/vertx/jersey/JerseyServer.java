@@ -26,7 +26,6 @@ package com.englishtown.vertx.jersey;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
-import io.vertx.ext.apex.core.Router;
 
 /**
  * Represents a jersey server running in vert.x
@@ -45,20 +44,13 @@ public interface JerseyServer {
     /**
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
-     * @param options http server and jersey configuration settings
-     * @param doneHandler  the optional callback for when initialization has completed
+     * @param options     http server and jersey configuration settings
+     * @param doneHandler the optional callback for when initialization has completed
      */
     void init(JerseyOptions options, Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
-     * Allows adding additional routes
-     *
-     * @param handler the callback to add routes
-     */
-    void routerHandler(Handler<Router> handler);
-
-    /**
-     * Allows custom setup during initialization before the http server is listening
+     * Allows custom setup during initialization before the http server is listening (add custom routes, etc.)
      *
      * @param handler the handler invoked with the http server
      */

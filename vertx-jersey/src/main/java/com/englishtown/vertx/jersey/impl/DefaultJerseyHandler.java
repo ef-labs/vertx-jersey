@@ -225,14 +225,11 @@ public class DefaultJerseyHandler implements JerseyHandler {
         }
 
         // Set request scoped instances
-        jerseyRequest.setRequestScopedInitializer(new RequestScopedInitializer() {
-            @Override
-            public void initialize(ServiceLocator locator) {
-                locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
-                }).getType()).set(vertxRequest);
-                locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {
-                }).getType()).set(vertxRequest.response());
-            }
+        jerseyRequest.setRequestScopedInitializer(locator -> {
+            locator.<Ref<HttpServerRequest>>getService((new TypeLiteral<Ref<HttpServerRequest>>() {
+            }).getType()).set(vertxRequest);
+            locator.<Ref<HttpServerResponse>>getService((new TypeLiteral<Ref<HttpServerResponse>>() {
+            }).getType()).set(vertxRequest.response());
         });
 
         // Call vertx before request processors
@@ -241,15 +238,12 @@ public class DefaultJerseyHandler implements JerseyHandler {
             if (inputStream == null) {
                 vertxRequest.pause();
             }
-            callVertxRequestProcessor(0, vertxRequest, jerseyRequest, new Handler<Void>() {
-                @Override
-                public void handle(Void aVoid) {
-                    // Resume the vert.x request if we haven't already read the body
-                    if (inputStream == null) {
-                        vertxRequest.resume();
-                    }
-                    applicationHandlerDelegate.handle(jerseyRequest);
+            callVertxRequestProcessor(0, vertxRequest, jerseyRequest, aVoid -> {
+                // Resume the vert.x request if we haven't already read the body
+                if (inputStream == null) {
+                    vertxRequest.resume();
                 }
+                applicationHandlerDelegate.handle(jerseyRequest);
             });
         } else {
             applicationHandlerDelegate.handle(jerseyRequest);

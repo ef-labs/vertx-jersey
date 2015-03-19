@@ -11,10 +11,13 @@ import java.io.IOException;
  */
 public class PoweredByResponseFilter implements ContainerResponseFilter {
 
+    public static final String HEADER_X_POWERED_BY = "X-Powered-By";
+    public static final String HEADER_X_POWERED_BY_VALUE = "Jersey :-)";
+
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext)
             throws IOException {
 
-        responseContext.getHeaders().add("X-Powered-By", "Jersey :-)");
+        responseContext.getHeaders().add(HEADER_X_POWERED_BY, HEADER_X_POWERED_BY_VALUE);
     }
 }

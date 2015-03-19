@@ -32,7 +32,6 @@ import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.impl.LoggerFactory;
-import io.vertx.ext.apex.core.Router;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 
 import javax.inject.Inject;
@@ -45,7 +44,6 @@ public class DefaultJerseyServer implements JerseyServer {
     private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyServer.class);
 
     private JerseyHandler jerseyHandler;
-    private Handler<Router> routerHandler;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
@@ -87,18 +85,9 @@ public class DefaultJerseyServer implements JerseyServer {
         jerseyHandler.init(options);
 
         // Set request handler for the baseUri
-        Router router = Router.router(options.getVertx());
-        server.requestHandler(router::accept);
+        server.requestHandler(jerseyHandler::handle);
 
-        // regex pattern will be: "^base_path/.*"
-        String pattern = "^" + jerseyHandler.getBaseUri().getPath() + ".*";
-        router.routeWithRegex(pattern).handler(rc -> jerseyHandler.handle(rc.request()));
-
-        // Add any additional routes if handler is provided
-        if (routerHandler != null) {
-            routerHandler.handle(router);
-        }
-
+        // Perform any additional server setup (add routes etc.)
         if (setupHandler != null) {
             setupHandler.handle(server);
         }
@@ -116,11 +105,6 @@ public class DefaultJerseyServer implements JerseyServer {
             }
         });
 
-    }
-
-    @Override
-    public void routerHandler(Handler<Router> handler) {
-        this.routerHandler = handler;
     }
 
     /**

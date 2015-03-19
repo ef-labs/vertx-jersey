@@ -29,7 +29,7 @@ import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.net.KeyStoreOptions;
+import io.vertx.core.net.JksOptions;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -46,8 +46,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
     final static String CONFIG_HOST = "host";
     final static String CONFIG_PORT = "port";
     final static String CONFIG_SSL = "ssl";
-    final static String CONFIG_KEY_STORE_PASSWORD = "key_store_password";
-    final static String CONFIG_KEY_STORE_PATH = "key_store_path";
+    final static String CONFIG_JKS_OPTIONS = "jks_options";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_BACKLOG_SIZE = "backlog_size";
 
@@ -131,8 +130,9 @@ public class DefaultJerseyOptions implements JerseyOptions {
      * @return
      */
     @Override
-    public KeyStoreOptions getKeyStoreOptions() {
-        return null;
+    public JksOptions getKeyStoreOptions() {
+        JsonObject json = config.getJsonObject(CONFIG_JKS_OPTIONS);
+        return json == null ? null : new JksOptions(json);
     }
 
     /**

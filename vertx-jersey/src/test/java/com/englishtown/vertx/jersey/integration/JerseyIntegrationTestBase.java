@@ -1,20 +1,13 @@
 package com.englishtown.vertx.jersey.integration;
 
 import com.englishtown.promises.Promise;
-import com.englishtown.vertx.hk2.HK2VertxBinder;
-import com.englishtown.vertx.hk2.WhenHK2JerseyBinder;
-import com.englishtown.vertx.jersey.JerseyVerticle;
 import com.englishtown.vertx.promises.WhenHttpClient;
 import com.englishtown.vertx.promises.WhenVertx;
-import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.hk2.api.ServiceLocatorFactory;
-import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,27 +16,29 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Base class for jersey integration tests
+ * Base integration test class
  */
 public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
     protected JsonObject config;
-    protected ServiceLocator locator;
     protected WhenVertx whenVertx;
     protected HttpClient httpClient;
     protected WhenHttpClient whenHttpClient;
     protected String deploymentID;
 
+    protected abstract <T> T getService(Class<T> clazz);
+
     @Override
     public void setUp() throws Exception {
         super.setUp();
+        init();
+    }
 
-        locator = ServiceLocatorFactory.getInstance().create(null);
-        ServiceLocatorUtilities.bind(locator, new HK2VertxBinder(vertx), new WhenHK2JerseyBinder(), new HK2WhenBinder());
+    protected void init() throws Exception {
 
         config = loadConfig();
-        whenVertx = locator.getService(WhenVertx.class);
-        whenHttpClient = locator.getService(WhenHttpClient.class);
+        whenVertx = getService(WhenVertx.class);
+        whenHttpClient = getService(WhenHttpClient.class);
 
         HttpClientOptions clientOptions = new HttpClientOptions()
                 .setConnectTimeout(1000);
@@ -58,8 +53,13 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
                     return null;
                 })
                 .otherwise(t -> {
-                    t.printStackTrace();
-                    fail();
+                    try {
+                        t.printStackTrace();
+                        fail(t.getMessage());
+                    } catch (Throwable t2) {
+                        t2.printStackTrace();
+                        fail(t2.getMessage());
+                    }
                     return null;
                 })
                 .ensure(latch::countDown);
@@ -68,22 +68,17 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
     }
 
-    protected Promise<String> deployJerseyVerticle() {
-        return deployJerseyVerticle("java-hk2:" + JerseyVerticle.class.getName());
-    }
+    protected abstract Promise<String> deployJerseyVerticle();
 
     protected Promise<String> deployJerseyVerticle(String identifier) {
         DeploymentOptions options = new DeploymentOptions().setConfig(config);
         return whenVertx.deployVerticle(identifier, options);
     }
 
-
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
-
         httpClient.close();
-        locator.shutdown();
     }
 
     protected JsonObject loadConfig() {

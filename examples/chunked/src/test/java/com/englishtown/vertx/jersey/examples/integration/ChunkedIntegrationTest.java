@@ -1,18 +1,18 @@
 package com.englishtown.vertx.jersey.examples.integration;
 
-import com.englishtown.vertx.jersey.integration.JerseyIntegrationTestBase;
+import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
 import com.englishtown.vertx.promises.RequestOptions;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
-public class ChunkedIntegrationTest extends JerseyIntegrationTestBase {
+public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private String BASE_PATH = "http://localhost:8080/chunked";
 
     private void runTest(String path) {
 
-        whenHttpClient.request(HttpMethod.GET, path)
+        whenHttpClient.requestAbs(HttpMethod.GET, path)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     assertEquals("chunked", response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
@@ -45,7 +45,7 @@ public class ChunkedIntegrationTest extends JerseyIntegrationTestBase {
 
         RequestOptions options = new RequestOptions().setPauseResponse(true);
 
-        whenHttpClient.request(HttpMethod.GET, BASE_PATH + "/stream", options)
+        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH + "/stream", options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     assertNull(response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
