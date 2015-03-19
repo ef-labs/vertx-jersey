@@ -36,7 +36,7 @@ import javax.ws.rs.core.MediaType;
  *
  *
  */
-public class IntegrationTests extends JerseyIntegrationTestBase {
+public class IntegrationTests extends JerseyHK2IntegrationTestBase {
 
     private String host = "localhost";
     private int port = 8080;

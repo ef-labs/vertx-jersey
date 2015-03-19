@@ -23,27 +23,27 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.ext.apex.core.Router;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.inject.Provider;
 import java.net.URI;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
@@ -67,8 +67,6 @@ public class DefaultJerseyServerTest {
     JerseyHandler jerseyHandler;
     @Mock
     Handler<AsyncResult<HttpServer>> doneHandler;
-    @Mock
-    Handler<Router> routeMatcherHandler;
     @Mock
     JerseyOptions options;
     @Mock
@@ -100,7 +98,7 @@ public class DefaultJerseyServerTest {
         Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
         assertNotNull(handler);
 
-        verify(httpServer).listen(any());
+        verify(httpServer).listen(Mockito.<Handler<AsyncResult<HttpServer>>>any());
 
         HttpServerOptions options = optionsCaptor.getValue();
         assertEquals(port, options.getPort());
@@ -166,19 +164,6 @@ public class DefaultJerseyServerTest {
     }
 
     @Test
-    public void testInit_Route_Match_Handler() throws Exception {
-
-        URI uri = URI.create("/test/");
-        when(jerseyHandler.getBaseUri()).thenReturn(uri);
-
-        jerseyServer.routerHandler(routeMatcherHandler);
-        jerseyServer.init(options);
-
-        verify(routeMatcherHandler).handle(any(Router.class));
-
-    }
-
-    @Test
     public void testGetHandler() throws Exception {
         jerseyServer.init(options);
         JerseyHandler handler = jerseyServer.getHandler();
@@ -190,6 +175,14 @@ public class DefaultJerseyServerTest {
         jerseyServer.setupHandler(setupHandler);
         jerseyServer.init(options);
         verify(setupHandler).handle(eq(httpServer));
+
+        Handler<HttpServerRequest> requestHandler = jerseyServer.getHandler();
+        assertNotNull(requestHandler);
+
+        // Wrap the request with a custom route
+        httpServer.requestHandler(request -> {
+        });
+
     }
 
     @Test

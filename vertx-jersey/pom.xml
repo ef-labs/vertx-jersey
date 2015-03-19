@@ -7,7 +7,7 @@
     <parent>
         <artifactId>vertx-jersey-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.0.0-RC1</version>
+        <version>4.0.0-RC2</version>
     </parent>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
@@ -15,34 +15,30 @@
 
     <dependencies>
         <dependency>
-            <artifactId>vertx-apex</artifactId>
-            <groupId>io.vertx</groupId>
-        </dependency>
-        <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
         </dependency>
 
-        <!--Provided dependencies-->
+        <!--Optional dependencies-->
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>guice-bridge</artifactId>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
             <artifactId>when.java</artifactId>
-            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <!--Test dependencies-->
@@ -59,6 +55,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-guice</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.glassfish.jersey.media</groupId>
             <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
@@ -71,7 +72,8 @@
         </dependency>
         <dependency>
             <groupId>com.englishtown</groupId>
-            <artifactId>when.java-testtools</artifactId>
+            <artifactId>when.java</artifactId>
+            <type>test-jar</type>
             <scope>test</scope>
         </dependency>
         <dependency>

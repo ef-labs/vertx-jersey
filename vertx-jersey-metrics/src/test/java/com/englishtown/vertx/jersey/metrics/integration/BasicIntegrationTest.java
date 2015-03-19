@@ -25,11 +25,8 @@ package com.englishtown.vertx.jersey.metrics.integration;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.englishtown.vertx.jersey.JerseyVerticle;
-import com.englishtown.vertx.jersey.integration.JerseyIntegrationTestBase;
+import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
 import com.englishtown.vertx.jersey.metrics.RequestProcessor;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -37,13 +34,11 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.SortedMap;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Integration tests for jersey metrics
  */
-public class BasicIntegrationTest extends JerseyIntegrationTestBase {
+public class BasicIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     // Had to mark this test as ignored now that SharedMetricRegistries is no longer used.
     // Not sure it is possible to get at the HK2 container's instance of MetricRegistry from here...
