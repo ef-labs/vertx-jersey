@@ -15,6 +15,8 @@ import javax.ws.rs.core.MediaType;
 @Path("test")
 public class TestResource {
 
+    public static final String RESPONSE_BODY = "All vert.x objects successfully injected!!! ";
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getString(@Context Vertx vertx,
@@ -24,7 +26,7 @@ public class TestResource {
 
         if (vertx != null && vertxRequest != null
                 && vertxResponse != null && vertxStream != null) {
-            return "All vert.x objects successfully injected!!! ";
+            return RESPONSE_BODY;
         } else {
             return "Vert.x objects were not successfully injected!!!";
         }
