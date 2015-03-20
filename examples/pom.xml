@@ -15,11 +15,12 @@
     <modules>
         <module>chunked</module>
         <module>filter</module>
-        <module>inject-securitycontext</module>
-        <module>inject-vertxrequesthandler</module>
-        <module>inject-vertx</module>
-        <module>jackson</module>
         <module>guice</module>
+        <module>inject-securitycontext</module>
+        <module>inject-vertx</module>
+        <module>inject-vertxrequesthandler</module>
+        <module>jackson</module>
+        <module>maven-service</module>
         <module>when.java</module>
     </modules>
 

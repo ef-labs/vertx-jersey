@@ -1,0 +1,9 @@
+{
+    "jersey": {
+        "hk2_binder": "com.englishtown.vertx.hk2.HK2JerseyBinder",
+        "host": "localhost",
+        "port": 8080,
+        "base_path": "/",
+        "resources": ["com.englishtown.vertx.jersey.examples.resources"]
+    }
+}

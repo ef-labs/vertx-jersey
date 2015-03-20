@@ -82,19 +82,7 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
     }
 
     protected JsonObject loadConfig() {
-        return loadConfig("/config.json");
-    }
-
-    protected JsonObject loadConfig(String name) {
-
-        try (InputStream is = this.getClass().getResourceAsStream(name)) {
-            try (Scanner scanner = new Scanner(is, "UTF-8").useDelimiter("\\A")) {
-                return scanner.hasNext() ? new JsonObject(scanner.next()) : new JsonObject();
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        return ConfigUtils.loadConfig();
     }
 
     protected Promise<Void> onRejected(Throwable t) {
