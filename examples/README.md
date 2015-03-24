@@ -10,7 +10,7 @@ mvn clean package -P fat-jar
 Each example can then be run from its directory with the following:
 
 ```
-java -jar target/ArtifactId-Version-fat.jar -conf src/test/resources/config.json
+java -jar target/{artifactId}-{version}-fat.jar -conf src/test/resources/config.json
 ```
 
 See the README files for details and test URLs

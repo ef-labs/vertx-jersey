@@ -2,7 +2,7 @@
 
 # vertx-jersey
 
-Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x.
+Allows creating JAX-RS [Jersey](https://jersey.java.net/) resources in vert.x.
 
 
 ## Getting started
@@ -17,9 +17,22 @@ Add the vertx-jersey dependency to your project
 </dependency>
 ```
 
+See the [example modules](examples) for more details.
+
+Version Matrix
+
+vert.x           | vertx-jersey
+---------------- | ------------
+3.0.0-milestone3 | 4.0.0-RC2
+3.0.0-milestone1 | 4.0.0-RC1
+2.x              | 3.0.1 (vertx-mod-jersey)
+
+
+
+
 There are multiple ways to start the Jersey Server:
 
-#### 1. Run vertx-jersey as a service 
+##### 1. Run vertx-jersey as a service 
 
 Running as a service is probably the easiest way to get started.
 
@@ -27,7 +40,6 @@ From the command line:
 
 ```
 vertx run service:com.englishtown.vertx:vertx-jersey:4.0.0-SNAPSHOT -conf config.json
-
 ```
 
 Programmatically:
@@ -40,7 +52,7 @@ See the [maven-service](https://github.com/englishtown/vertx-jersey/tree/develop
 
 NOTE: When running as a service, [vertx-hk2](https://github.com/englishtown/vertx-hk2) __must__ be on the class path.
 
-#### 2. Run the verticle
+##### 2. Run the verticle
 
 Rather than running as a service, you can run the JerseyVerticle from the command line:
 
@@ -59,7 +71,7 @@ vertx.deployVerticle("java-guice:com.englishtown.vertx.jersey.JerseyVerticle", c
 This assumes you have vertx-hk2 or vertx-guice on the class path as well as vertx-jersey and all its dependencies.
 
 
-#### 3. Create JerseyServer yourself
+##### 3. Create JerseyServer yourself
 
 You can also skip the `JerseyVerticle` and instantiate the `JerseyServer` yourself.  It is easiest to use DI for this, but it can also be done manually.
 
@@ -99,8 +111,8 @@ Default is `0.0.0.0`
 
 The only required field is `resources`.
 
-### Examples
-#### Simple
+#### Examples
+##### Simple
 
 ```json
 {
@@ -108,7 +120,7 @@ The only required field is `resources`.
 }
 ```
 
-#### All settings
+##### All settings
 
 ```json
 {
@@ -127,16 +139,15 @@ The only required field is `resources`.
 The `javax.ws.rs.core.Context` annotation can be used to inject vert.x objects into a resource constructor, field,
 or method parameter.  Supported vert.x objects include
 
-* `org.vertx.java.core.http.HttpServerRequest`
-* `org.vertx.java.core.http.HttpServerResponse`
-* `org.vertx.java.core.streams.ReadStream<org.vertx.java.core.http.HttpServerRequest>`
-* `org.vertx.java.core.Vertx`
-* `org.vertx.java.platform.Container`
+* `io.vertx.core.http.HttpServerRequest`
+* `io.vertx.core.http.HttpServerResponse`
+* `io.vertx.core.streams.ReadStream<io.vertx.core.http.HttpServerRequest>`
+* `io.vertx.core.Vertx`
 
 To inject custom objects, you must provide one or more binders in the configuration.  See the injection example projects.
 
 
-#### Dependency Injection
+### Dependency Injection
 The JerseyVerticle requires dependency injection.  Guice and HK2 binders are provided:
 
 * `com.englishtown.vertx.guice.GuiceJerseyBinder`
@@ -144,18 +155,18 @@ The JerseyVerticle requires dependency injection.  Guice and HK2 binders are pro
 
 See the examples directory for runnable hk2 and guice samples.
 
-##### vertx-guice
+###### vertx-guice
 If using [vertx-guice](https://github.com/englishtown/vertx-guice), ensure the vertx-guice jar is on the class path so vert.x registers the `GuiceVerticleFactory`.
 
 __Note: The Guice Multibindings extension is required.__
 
-##### vertx-mod-hk2
+###### vertx-mod-hk2
 If using [vertx-hk2](https://github.com/englishtown/vertx-hk2), ensure the vertx-hk2 jar is on the class path so vert.x registers the `HK2VerticleFactory`.
 
 __Note: if you are using vertx-mod-hk2, ensure you are using 1.7.0 or higher.__
 
 
-### Example Resource Method
+#### Example Resource Method
 ```java
 @GET
 @Produces(MediaType.APPLICATION_JSON)
@@ -163,8 +174,7 @@ public void getQuery(
         @Suspended final AsyncResponse response,
         @Context ContainerRequest jerseyRequest,
         @Context HttpServerRequest vertxRequest,
-        @Context Vertx vertx,
-        @Context Container container) {
+        @Context Vertx vertx) {
 
     vertx.runOnLoop(new Handler<Void>() {
         @Override
@@ -180,7 +190,7 @@ public void getQuery(
 
 The promises package provides when.java wrappers to create a JerseyServer.  You must provide the when.java dependency.
 
-### Example
+#### Example
 
 The following example assumes a `com.englishtown.vertx.jersey.promises.WhenJerseyServer` instance has been injected using the `com.englishtown.vertx.hk2.WhenHK2JerseyBinder` with vertx-hk2 module.
 
