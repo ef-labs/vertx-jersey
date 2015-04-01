@@ -49,6 +49,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
     final static String CONFIG_JKS_OPTIONS = "jks_options";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_BACKLOG_SIZE = "backlog_size";
+    final static String CONFIG_RESOURCE_CONFIG = "resource_config";
 
     public static final String CONFIG_BASE_PATH = "base_path";
     public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
@@ -238,6 +239,13 @@ public class DefaultJerseyOptions implements JerseyOptions {
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+        final JsonObject resourceConfigAdditions = config.getJsonObject(CONFIG_RESOURCE_CONFIG);
+        if (resourceConfigAdditions != null) {
+            for (final String fieldName : resourceConfigAdditions.fieldNames()) {
+                rc.property(fieldName, resourceConfigAdditions.getValue(fieldName));
             }
         }
 
