@@ -50,6 +50,7 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
     final static String CONFIG_KEY_STORE_PATH = "key_store_path";
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_BACKLOG_SIZE = "backlog_size";
+    final static String CONFIG_RESOURCE_CONFIG = "resource_config";
 
     public static final String CONFIG_BASE_PATH = "base_path";
     public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
@@ -260,6 +261,13 @@ public class DefaultJerseyConfigurator implements JerseyConfigurator {
                 } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                     throw new RuntimeException(e);
                 }
+            }
+        }
+
+        final JsonObject resourceConfigAdditions = config.getObject(CONFIG_RESOURCE_CONFIG);
+        if (resourceConfigAdditions != null) {
+            for (final String fieldName : resourceConfigAdditions.getFieldNames()) {
+                rc.property(fieldName, resourceConfigAdditions.getValue(fieldName));
             }
         }
 
