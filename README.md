@@ -55,7 +55,8 @@ The vertx-mod-jersey module configuration is as follows:
     "resources": ["<resources>"],
     "features": ["<features>"],
     "binders": ["<binders>"],
-    "backlog_size": <backlog_sze>
+    "backlog_size": <backlog_sze>,
+    "resource_config": {"<resource_config>"}
 }
 ````
 
@@ -72,6 +73,7 @@ Default is `0.0.0.0`
 * `features` - An array of feature classes to inject.  For example: `"org.glassfish.jersey.jackson.JacksonFeature"`
 * `binders` - An array of HK2 binder classes to configure injection bindings.
 * `backlog_size` - An int that sets the http server backlog size.  The default value is 10,000
+* `resource_config` - An object with additional properties to be set on the ResourceConfig
 
 ### Examples
 #### Simple
