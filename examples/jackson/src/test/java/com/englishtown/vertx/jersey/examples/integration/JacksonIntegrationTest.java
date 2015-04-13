@@ -40,7 +40,7 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
     public void testGetJsonp() throws Exception {
 
         runTest("/jsonp?cb=myCallback", body -> {
-            assertEquals("callback({\"name\":\"Andy\"})", body.toString());
+            assertEquals("myCallback({\"name\":\"Andy\"})", body.toString());
         });
 
     }
