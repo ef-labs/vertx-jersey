@@ -7,12 +7,8 @@
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.0.0-RC2</version>
+        <version>4.0.0-RC3</version>
     </parent>
-
-    <properties>
-        <vertx.mod.when.version>4.0.0-RC1</vertx.mod.when.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -22,9 +18,32 @@
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>vertx-when</artifactId>
-            <version>${vertx.mod.when.version}</version>
             <scope>compile</scope>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>fat-jar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Verticle>java-hk2:com.englishtown.vertx.jersey.examples.StartupVerticle
+                                        </Main-Verticle>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

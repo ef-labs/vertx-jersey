@@ -3,10 +3,11 @@
 This sample shows running jersey inside vert.x using the `org.glassfish.jersey.jackson.JacksonFeature` for json
 serialization.
 
+
 ## Run It
 
-1. Run from the command line `mvn vertx:runMod'
-2. Run from inside IDEA via the vert.x maven plugin vertx:runMod
+1. Run from the command line `java -jar target/vertx-jersey-examples-jackson-Version-fat.jar -conf src/test/resources/config.json'
+2. Run from inside IDEA creating a JAR Application build configuration with program arguments `-conf src/test/resources/config.json`
 
 
 Try the following urls in your browser:
@@ -18,21 +19,4 @@ Try the following urls in your browser:
 
 ## The Configuration
 
-mod.json instructs vert.x to include the vertx-mod-jersey module and to run `com.englishtown.vertx.jersey.JerseyModule`
-```json
-{
-    "main": "com.englishtown.vertx.jersey.JerseyModule",
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0"
-}
-```
-
-config.json sets up the vertx-mod-jersey module with the following settings:
-```json
-{
-    "host": "localhost",
-    "port": 8080,
-    "base_path": "/",
-    "resources": ["com.englishtown.vertx.jersey.examples.resources"],
-    "features": ["org.glassfish.jersey.jackson.JacksonFeature"]
-}
-```
+Add the jersey feature `org.glassfish.jersey.jackson.JacksonFeature` to enable Jackson serialization.

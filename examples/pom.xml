@@ -9,17 +9,18 @@
     <parent>
         <groupId>com.englishtown.vertx</groupId>
         <artifactId>vertx-jersey-parent</artifactId>
-        <version>4.0.0-RC2</version>
+        <version>4.0.0-RC3</version>
     </parent>
 
     <modules>
         <module>chunked</module>
         <module>filter</module>
-        <module>inject-securitycontext</module>
-        <module>inject-vertxrequesthandler</module>
-        <module>inject-vertx</module>
-        <module>jackson</module>
         <module>guice</module>
+        <module>inject-securitycontext</module>
+        <module>inject-vertx</module>
+        <module>inject-vertxrequestprocessor</module>
+        <module>jackson</module>
+        <module>maven-service</module>
         <module>when.java</module>
     </modules>
 
@@ -52,20 +53,31 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <!--<plugin>-->
-                <!--<groupId>org.apache.maven.plugins</groupId>-->
-                <!--<artifactId>maven-shade-plugin</artifactId>-->
-                <!--<configuration>-->
-                    <!--<transformers>-->
-                        <!--<transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">-->
-                            <!--<manifestEntries>-->
-                                <!--<Main-Verticle>java-hk2:com.englishtown.vertx.jersey.JerseyVerticle</Main-Verticle>-->
-                            <!--</manifestEntries>-->
-                        <!--</transformer>-->
-                    <!--</transformers>-->
-                <!--</configuration>-->
-            <!--</plugin>-->
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>fat-jar</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-shade-plugin</artifactId>
+                        <configuration>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+                                        <Main-Verticle>java-hk2:com.englishtown.vertx.jersey.JerseyVerticle
+                                        </Main-Verticle>
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

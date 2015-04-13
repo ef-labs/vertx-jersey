@@ -4,8 +4,8 @@ This sample shows running jersey inside vert.x using when.java promises and `Whe
 
 ## Run It
 
-1. Run from the command line `mvn vertx:runMod'
-2. Run from inside IDEA via the vert.x maven plugin vertx:runMod
+1. Run from the command line `java -jar target/vertx-jersey-examples-when.java-Version-fat.jar -conf src/test/resources/config.json'
+2. Run from inside IDEA creating a JAR Application build configuration with program arguments `-conf src/test/resources/config.json`
 
 
 Try the following url in your browser:
@@ -14,29 +14,4 @@ Try the following url in your browser:
 
 ## The Configuration
 
-mod.json instructs vert.x to include the vertx-mod-jersey and vertx-mod-when modules and to run `StartupVerticle`
-```json
-{
-    "main": "com.englishtown.vertx.jersey.examples.StartupVerticle",
-    "includes": "com.englishtown~vertx-mod-jersey~3.0.0,com.englishtown~vertx-mod-when~3.0.0"
-}
-```
-
-config.json sets up the vertx-mod-jersey module with the following settings:
-```json
-{
-    "hk2_binder": [
-        "com.englishtown.vertx.hk2.WhenHK2JerseyBinder",
-        "com.englishtown.vertx.promises.hk2.HK2WhenBinder"
-    ],
-
-    "jersey": {
-        "host": "localhost",
-        "port": 8080,
-        "base_path": "/",
-        "resources": ["com.englishtown.vertx.jersey.examples.resources"]
-    }
-}
-```
-
-Note the hk2 bindings for Jersey and when.java.
+The vertx-when jar is used to deploy a `JerseyServer`.  See the config.json file for binders and jersey configuration.

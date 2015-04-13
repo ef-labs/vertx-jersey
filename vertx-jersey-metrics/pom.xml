@@ -7,13 +7,8 @@
     <parent>
         <groupId>com.englishtown.vertx</groupId>
         <artifactId>vertx-jersey-parent</artifactId>
-        <version>4.0.0-RC2</version>
+        <version>4.0.0-RC3</version>
     </parent>
-
-    <properties>
-        <!--Dependency versions-->
-        <vertx.ext.metrics.version>2.0.0-SNAPSHOT</vertx.ext.metrics.version>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -23,7 +18,7 @@
         </dependency>
         <dependency>
             <groupId>io.vertx</groupId>
-            <artifactId>vertx-metrics</artifactId>
+            <artifactId>vertx-dropwizard-metrics</artifactId>
             <version>${vertx.version}</version>
         </dependency>
 
