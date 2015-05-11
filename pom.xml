@@ -5,7 +5,7 @@
 
     <artifactId>vertx-jersey-parent</artifactId>
     <packaging>pom</packaging>
-    <version>4.0.0-RC3</version>
+    <version>4.0.0-RC4</version>
 
     <parent>
         <groupId>com.englishtown.vertx</groupId>
@@ -21,14 +21,14 @@
 
     <properties>
         <!--Dependency versions-->
-        <vertx.version>3.0.0-milestone4</vertx.version>
+        <vertx.version>3.0.0-milestone5</vertx.version>
         <jersey.version>2.17</jersey.version>
         <jackson.version>2.4.3</jackson.version>
         <asm.version>3.3.1</asm.version>
 
-        <vertx.hk2.version>2.0.0-RC3</vertx.hk2.version>
-        <vertx.guice.version>2.0.0-RC3</vertx.guice.version>
-        <vertx.when.version>4.0.0-RC3</vertx.when.version>
+        <vertx.hk2.version>2.0.0-RC4</vertx.hk2.version>
+        <vertx.guice.version>2.0.0-RC4</vertx.guice.version>
+        <vertx.when.version>4.0.0-RC4</vertx.when.version>
         <hk2.guice.bridge.version>2.4.0-b10</hk2.guice.bridge.version>
         <guice.version>3.0</guice.version>
         <when.java.version>3.1.0</when.java.version>
