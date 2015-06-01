@@ -23,6 +23,7 @@ Version Matrix
 
 vert.x           | vertx-jersey
 ---------------- | ------------
+3.0.0-milestone6 | 4.0.0-RC5
 3.0.0-milestone5 | 4.0.0-RC4
 3.0.0-milestone4 | 4.0.0-RC3
 3.0.0-milestone3 | 4.0.0-RC2
