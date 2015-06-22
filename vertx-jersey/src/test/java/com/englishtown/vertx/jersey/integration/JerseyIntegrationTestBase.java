@@ -9,9 +9,6 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 

@@ -24,8 +24,8 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
@@ -36,13 +36,11 @@ import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.impl.LoggerFactory;
-import org.glassfish.hk2.api.ServiceLocator;
+import io.vertx.core.logging.LoggerFactory;
 import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.jersey.internal.MapPropertiesDelegate;
 import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.spi.RequestScopedInitializer;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;

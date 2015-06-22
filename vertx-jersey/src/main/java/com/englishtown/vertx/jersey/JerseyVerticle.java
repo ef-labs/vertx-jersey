@@ -28,7 +28,6 @@ import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * The Vertx Module to enable Jersey to handle JAX-RS resources

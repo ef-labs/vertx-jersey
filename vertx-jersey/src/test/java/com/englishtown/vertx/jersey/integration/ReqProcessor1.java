@@ -29,6 +29,6 @@ public class ReqProcessor1 implements VertxRequestProcessor {
      */
     @Override
     public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, final Handler<Void> done) {
-        vertx.runOnContext(aVoid -> done.handle(aVoid));
+        vertx.runOnContext(done::handle);
     }
 }

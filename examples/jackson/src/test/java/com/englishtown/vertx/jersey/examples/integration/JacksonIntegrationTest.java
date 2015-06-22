@@ -1,6 +1,5 @@
 package com.englishtown.vertx.jersey.examples.integration;
 
-import com.englishtown.promises.Promise;
 import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
 import com.englishtown.vertx.promises.RequestOptions;
 import io.vertx.core.buffer.Buffer;
@@ -56,7 +55,7 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
                 })
                 .setData(new JsonObject().put("name", "Andy").encode());
 
-        whenHttpClient.requestAbs(HttpMethod.POST, BASE_PATH , options)
+        whenHttpClient.requestAbs(HttpMethod.POST, BASE_PATH, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     return whenHttpClient.body(response);

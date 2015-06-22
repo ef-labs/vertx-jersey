@@ -4,23 +4,10 @@ import com.englishtown.promises.Promise;
 import com.englishtown.vertx.hk2.HK2VertxBinder;
 import com.englishtown.vertx.hk2.WhenHK2JerseyBinder;
 import com.englishtown.vertx.jersey.JerseyVerticle;
-import com.englishtown.vertx.promises.WhenHttpClient;
-import com.englishtown.vertx.promises.WhenVertx;
 import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.http.HttpClient;
-import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.json.JsonObject;
-import io.vertx.test.core.VertxTestBase;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Scanner;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Base class for jersey integration tests

@@ -33,7 +33,6 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
 
 /**
  * Default implementation of {@link WhenJerseyServer}

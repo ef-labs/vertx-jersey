@@ -39,6 +39,6 @@ public interface VertxPostResponseProcessor {
      * @param vertxResponse  the vert.x http server response
      * @param jerseyResponse the jersey container response
      */
-    public void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse);
+    void process(HttpServerResponse vertxResponse, ContainerResponse jerseyResponse);
 
 }

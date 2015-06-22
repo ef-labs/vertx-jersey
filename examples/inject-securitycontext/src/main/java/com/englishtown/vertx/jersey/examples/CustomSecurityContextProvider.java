@@ -32,13 +32,14 @@ public class CustomSecurityContextProvider implements VertxRequestProcessor {
     public void process(final HttpServerRequest vertxRequest, final ContainerRequest jerseyRequest, final Handler<Void> done) {
 
         vertx.runOnContext(aVoid -> {
+            Principal p = () -> "test";
             SecurityContext securityContext = new SecurityContext() {
                 /**
                  * {@inheritDoc}
                  */
                 @Override
                 public Principal getUserPrincipal() {
-                    return null;
+                    return p;
                 }
 
                 /**

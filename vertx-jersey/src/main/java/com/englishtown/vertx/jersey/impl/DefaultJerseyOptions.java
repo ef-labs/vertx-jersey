@@ -128,7 +128,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
     /**
      * Vert.x http server key store options
      *
-     * @return
+     * @return Java key store options
      */
     @Override
     public JksOptions getKeyStoreOptions() {

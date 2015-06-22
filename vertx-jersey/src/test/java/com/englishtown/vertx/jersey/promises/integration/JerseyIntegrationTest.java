@@ -25,11 +25,11 @@ package com.englishtown.vertx.jersey.promises.integration;
 
 import com.englishtown.promises.When;
 import com.englishtown.promises.WhenFactory;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
+import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
@@ -41,13 +41,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 import org.junit.Test;
 
-import javax.inject.Provider;
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 /**
  * Integration test for

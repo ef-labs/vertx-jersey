@@ -39,8 +39,6 @@ public interface ContainerResponseWriterProvider {
      * @param jerseyRequest the jersey request
      * @return the response writer
      */
-    public ContainerResponseWriter get(
-            HttpServerRequest vertxRequest,
-            ContainerRequest jerseyRequest);
+    ContainerResponseWriter get(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest);
 
 }
