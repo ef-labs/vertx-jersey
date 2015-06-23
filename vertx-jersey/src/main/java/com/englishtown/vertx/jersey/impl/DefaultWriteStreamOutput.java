@@ -4,7 +4,6 @@ import com.englishtown.vertx.jersey.WriteStreamOutput;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerResponse;
-import io.vertx.core.streams.WriteStream;
 
 /**
  * Default implementation of {@link com.englishtown.vertx.jersey.WriteStreamOutput}

@@ -31,7 +31,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.impl.LoggerFactory;
+import io.vertx.core.logging.LoggerFactory;
 import org.glassfish.jersey.server.ContainerException;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
@@ -278,9 +278,7 @@ public class VertxResponseWriter implements ContainerResponseWriter {
             return new VertxChunkedOutputStream(response);
         } else if (responseContext.hasEntity() && WriteStreamOutput.class.isAssignableFrom(responseContext.getEntityClass())) {
             WriteStreamOutput writeStreamOutput = (WriteStreamOutput) responseContext.getEntity();
-            writeStreamOutput.init(response, event -> {
-                end();
-            });
+            writeStreamOutput.init(response, event -> end());
             isWriteStream = true;
             return new NOPOutputStream();
         } else {

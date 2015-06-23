@@ -39,6 +39,6 @@ public interface VertxRequestProcessor {
      * @param jerseyRequest the jersey container request
      * @param done          the done async callback handler
      */
-    public void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done);
+    void process(HttpServerRequest vertxRequest, ContainerRequest jerseyRequest, Handler<Void> done);
 
 }

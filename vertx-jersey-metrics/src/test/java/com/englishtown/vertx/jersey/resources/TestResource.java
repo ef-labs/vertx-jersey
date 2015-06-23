@@ -42,9 +42,7 @@ public class TestResource {
     @GET
     public void getString(@Context Vertx vertx, @Suspended final AsyncResponse asyncResponse) {
 
-        vertx.setTimer(100, event -> {
-            asyncResponse.resume("OK");
-        });
+        vertx.setTimer(100, event -> asyncResponse.resume("OK"));
 
     }
 

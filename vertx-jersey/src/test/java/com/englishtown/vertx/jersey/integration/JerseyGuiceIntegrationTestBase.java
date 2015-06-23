@@ -3,15 +3,10 @@ package com.englishtown.vertx.jersey.integration;
 import com.englishtown.promises.Promise;
 import com.englishtown.vertx.guice.GuiceVertxBinder;
 import com.englishtown.vertx.guice.WhenGuiceJerseyBinder;
-import com.englishtown.vertx.hk2.HK2VertxBinder;
-import com.englishtown.vertx.hk2.WhenHK2JerseyBinder;
 import com.englishtown.vertx.jersey.JerseyVerticle;
 import com.englishtown.vertx.promises.guice.GuiceWhenBinder;
-import com.englishtown.vertx.promises.hk2.HK2WhenBinder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.glassfish.hk2.api.ServiceLocatorFactory;
-import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 
 /**
  * Base class for jersey integration tests

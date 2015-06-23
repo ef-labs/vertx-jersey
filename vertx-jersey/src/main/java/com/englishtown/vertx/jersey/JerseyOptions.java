@@ -74,7 +74,7 @@ public interface JerseyOptions {
     /**
      * Vert.x http server key store options
      *
-     * @return
+     * @return Java key store options
      */
     JksOptions getKeyStoreOptions();
 
