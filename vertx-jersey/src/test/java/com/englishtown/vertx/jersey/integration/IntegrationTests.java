@@ -106,6 +106,32 @@ public class IntegrationTests extends JerseyHK2IntegrationTestBase {
     }
 
     @Test
+    public void test_postJsonArray() throws Exception {
+
+        HttpClientRequest request = httpClient.request(HttpMethod.POST, port, host, "/rest/test/jsonarray", response -> {
+            verifyResponse(response, 200, MediaType.APPLICATION_JSON, "[\"async response\"]");
+        });
+
+        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        request.end("[\"post\"]");
+        await();
+
+    }
+
+    @Test
+    public void test_postJsonObject() throws Exception {
+
+        HttpClientRequest request = httpClient.request(HttpMethod.POST, port, host, "/rest/test/jsonobject", response -> {
+            verifyResponse(response, 200, MediaType.APPLICATION_JSON, "{\"name\":\"async response\"}");
+        });
+
+        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+        request.end("{\"name\":\"post\"}");
+        await();
+
+    }
+
+    @Test
     public void test_getChunked() throws Exception {
 
         HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/chunked", response -> {
