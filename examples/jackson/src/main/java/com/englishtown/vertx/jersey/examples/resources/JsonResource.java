@@ -1,6 +1,9 @@
 package com.englishtown.vertx.jersey.examples.resources;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.glassfish.jersey.server.JSONP;
 
 import javax.ws.rs.*;
@@ -37,6 +40,22 @@ public class JsonResource {
         return in;
     }
 
+    @POST
+    @Path("json_object")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObjectWrapper postJsonObject(JsonObjectWrapper in) {
+        return in;
+    }
+
+    @POST
+    @Path("json_array")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonArrayWrapper postJsonArray(JsonArrayWrapper in) {
+        return in;
+    }
+
     @GET
     @Path("async")
     @Produces(MediaType.APPLICATION_JSON)
@@ -58,6 +77,32 @@ public class JsonResource {
 
         public void setName(String name) {
             this.name = name;
+        }
+    }
+
+    public static class JsonObjectWrapper {
+
+        private JsonObject metadata;
+
+        public JsonObject getMetadata() {
+            return metadata;
+        }
+
+        public void setMetadata(JsonObject metadata) {
+            this.metadata = metadata;
+        }
+    }
+
+    public static class JsonArrayWrapper {
+
+        private JsonArray groupIds;
+
+        public JsonArray getGroupIds() {
+            return groupIds;
+        }
+
+        public void setGroupIds(JsonArray groupIds) {
+            this.groupIds = groupIds;
         }
     }
 

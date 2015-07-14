@@ -32,7 +32,9 @@ import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
-import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
+import com.englishtown.vertx.jersey.inject.impl.*;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.glassfish.hk2.api.Factory;
 import org.glassfish.hk2.api.IterableProvider;
 import org.glassfish.hk2.api.TypeLiteral;
@@ -40,6 +42,7 @@ import org.glassfish.hk2.utilities.binding.AbstractBinder;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -142,6 +145,14 @@ public class HK2JerseyBinder extends AbstractBinder {
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyOptions.class).to(JerseyOptions.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
+        bind(JsonArrayReader.class).to(new TypeLiteral<MessageBodyReader<JsonArray>>() {
+        });
+        bind(JsonArrayWriter.class).to(new TypeLiteral<MessageBodyWriter<JsonArray>>() {
+        });
+        bind(JsonObjectReader.class).to(new TypeLiteral<MessageBodyReader<JsonObject>>() {
+        });
+        bind(JsonObjectWriter.class).to(new TypeLiteral<MessageBodyWriter<JsonObject>>() {
+        });
         bind(WriteStreamBodyWriter.class).to(MessageBodyWriter.class).in(Singleton.class);
 
         bindFactory(VertxRequestProcessorFactory.class).to(new TypeLiteral<List<VertxRequestProcessor>>() {

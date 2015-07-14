@@ -17,6 +17,7 @@
         <module>vertx-jersey</module>
         <module>vertx-jersey-metrics</module>
         <module>examples</module>
+        <module>vertx-jersey-jackson</module>
     </modules>
 
     <properties>

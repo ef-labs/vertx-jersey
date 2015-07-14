@@ -25,6 +25,8 @@ package com.englishtown.vertx.jersey.resources;
 
 import com.englishtown.vertx.jersey.integration.MyObject;
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.json.JsonObject;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.glassfish.jersey.server.JSONP;
 
@@ -87,6 +89,46 @@ public class TestResource {
             obj2.setName("async response");
             response.resume(obj2);
         });
+    }
+
+    @POST
+    @Path("jsonarray")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void postJsonArray(
+            final JsonArray jsonArr,
+            @Suspended final AsyncResponse response,
+            @Context Vertx vertx) {
+
+        vertx.runOnContext((aVoid) -> {
+            if (jsonArr == null) {
+                throw new RuntimeException();
+            }
+            JsonArray jsonArr2 = new JsonArray();
+            jsonArr2.add("async response");
+            response.resume(jsonArr2);
+        });
+
+    }
+
+    @POST
+    @Path("jsonobject")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public void postJsonObject(
+            final JsonObject jsonObj,
+            @Suspended final AsyncResponse response,
+            @Context Vertx vertx) {
+
+        vertx.runOnContext((aVoid) -> {
+            if (jsonObj == null) {
+                throw new RuntimeException();
+            }
+            JsonObject jsonObj2 = new JsonObject();
+            jsonObj2.put("name", "async response");
+            response.resume(jsonObj2);
+        });
+
     }
 
     @GET
