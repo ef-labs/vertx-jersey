@@ -22,6 +22,7 @@
         <module>jackson</module>
         <module>maven-service</module>
         <module>when.java</module>
+        <module>swagger</module>
     </modules>
 
     <dependencies>
