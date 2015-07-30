@@ -51,6 +51,7 @@ public class JerseyVerticle extends AbstractVerticle {
         this.start();
 
         JsonObject config = getVertx().getOrCreateContext().config();
+        config = config.getJsonObject("jersey", config);
         options.init(config, getVertx());
 
         jerseyServer.init(options, ar -> {
