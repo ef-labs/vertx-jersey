@@ -5,6 +5,7 @@ import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 
+import javax.inject.Inject;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -13,11 +14,22 @@ import javax.ws.rs.core.FeatureContext;
  */
 public class SwaggerFeature implements Feature {
 
+    private final SwaggerFeatureConfig config;
+
+    @Inject
+    public SwaggerFeature(SwaggerFeatureConfig config) {
+        this.config = config;
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public boolean configure(FeatureContext context) {
+
+        if (config != null && !config.enabled()) {
+            return false;
+        }
 
         if (!context.getConfiguration().isRegistered(ApiListingResource.class)) {
             context.register(ApiListingResource.class);

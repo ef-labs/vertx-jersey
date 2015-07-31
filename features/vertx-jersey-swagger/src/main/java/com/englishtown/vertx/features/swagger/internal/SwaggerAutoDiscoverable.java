@@ -1,6 +1,7 @@
 package com.englishtown.vertx.features.swagger.internal;
 
 import com.englishtown.vertx.features.swagger.SwaggerFeature;
+import com.englishtown.vertx.features.swagger.SwaggerFeatureConfig;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.spi.AutoDiscoverable;
 
@@ -36,7 +37,9 @@ public class SwaggerAutoDiscoverable implements AutoDiscoverable {
          */
         @Override
         protected void configure() {
-            bind(SwaggerServletContext.class).to(ServletContext.class).in(Singleton.class);
+            // Use a static instance since ApiListingResource has a static initialized flag (sigh)
+            bind(SwaggerServletContext.INSTANCE).to(ServletContext.class);
+            bind(JsonSwaggerFeatureConfig.class).to(SwaggerFeatureConfig.class).in(Singleton.class);
         }
 
     }
