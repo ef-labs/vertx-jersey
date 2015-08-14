@@ -1,4 +1,4 @@
-package com.englishtown.vertx.features.swagger.internal;
+package com.englishtown.vertx.jersey.features.swagger.internal;
 
 import javax.servlet.*;
 import javax.servlet.descriptor.JspConfigDescriptor;
@@ -114,6 +114,7 @@ class SwaggerServletContext implements ServletContext {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public Servlet getServlet(String name) throws ServletException {
         return null;
     }
@@ -122,6 +123,7 @@ class SwaggerServletContext implements ServletContext {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public Enumeration<Servlet> getServlets() {
         return null;
     }
@@ -130,6 +132,7 @@ class SwaggerServletContext implements ServletContext {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public Enumeration<String> getServletNames() {
         return null;
     }
@@ -146,6 +149,7 @@ class SwaggerServletContext implements ServletContext {
      * {@inheritDoc}
      */
     @Override
+    @Deprecated
     public void log(Exception exception, String msg) {
 
     }

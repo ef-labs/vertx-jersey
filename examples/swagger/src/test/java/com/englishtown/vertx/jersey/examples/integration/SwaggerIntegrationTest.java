@@ -2,13 +2,11 @@ package com.englishtown.vertx.jersey.examples.integration;
 
 import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
 import com.englishtown.vertx.promises.RequestOptions;
-import io.swagger.jaxrs.listing.ApiListingResource;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.util.function.Consumer;
 
 public class SwaggerIntegrationTest extends JerseyHK2IntegrationTestBase {

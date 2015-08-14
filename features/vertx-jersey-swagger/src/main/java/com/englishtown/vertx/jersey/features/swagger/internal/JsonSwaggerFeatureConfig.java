@@ -1,6 +1,6 @@
-package com.englishtown.vertx.features.swagger.internal;
+package com.englishtown.vertx.jersey.features.swagger.internal;
 
-import com.englishtown.vertx.features.swagger.SwaggerFeatureConfig;
+import com.englishtown.vertx.jersey.features.swagger.SwaggerFeatureConfig;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 

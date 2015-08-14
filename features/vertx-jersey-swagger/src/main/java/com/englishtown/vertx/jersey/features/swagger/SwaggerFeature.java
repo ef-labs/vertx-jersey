@@ -1,4 +1,4 @@
-package com.englishtown.vertx.features.swagger;
+package com.englishtown.vertx.jersey.features.swagger;
 
 import io.swagger.config.ScannerFactory;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;

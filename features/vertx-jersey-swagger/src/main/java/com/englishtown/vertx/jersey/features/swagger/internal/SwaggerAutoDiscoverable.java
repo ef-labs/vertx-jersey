@@ -1,7 +1,7 @@
-package com.englishtown.vertx.features.swagger.internal;
+package com.englishtown.vertx.jersey.features.swagger.internal;
 
-import com.englishtown.vertx.features.swagger.SwaggerFeature;
-import com.englishtown.vertx.features.swagger.SwaggerFeatureConfig;
+import com.englishtown.vertx.jersey.features.swagger.SwaggerFeature;
+import com.englishtown.vertx.jersey.features.swagger.SwaggerFeatureConfig;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.spi.AutoDiscoverable;
 

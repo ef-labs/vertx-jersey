@@ -12,9 +12,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.version}</version>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-jersey-jackson</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
