@@ -12,12 +12,7 @@ import java.util.*;
  */
 class SwaggerServletContext implements ServletContext {
 
-    public static SwaggerServletContext INSTANCE = new SwaggerServletContext();
-
     private final Map<String, Object> attributes = new HashMap<>();
-
-    private SwaggerServletContext() {
-    }
 
     /**
      * {@inheritDoc}

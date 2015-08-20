@@ -14,7 +14,7 @@
     </parent>
 
     <properties>
-        <swagger.version>1.5.0</swagger.version>
+        <swagger.version>1.5.3</swagger.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
     </properties>
 
