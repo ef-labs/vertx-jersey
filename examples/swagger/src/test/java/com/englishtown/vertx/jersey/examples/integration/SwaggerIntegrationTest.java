@@ -15,17 +15,6 @@ public class SwaggerIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private String BASE_PATH = "http://localhost:8080/";
 
-    @Override
-    public void setUp() throws Exception {
-
-        // Reset static initialized flag
-        Field initialized = ApiListingResource.class.getDeclaredField("initialized");
-        initialized.setAccessible(true);
-        initialized.set(null, false);
-
-        super.setUp();
-    }
-
     @Test
     public void testSwaggerJson() throws Exception {
 

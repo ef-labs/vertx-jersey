@@ -37,8 +37,7 @@ public class SwaggerAutoDiscoverable implements AutoDiscoverable {
          */
         @Override
         protected void configure() {
-            // Use a static instance since ApiListingResource has a static initialized flag (sigh)
-            bind(SwaggerServletContext.INSTANCE).to(ServletContext.class);
+            bind(SwaggerServletContext.class).to(ServletContext.class).in(Singleton.class);
             bind(JsonSwaggerFeatureConfig.class).to(SwaggerFeatureConfig.class).in(Singleton.class);
         }
 
