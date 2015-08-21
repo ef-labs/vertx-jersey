@@ -50,6 +50,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
     final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     final static String CONFIG_BACKLOG_SIZE = "backlog_size";
     final static String CONFIG_RESOURCE_CONFIG = "resource_config";
+    final static String CONFIG_COMPRESSION_SUPPORTED = "compression_supported";
 
     public static final String CONFIG_BASE_PATH = "base_path";
     public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
@@ -193,6 +194,17 @@ public class DefaultJerseyOptions implements JerseyOptions {
     public int getMaxBodySize() {
         checkState();
         return config.getInteger(CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE);
+    }
+
+    /**
+     * Gets whether the server supports compression (defaults to false)
+     *
+     * @return whether compression is supported
+     */
+    @Override
+    public boolean getCompressionSupported() {
+        checkState();
+        return config.getBoolean(CONFIG_COMPRESSION_SUPPORTED, false);
     }
 
     protected ResourceConfig getResourceConfig() {

@@ -113,4 +113,11 @@ public interface JerseyOptions {
      */
     int getMaxBodySize();
 
+    /**
+     * Gets whether the server supports compression (defaults to false)
+     *
+     * @return whether compression is supported
+     */
+    boolean getCompressionSupported();
+
 }

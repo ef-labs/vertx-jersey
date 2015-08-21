@@ -62,7 +62,8 @@ public class DefaultJerseyServer implements JerseyServer {
         HttpServerOptions serverOptions = new HttpServerOptions()
                 .setHost(options.getHost())
                 .setPort(options.getPort())
-                .setAcceptBacklog(options.getAcceptBacklog()); // Performance tweak
+                .setAcceptBacklog(options.getAcceptBacklog()) // Performance tweak
+                .setCompressionSupported(options.getCompressionSupported());
 
         // Enable https
         if (options.getSSL()) {

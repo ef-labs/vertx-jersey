@@ -121,12 +121,14 @@ public class DefaultJerseyServerTest {
         int port = 8888;
         int bufferSize = 1024;
         boolean ssl = true;
+        boolean compressionSupported = true;
 
         when(options.getHost()).thenReturn(host);
         when(options.getPort()).thenReturn(port);
         when(options.getReceiveBufferSize()).thenReturn(bufferSize);
         when(options.getVertx()).thenReturn(vertx);
         when(options.getSSL()).thenReturn(ssl);
+        when(options.getCompressionSupported()).thenReturn(compressionSupported);
 
         jerseyServer.init(options);
         verifyResults(port, host);
@@ -139,6 +141,7 @@ public class DefaultJerseyServerTest {
         assertEquals(port, options.getPort());
         assertEquals(bufferSize, options.getReceiveBufferSize());
         assertEquals(ssl, options.isSsl());
+        assertEquals(compressionSupported, options.isCompressionSupported());
 
     }
 
