@@ -32,8 +32,8 @@ public class SwaggerFeature implements Feature {
         }
 
         if (!context.getConfiguration().isRegistered(ApiListingResource.class)) {
-            context.register(ApiListingResource.class);
-            context.register(SwaggerSerializers.class);
+            context.register(new ApiListingResource());
+            context.register(new SwaggerSerializers());
         }
 
         if (ScannerFactory.getScanner() == null) {
