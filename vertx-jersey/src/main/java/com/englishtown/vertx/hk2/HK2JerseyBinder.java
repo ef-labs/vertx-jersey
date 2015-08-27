@@ -23,10 +23,7 @@
 
 package com.englishtown.vertx.hk2;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
-import com.englishtown.vertx.jersey.JerseyOptions;
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.*;
 import com.englishtown.vertx.jersey.impl.*;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
@@ -137,7 +134,7 @@ public class HK2JerseyBinder extends AbstractBinder {
     @Override
     protected void configure() {
 
-        bind(DefaultApplicationHandlerDelegate.class).to(ApplicationHandlerDelegate.class);
+        bind(DefaultVertxContainer.class).to(VertxContainer.class);
         bind(DefaultJerseyServer.class).to(JerseyServer.class);
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
         bind(DefaultJerseyOptions.class).to(JerseyOptions.class);

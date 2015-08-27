@@ -26,6 +26,7 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
@@ -58,7 +59,7 @@ import java.util.Map;
  */
 public class DefaultJerseyHandler implements JerseyHandler {
 
-    private ApplicationHandlerDelegate applicationHandlerDelegate;
+    private VertxContainer container;
     private URI baseUri;
     private int maxBodySize;
 
@@ -74,11 +75,21 @@ public class DefaultJerseyHandler implements JerseyHandler {
         this.requestProcessors = requestProcessors;
     }
 
+    /**
+     * @param options
+     * @deprecated Use overload with {@link VertxContainer} instead.
+     */
+    @Deprecated
     @Override
     public void init(JerseyOptions options) {
-        baseUri = options.getBaseUri();
-        maxBodySize = options.getMaxBodySize();
-        applicationHandlerDelegate = options.getApplicationHandler();
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void init(VertxContainer container) {
+        this.container = container;
+        baseUri = container.getOptions().getBaseUri();
+        maxBodySize = container.getOptions().getMaxBodySize();
 
         logger.debug("DefaultJerseyHandler - initialized");
     }
@@ -93,7 +104,12 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     @Override
     public ApplicationHandlerDelegate getDelegate() {
-        return applicationHandlerDelegate;
+        return container.getApplicationHandlerDelegate();
+    }
+
+    @Override
+    public VertxContainer getContainer() {
+        return container;
     }
 
     /**
@@ -241,10 +257,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 if (inputStream == null) {
                     vertxRequest.resume();
                 }
-                applicationHandlerDelegate.handle(jerseyRequest);
+                getDelegate().handle(jerseyRequest);
             });
         } else {
-            applicationHandlerDelegate.handle(jerseyRequest);
+            getDelegate().handle(jerseyRequest);
         }
 
     }
