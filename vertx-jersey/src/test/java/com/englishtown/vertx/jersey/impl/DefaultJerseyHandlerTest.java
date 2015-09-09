@@ -29,6 +29,7 @@ import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import io.netty.handler.codec.http.DefaultHttpHeaders;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -187,6 +188,33 @@ public class DefaultJerseyHandlerTest {
         endHandlerCaptor.getValue().handle(null);
 
         verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
+    }
+
+    @Test
+    public void testHandle_RequestProcessors_Throw() throws Exception {
+
+        when(request.headers()).thenReturn(mock(MultiMap.class));
+        when(request.method()).thenReturn(HttpMethod.GET);
+        InputStream inputStream = null;
+
+        VertxRequestProcessor rp1 = mock(VertxRequestProcessor.class);
+        VertxRequestProcessor rp2 = mock(VertxRequestProcessor.class);
+
+        when(response.setStatusCode(anyInt())).thenReturn(response);
+        doThrow(RuntimeException.class).when(rp2).process(any(), any(), any());
+
+        requestProcessors.add(rp1);
+        requestProcessors.add(rp2);
+
+        jerseyHandler.init(container);
+        jerseyHandler.handle(request, inputStream);
+
+        verify(rp1).process(any(), any(), endHandlerCaptor.capture());
+        endHandlerCaptor.getValue().handle(null);
+
+        verify(rp2).process(any(), any(), any());
+        verify(response).setStatusCode(eq(HttpResponseStatus.INTERNAL_SERVER_ERROR.code()));
+        verify(response).end();
     }
 
     @Test

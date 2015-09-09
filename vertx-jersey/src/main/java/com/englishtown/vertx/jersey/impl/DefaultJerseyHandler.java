@@ -30,6 +30,7 @@ import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -279,13 +280,21 @@ public class DefaultJerseyHandler implements JerseyHandler {
         VertxRequestProcessor processor = requestProcessors.get(index);
         final int next = index + 1;
 
-        processor.process(vertxRequest, jerseyRequest, aVoid -> {
-            if (next >= requestProcessors.size()) {
-                done.handle(null);
-            } else {
-                callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
-            }
-        });
+        try {
+            processor.process(vertxRequest, jerseyRequest, aVoid -> {
+                if (next >= requestProcessors.size()) {
+                    done.handle(null);
+                } else {
+                    callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
+                }
+            });
+
+        } catch (Throwable t) {
+            logger.error("VertxRequestProcessor " + processor.getClass().getSimpleName() + " threw exception: " + t.getMessage(), t);
+            vertxRequest.response()
+                    .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
+                    .end();
+        }
 
     }
 
