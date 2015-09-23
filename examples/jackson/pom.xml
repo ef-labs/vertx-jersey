@@ -7,14 +7,14 @@
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.0.0</version>
+        <version>4.1.0</version>
     </parent>
 
     <dependencies>
         <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.version}</version>
+            <groupId>com.englishtown.vertx</groupId>
+            <artifactId>vertx-jersey-jackson</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>

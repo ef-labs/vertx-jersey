@@ -84,6 +84,7 @@ The vertx-jersey configuration is as follows:
     "host": "<host>",
     "port": <port>,
     "ssl": <ssl>,
+    "compression_supported": <compression_supported>,
     "jks_options": <jks_options>,
     "receive_buffer_size": <receive_buffer_size>,
     "max_body_size": <max_body_size>,
@@ -99,8 +100,9 @@ The vertx-jersey configuration is as follows:
 * `host` - The host or ip address to listen at for connections. `0.0.0.0` means listen at all available addresses.
 Default is `0.0.0.0`
 * `port` -  The port to listen at for connections. Default is `80`.
-* `ssl`. Should the server use `https` as a protocol? Default is `false`.
-* `jks_options`. A JSON object to create the io.vertx.core.net.JksOptions. Only used if `ssl` is `true`.
+* `ssl` - Should the server use `https` as a protocol? Default is `false`.
+* `compression_supported` - A boolean whether the server supports compression. Default is `false`.
+* `jks_options` - A JSON object to create the io.vertx.core.net.JksOptions. Only used if `ssl` is `true`.
 * `receive_buffer_size` - The int receive buffer size.  The value is optional.
 * `max_body_size` - The int max body size allowed.  The default value is 1MB.
 * `base_path` - The base path jersey responds to.  Default is `/`.

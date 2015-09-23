@@ -80,7 +80,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer(config)
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(options).init(eq(config), eq(vertx));
+        verify(options).init(eq(config));
         verify(server).init(eq(options), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
@@ -96,7 +96,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer(config)
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(options).init(eq(config), eq(vertx));
+        verify(options).init(eq(config));
         verify(server).init(eq(options), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);

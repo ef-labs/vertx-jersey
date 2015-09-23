@@ -28,9 +28,11 @@ import com.englishtown.promises.WhenFactory;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
+import com.englishtown.vertx.jersey.impl.DefaultVertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import com.englishtown.vertx.jersey.promises.impl.DefaultWhenJerseyServer;
@@ -78,9 +80,10 @@ public class JerseyIntegrationTest extends VertxTestBase {
                 new ArrayList<>(),
                 new ArrayList<>());
 
+        VertxContainer container = new DefaultVertxContainer(vertx, null);
         JerseyHandler handler = new DefaultJerseyHandler(provider, new ArrayList<>());
-        JerseyServer server = new DefaultJerseyServer(handler);
-        JerseyOptions options = new DefaultJerseyOptions(null);
+        JerseyServer server = new DefaultJerseyServer(handler, container);
+        JerseyOptions options = new DefaultJerseyOptions();
         When when = WhenFactory.createSync();
 
         DefaultWhenJerseyServer whenJerseyServer = new DefaultWhenJerseyServer(vertx, server, options, when);

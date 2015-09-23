@@ -32,15 +32,25 @@ import java.net.URI;
  * The vert.x jersey http handler
  */
 public interface JerseyHandler extends Handler<HttpServerRequest> {
+
     /**
-     * Initialize the handler with vertx and container instances
-     *
-     * @param options contains configuration details
+     * @param options
+     * @deprecated Use overload with {@link VertxContainer} instead.
      */
+    @Deprecated
     void init(JerseyOptions options);
+
+    /**
+     * Initialize the handler with the container instances
+     *
+     * @param container contains configuration details
+     */
+    void init(VertxContainer container);
 
     URI getBaseUri();
 
     ApplicationHandlerDelegate getDelegate();
+
+    VertxContainer getContainer();
 
 }

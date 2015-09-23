@@ -1,0 +1,10 @@
+{
+    "jersey": {
+        "host": "localhost",
+        "port": 8080,
+        "base_path": "/",
+        "resources": [
+            "com.englishtown.vertx.jersey.examples.resources"
+        ]
+    }
+}

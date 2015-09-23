@@ -29,6 +29,9 @@ import io.vertx.core.net.JksOptions;
 import org.glassfish.jersey.server.ApplicationHandler;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Provides configuration for a {@link JerseyHandler}
@@ -36,19 +39,49 @@ import java.net.URI;
 public interface JerseyOptions {
 
     /**
+     * @param config
+     * @param vertx
+     * @deprecated use overload with just {@link JsonObject}
+     */
+    @Deprecated
+    default void init(JsonObject config, Vertx vertx) {
+        init(config);
+    }
+
+    /**
      * Initializes the jersey options
      *
      * @param config the underlying configuration settings
-     * @param vertx  the vertx instance
      */
-    void init(JsonObject config, Vertx vertx);
+    void init(JsonObject config);
 
     /**
-     * Returns the current vertx instance
+     * Returns a list of packages to be scanned for resources and components
      *
-     * @return the {@link Vertx} instance
+     * @return
      */
-    Vertx getVertx();
+    List<String> getPackages();
+
+    /**
+     * Optional additional properties to be applied to Jersey resource configuration
+     *
+     * @return
+     */
+    Map<String, Object> getProperties();
+
+    /**
+     * Optional list of components to be registered (features etc.)
+     *
+     * @return
+     */
+    Set<Class<?>> getComponents();
+
+    /**
+     * Optional list of singleton instances to be registered (hk2 binders etc.)
+     *
+     * @return
+     */
+    Set<Object> getInstances();
 
     /**
      * The http web server host
@@ -103,7 +136,9 @@ public interface JerseyOptions {
      * Returns the Jersey {@link ApplicationHandler} instance
      *
      * @return the application handler instance
+     * @deprecated
      */
+    @Deprecated
     ApplicationHandlerDelegate getApplicationHandler();
 
     /**
@@ -112,5 +147,12 @@ public interface JerseyOptions {
      * @return the max body size bytes
      */
     int getMaxBodySize();
+
+    /**
+     * Gets whether the server supports compression (defaults to false)
+     *
+     * @return whether compression is supported
+     */
+    boolean getCompressionSupported();
 
 }

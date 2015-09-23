@@ -117,6 +117,34 @@ public class VertxResponseWriterTest {
     }
 
     @Test
+    public void testWriteResponse_Throw() throws Exception {
+
+        ContainerResponse cr = mock(ContainerResponse.class);
+        MultivaluedMap<String, String> headers = new MultivaluedHashMap<>();
+        when(cr.getStatusInfo()).thenReturn(mock(Response.StatusType.class));
+        when(cr.getStringHeaders()).thenReturn(headers);
+
+        VertxResponseProcessor processor1 = mock(VertxResponseProcessor.class);
+        VertxResponseProcessor processor2 = mock(VertxResponseProcessor.class);
+        responseProcessors.add(processor1);
+        responseProcessors.add(processor2);
+
+        headers.add("x-test", "custom header");
+        OutputStream outputStream = writer.writeResponseStatusAndHeaders(15, cr);
+
+        assertNotNull(outputStream);
+        verify(response, times(1)).setStatusCode(anyInt());
+        verify(response, times(1)).setStatusMessage(anyString());
+        verify(response, times(2)).putHeader(anyString(), anyString());
+        verify(processor1).process(eq(response), eq(cr));
+        verify(processor2).process(eq(response), eq(cr));
+
+        writer.writeResponseStatusAndHeaders(-1, cr);
+        verify(response, times(3)).putHeader(anyString(), anyString());
+
+    }
+
+    @Test
     public void testWrite() throws Exception {
 
         ContainerResponse cr = mock(ContainerResponse.class);

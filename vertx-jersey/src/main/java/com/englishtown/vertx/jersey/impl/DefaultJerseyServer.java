@@ -26,6 +26,7 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.VertxContainer;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
@@ -44,25 +45,27 @@ public class DefaultJerseyServer implements JerseyServer {
     private static final Logger logger = LoggerFactory.getLogger(DefaultJerseyServer.class);
 
     private JerseyHandler jerseyHandler;
+    private VertxContainer container;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
-    public DefaultJerseyServer(JerseyHandler jerseyHandler) {
+    public DefaultJerseyServer(JerseyHandler jerseyHandler, VertxContainer container) {
         this.jerseyHandler = jerseyHandler;
+        this.container = container;
     }
 
     @Override
     public void init(
-            final JerseyOptions options,
-            final Handler<AsyncResult<HttpServer>> doneHandler) {
-
+            JerseyOptions options,
+            Handler<AsyncResult<HttpServer>> doneHandler) {
 
         // Setup the http server options
         HttpServerOptions serverOptions = new HttpServerOptions()
                 .setHost(options.getHost())
                 .setPort(options.getPort())
-                .setAcceptBacklog(options.getAcceptBacklog()); // Performance tweak
+                .setAcceptBacklog(options.getAcceptBacklog()) // Performance tweak
+                .setCompressionSupported(options.getCompressionSupported());
 
         // Enable https
         if (options.getSSL()) {
@@ -79,10 +82,11 @@ public class DefaultJerseyServer implements JerseyServer {
         }
 
         // Create the http server
-        server = options.getVertx().createHttpServer(serverOptions);
+        server = container.getVertx().createHttpServer(serverOptions);
 
-        // Init jersey handler
-        jerseyHandler.init(options);
+        // Init container and handler
+        container.init(options);
+        jerseyHandler.init(container);
 
         // Set request handler for the baseUri
         server.requestHandler(jerseyHandler::handle);
@@ -142,6 +146,11 @@ public class DefaultJerseyServer implements JerseyServer {
      */
     @Override
     public void close() {
+        // Run jersey shutdown lifecycle
+        if (container != null) {
+            container.getApplicationHandler().onShutdown(container);
+            container = null;
+        }
         // Destroy the jersey service locator
         if (jerseyHandler != null && jerseyHandler.getDelegate() != null) {
             ServiceLocatorFactory.getInstance().destroy(jerseyHandler.getDelegate().getServiceLocator());

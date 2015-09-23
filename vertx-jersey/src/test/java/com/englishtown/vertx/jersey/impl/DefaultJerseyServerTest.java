@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.VertxContainer;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -70,6 +71,8 @@ public class DefaultJerseyServerTest {
     @Mock
     JerseyOptions options;
     @Mock
+    VertxContainer container;
+    @Mock
     Handler<HttpServer> setupHandler;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
@@ -82,17 +85,17 @@ public class DefaultJerseyServerTest {
     public void setUp() {
 
         when(vertx.createHttpServer(any(HttpServerOptions.class))).thenReturn(httpServer);
-        when(options.getVertx()).thenReturn(vertx);
+        when(container.getVertx()).thenReturn(vertx);
 
         when(jerseyHandler.getBaseUri()).thenReturn(baseUri);
-        jerseyServer = new DefaultJerseyServer(jerseyHandler);
+        jerseyServer = new DefaultJerseyServer(jerseyHandler, container);
 
     }
 
     private void verifyResults(int port, String host) {
 
         verify(vertx).createHttpServer(optionsCaptor.capture());
-        verify(jerseyHandler).init(any(JerseyOptions.class));
+        verify(jerseyHandler).init(any(VertxContainer.class));
 
         verify(httpServer).requestHandler(requestHandlerCaptor.capture());
         Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
@@ -121,12 +124,14 @@ public class DefaultJerseyServerTest {
         int port = 8888;
         int bufferSize = 1024;
         boolean ssl = true;
+        boolean compressionSupported = true;
 
+        when(container.getVertx()).thenReturn(vertx);
         when(options.getHost()).thenReturn(host);
         when(options.getPort()).thenReturn(port);
         when(options.getReceiveBufferSize()).thenReturn(bufferSize);
-        when(options.getVertx()).thenReturn(vertx);
         when(options.getSSL()).thenReturn(ssl);
+        when(options.getCompressionSupported()).thenReturn(compressionSupported);
 
         jerseyServer.init(options);
         verifyResults(port, host);
@@ -139,6 +144,7 @@ public class DefaultJerseyServerTest {
         assertEquals(port, options.getPort());
         assertEquals(bufferSize, options.getReceiveBufferSize());
         assertEquals(ssl, options.isSsl());
+        assertEquals(compressionSupported, options.isCompressionSupported());
 
     }
 

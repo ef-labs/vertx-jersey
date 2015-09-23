@@ -1,0 +1,10 @@
+{
+    "hk2_binder": "com.englishtown.vertx.jersey.integration.IntegrationBinder",
+    "host": "0.0.0.0",
+    "port": 8080,
+    "base_path": "/",
+    "resources": ["com.englishtown.vertx.jersey.features.jackson.integration"],
+    "jackson": {
+        "property_naming_strategy": "LowerCaseWithUnderscoresStrategy"
+    }
+}

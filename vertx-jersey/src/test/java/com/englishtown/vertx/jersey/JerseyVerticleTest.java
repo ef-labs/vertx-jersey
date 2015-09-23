@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.json.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,6 +44,7 @@ import static org.mockito.Mockito.*;
 public class JerseyVerticleTest {
 
     JerseyVerticle jerseyVerticle;
+    JsonObject config = new JsonObject();
 
     @Mock
     Vertx vertx;
@@ -62,6 +64,7 @@ public class JerseyVerticleTest {
     @Before
     public void setUp() {
         when(vertx.getOrCreateContext()).thenReturn(context);
+        when(context.config()).thenReturn(config);
         jerseyVerticle = new JerseyVerticle(jerseyServer, options);
         jerseyVerticle.init(vertx, context);
     }

@@ -3,8 +3,10 @@ package com.englishtown.vertx.guice;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
+import com.englishtown.vertx.jersey.impl.DefaultVertxContainer;
 import com.englishtown.vertx.jersey.impl.WriteStreamBodyWriter;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
@@ -43,6 +45,7 @@ public class GuiceJerseyBinder extends AbstractModule {
         ServiceLocator locator = ServiceLocatorFactory.getInstance().create(null);
         bind(ServiceLocator.class).toInstance(locator);
 
+        bind(VertxContainer.class).to(DefaultVertxContainer.class);
         bind(JerseyServer.class).to(GuiceJerseyServer.class);
         bind(JerseyHandler.class).to(DefaultJerseyHandler.class);
         bind(JerseyOptions.class).to(DefaultJerseyOptions.class);

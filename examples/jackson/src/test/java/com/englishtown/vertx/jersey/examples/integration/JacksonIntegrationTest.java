@@ -46,6 +46,15 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     @Test
     public void testPost() throws Exception {
+        testPost(BASE_PATH);
+    }
+
+    @Test
+    public void testPost2() throws Exception {
+        testPost(BASE_PATH + "/json");
+    }
+
+    private void testPost(String path) throws Exception {
 
         RequestOptions options = new RequestOptions()
                 .setPauseResponse(true)
@@ -55,7 +64,7 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
                 })
                 .setData(new JsonObject().put("name", "Andy").encode());
 
-        whenHttpClient.requestAbs(HttpMethod.POST, BASE_PATH, options)
+        whenHttpClient.requestAbs(HttpMethod.POST, path, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     return whenHttpClient.body(response);

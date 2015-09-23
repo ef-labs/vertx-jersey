@@ -1,6 +1,7 @@
 package com.englishtown.vertx.jersey.examples.resources;
 
 import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
 import org.glassfish.jersey.server.JSONP;
 
 import javax.ws.rs.*;
@@ -34,6 +35,14 @@ public class JsonResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public MyObject postJson(MyObject in) {
+        return in;
+    }
+
+    @POST
+    @Path("json")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public JsonObject postJson2(JsonObject in) {
         return in;
     }
 

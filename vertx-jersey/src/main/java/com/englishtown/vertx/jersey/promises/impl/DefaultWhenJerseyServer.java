@@ -57,7 +57,7 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
-            options.init(config, vertx);
+            options.init(config);
 
             jerseyServer.init(options, result -> {
                 if (result.succeeded()) {

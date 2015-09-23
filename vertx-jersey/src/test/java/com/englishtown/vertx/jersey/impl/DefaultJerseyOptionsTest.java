@@ -23,22 +23,24 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
-import org.glassfish.hk2.api.ServiceLocator;
-import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.jvnet.hk2.internal.ServiceLocatorImpl;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 /**
@@ -60,19 +62,18 @@ public class DefaultJerseyOptionsTest {
 
         config = new JsonObject();
 
-        ServiceLocator locator = new ServiceLocatorImpl("test", null);
-        options = new DefaultJerseyOptions(locator);
-        options.init(config, vertx);
+        options = new DefaultJerseyOptions();
+        options.init(config);
 
     }
 
     @Test
     public void testInit_No_Config() throws Exception {
 
-        DefaultJerseyOptions options = new DefaultJerseyOptions(null);
+        DefaultJerseyOptions options = new DefaultJerseyOptions();
 
         try {
-            options.init(null, null);
+            options.init(null);
             fail();
         } catch (IllegalStateException e) {
             // Expected
@@ -106,19 +107,6 @@ public class DefaultJerseyOptionsTest {
     }
 
     @Test
-    public void testGetApplicationHandler() throws Exception {
-
-        JsonArray resources = new JsonArray().add("com.englishtown.vertx.resources");
-        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, resources);
-
-        ApplicationHandlerDelegate applicationHandlerDelegate;
-        applicationHandlerDelegate = options.getApplicationHandler();
-
-        assertNotNull(applicationHandlerDelegate);
-
-    }
-
-    @Test
     public void testGetMaxBodySize() throws Exception {
 
         int expected = DefaultJerseyOptions.DEFAULT_MAX_BODY_SIZE;
@@ -136,70 +124,98 @@ public class DefaultJerseyOptionsTest {
     }
 
     @Test
-    public void testGetResourceConfig_Missing_Resources() throws Exception {
+    public void testGetPackages() throws Exception {
 
-        try {
-            options.getResourceConfig();
-            fail();
+        String package1 = "com.englishtown.vertx.jersey.resources1";
+        String package2 = "com.englishtown.vertx.jersey.resources2";
 
-        } catch (RuntimeException e) {
-            assertEquals("At least one resource package name must be specified in the config " +
-                    "resources", e.getMessage());
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, new JsonArray().add(package1));
+        config.put(DefaultJerseyOptions.CONFIG_PACKAGES, new JsonArray().add(package2));
 
-        }
+        List<String> packages = options.getPackages();
+
+        assertNotNull(packages);
+        assertEquals(2, packages.size());
+        assertEquals(package1, packages.get(0));
+        assertEquals(package2, packages.get(1));
 
     }
 
     @Test
-    public void testGetResourceConfig() throws Exception {
+    public void testGetComponents() throws Exception {
 
-        ResourceConfig resourceConfig;
+        config.put(DefaultJerseyOptions.CONFIG_COMPONENTS, new JsonArray().add(MyObj.class.getName()));
+        config.put(DefaultJerseyOptions.CONFIG_FEATURES, new JsonArray().add(MyBinder.class.getName()));
 
-        try {
-            options.getResourceConfig();
-            fail();
-        } catch (RuntimeException e) {
-            // Expected
-        }
+        Set<Class<?>> instances = options.getComponents();
 
-        JsonArray resources = new JsonArray().add("com.englishtown.vertx.jersey.resources");
-        config.put(DefaultJerseyOptions.CONFIG_RESOURCES, resources);
-        resourceConfig = options.getResourceConfig();
-
-        assertNotNull(resourceConfig);
-        assertEquals(1, resourceConfig.getClasses().size());
-        assertEquals(1, resourceConfig.getInstances().size());
-
-        JsonArray features = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestFeature");
-        config.put(DefaultJerseyOptions.CONFIG_FEATURES, features);
-        resourceConfig = options.getResourceConfig();
-
-        assertNotNull(resourceConfig);
-        assertEquals(2, resourceConfig.getClasses().size());
-
-        JsonArray binders = new JsonArray().add("com.englishtown.vertx.jersey.inject.TestBinder2");
-        config.put(DefaultJerseyOptions.CONFIG_BINDERS, binders);
-        resourceConfig = options.getResourceConfig();
-
-        assertNotNull(resourceConfig);
-        assertEquals(2, resourceConfig.getClasses().size());
-        assertEquals(2, resourceConfig.getInstances().size());
-
-        binders.add("com.englishtown.vertx.jersey.inject.ClassNotFoundBinder");
-        try {
-            options.getResourceConfig();
-            fail();
-        } catch (RuntimeException e) {
-            // Expected
-        }
-
-        features.add("com.englishtown.vertx.jersey.inject.ClassNotFoundFeature");
-        try {
-            options.getResourceConfig();
-            fail();
-        } catch (RuntimeException e) {
-            // Expected
-        }
+        assertNotNull(instances);
+        assertEquals(2, instances.size());
+        assertTrue(instances.contains(MyObj.class));
+        assertTrue(instances.contains(MyBinder.class));
 
     }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetComponents_Fail() throws Exception {
+
+        config.put(DefaultJerseyOptions.CONFIG_COMPONENTS, new JsonArray().add(MyObj.class.getName() + ".invalid"));
+        options.getComponents();
+        fail();
+
+    }
+
+    @Test
+    public void testGetInstances() throws Exception {
+
+        config.put(DefaultJerseyOptions.CONFIG_INSTANCES, new JsonArray().add(MyObj.class.getName()));
+        config.put(DefaultJerseyOptions.CONFIG_BINDERS, new JsonArray().add(MyBinder.class.getName()));
+
+        Set<Object> instances = options.getInstances();
+
+        assertNotNull(instances);
+        assertEquals(2, instances.size());
+
+        List<Object> list = new ArrayList<>();
+        list.addAll(instances);
+        assertThat(list.get(0), instanceOf(MyObj.class));
+        assertThat(list.get(1), instanceOf(MyBinder.class));
+
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testGetInstances_Fail() throws Exception {
+
+        config.put(DefaultJerseyOptions.CONFIG_INSTANCES, new JsonArray().add(MyObj.class.getName() + ".invalid"));
+        options.getInstances();
+        fail();
+
+    }
+
+    @Test
+    public void testGetProperties() throws Exception {
+
+        JsonObject rc = new JsonObject().put("prop1", "a");
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCE_CONFIG, rc);
+        assertEquals(rc.getMap(), options.getProperties());
+
+    }
+
+    public static class MyObj {
+         @Override
+        public int hashCode() {
+            return 1;
+        }
+    }
+
+    public static class MyBinder extends AbstractBinder {
+        @Override
+        protected void configure() {
+        }
+        @Override
+        public int hashCode() {
+            return 2;
+        }
+    }
+
 }

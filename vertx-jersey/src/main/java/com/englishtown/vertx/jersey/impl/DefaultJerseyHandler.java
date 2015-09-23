@@ -26,9 +26,11 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.security.DefaultSecurityContext;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
@@ -58,7 +60,7 @@ import java.util.Map;
  */
 public class DefaultJerseyHandler implements JerseyHandler {
 
-    private ApplicationHandlerDelegate applicationHandlerDelegate;
+    private VertxContainer container;
     private URI baseUri;
     private int maxBodySize;
 
@@ -74,11 +76,21 @@ public class DefaultJerseyHandler implements JerseyHandler {
         this.requestProcessors = requestProcessors;
     }
 
+    /**
+     * @param options
+     * @deprecated Use overload with {@link VertxContainer} instead.
+     */
+    @Deprecated
     @Override
     public void init(JerseyOptions options) {
-        baseUri = options.getBaseUri();
-        maxBodySize = options.getMaxBodySize();
-        applicationHandlerDelegate = options.getApplicationHandler();
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void init(VertxContainer container) {
+        this.container = container;
+        baseUri = container.getOptions().getBaseUri();
+        maxBodySize = container.getOptions().getMaxBodySize();
 
         logger.debug("DefaultJerseyHandler - initialized");
     }
@@ -93,7 +105,12 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     @Override
     public ApplicationHandlerDelegate getDelegate() {
-        return applicationHandlerDelegate;
+        return container.getApplicationHandlerDelegate();
+    }
+
+    @Override
+    public VertxContainer getContainer() {
+        return container;
     }
 
     /**
@@ -241,10 +258,10 @@ public class DefaultJerseyHandler implements JerseyHandler {
                 if (inputStream == null) {
                     vertxRequest.resume();
                 }
-                applicationHandlerDelegate.handle(jerseyRequest);
+                getDelegate().handle(jerseyRequest);
             });
         } else {
-            applicationHandlerDelegate.handle(jerseyRequest);
+            getDelegate().handle(jerseyRequest);
         }
 
     }
@@ -263,13 +280,21 @@ public class DefaultJerseyHandler implements JerseyHandler {
         VertxRequestProcessor processor = requestProcessors.get(index);
         final int next = index + 1;
 
-        processor.process(vertxRequest, jerseyRequest, aVoid -> {
-            if (next >= requestProcessors.size()) {
-                done.handle(null);
-            } else {
-                callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
-            }
-        });
+        try {
+            processor.process(vertxRequest, jerseyRequest, aVoid -> {
+                if (next >= requestProcessors.size()) {
+                    done.handle(null);
+                } else {
+                    callVertxRequestProcessor(next, vertxRequest, jerseyRequest, done);
+                }
+            });
+
+        } catch (Throwable t) {
+            logger.error("VertxRequestProcessor " + processor.getClass().getSimpleName() + " threw exception: " + t.getMessage(), t);
+            vertxRequest.response()
+                    .setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code())
+                    .end();
+        }
 
     }
 

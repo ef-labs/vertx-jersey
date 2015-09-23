@@ -61,7 +61,7 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
                 })
                 .ensure(latch::countDown);
 
-        latch.await(2, TimeUnit.SECONDS);
+        latch.await(10, TimeUnit.SECONDS);
 
     }
 
