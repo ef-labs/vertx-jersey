@@ -12,7 +12,10 @@ public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private void runTest(String path) {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, path)
+        RequestOptions options = new RequestOptions()
+                .setPauseResponse(true);
+
+        whenHttpClient.requestAbs(HttpMethod.GET, path, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     assertEquals("chunked", response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
