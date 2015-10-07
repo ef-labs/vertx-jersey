@@ -7,7 +7,7 @@
     <parent>
         <artifactId>vertx-jersey-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.1.0</version>
+        <version>4.2.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
