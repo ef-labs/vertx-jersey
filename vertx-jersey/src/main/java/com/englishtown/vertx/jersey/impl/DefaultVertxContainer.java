@@ -37,8 +37,8 @@ public class DefaultVertxContainer implements VertxContainer {
         this.options = options;
         ResourceConfig rc = createConfiguration();
         ApplicationHandler applicationHandler = new ApplicationHandler(rc, null, locator);
-        applicationHandler.onStartup(this);
         applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
+        applicationHandler.onStartup(this);
     }
 
     /**
@@ -101,9 +101,9 @@ public class DefaultVertxContainer implements VertxContainer {
     @Override
     public void reload(ResourceConfig configuration) {
         ApplicationHandler applicationHandler = new ApplicationHandler(configuration, null, locator);
+        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
         getApplicationHandler().onReload(this);
         applicationHandler.onStartup(this);
-        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
     }
 
     protected ResourceConfig createConfiguration() {
