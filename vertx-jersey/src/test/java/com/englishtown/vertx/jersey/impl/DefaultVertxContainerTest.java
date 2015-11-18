@@ -1,6 +1,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import io.vertx.core.Vertx;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
@@ -37,7 +38,7 @@ public class DefaultVertxContainerTest {
         when(options.getPackages()).thenReturn(packages);
 
         locator = ServiceLocatorFactory.getInstance().create(null);
-        container = new DefaultVertxContainer(vertx, locator);
+        container = new DefaultVertxContainer(vertx, locator, null);
     }
 
     @Test
@@ -56,6 +57,25 @@ public class DefaultVertxContainerTest {
         assertNotNull(container.getConfiguration());
         assertNotNull(container.getApplicationHandler());
         assertNotNull(container.getApplicationHandlerDelegate());
+
+    }
+
+    @Test
+    public void testResourceConfigModifier() throws Exception {
+
+        boolean[] b = {false};
+
+        ApplicationConfigurator configurator = rc -> {
+            b[0] = true;
+            return rc;
+        };
+
+        container = new DefaultVertxContainer(vertx, locator, configurator);
+        packages.add("com.englishtown.vertx.jersey.resources");
+
+        assertFalse(b[0]);
+        container.init(options);
+        assertTrue(b[0]);
 
     }
 

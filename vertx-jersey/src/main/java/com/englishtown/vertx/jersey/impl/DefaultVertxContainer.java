@@ -2,8 +2,10 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
+import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.Vertx;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
@@ -23,13 +25,15 @@ public class DefaultVertxContainer implements VertxContainer {
 
     private final Vertx vertx;
     private final ServiceLocator locator;
+    private final ApplicationConfigurator configurator;
     private JerseyOptions options;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
 
     @Inject
-    public DefaultVertxContainer(Vertx vertx, @Optional ServiceLocator locator) {
+    public DefaultVertxContainer(Vertx vertx, @Optional @Nullable ServiceLocator locator, @Optional @Nullable ApplicationConfigurator configurator) {
         this.vertx = vertx;
         this.locator = locator;
+        this.configurator = configurator;
     }
 
     @Override
@@ -133,6 +137,10 @@ public class DefaultVertxContainer implements VertxContainer {
         Map<String, Object> properties = options.getProperties();
         if (properties != null) {
             rc.addProperties(properties);
+        }
+
+        if (configurator != null) {
+            rc = configurator.configure(rc);
         }
 
         return rc;

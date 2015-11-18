@@ -80,7 +80,7 @@ public class JerseyIntegrationTest extends VertxTestBase {
                 new ArrayList<>(),
                 new ArrayList<>());
 
-        VertxContainer container = new DefaultVertxContainer(vertx, null);
+        VertxContainer container = new DefaultVertxContainer(vertx, null, null);
         JerseyHandler handler = new DefaultJerseyHandler(provider, new ArrayList<>());
         JerseyServer server = new DefaultJerseyServer(handler, container);
         JerseyOptions options = new DefaultJerseyOptions();

@@ -36,7 +36,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -202,7 +201,7 @@ public class DefaultJerseyOptionsTest {
     }
 
     public static class MyObj {
-         @Override
+        @Override
         public int hashCode() {
             return 1;
         }
@@ -212,6 +211,7 @@ public class DefaultJerseyOptionsTest {
         @Override
         protected void configure() {
         }
+
         @Override
         public int hashCode() {
             return 2;
