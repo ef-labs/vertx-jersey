@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey.impl;
 
+import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
@@ -41,6 +42,7 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.when;
 
 /**
  * {@link DefaultJerseyOptions} unit tests
@@ -49,41 +51,22 @@ import static org.junit.Assert.*;
 public class DefaultJerseyOptionsTest {
 
     @Mock
-    Vertx vertx;
+    private Vertx vertx;
     @Mock
-    Logger logger;
+    private Context context;
+    @Mock
+    private Logger logger;
 
-    JsonObject config;
-    DefaultJerseyOptions options;
+    private JsonObject config = new JsonObject();
+    private DefaultJerseyOptions options;
 
     @Before
     public void setUp() throws Exception {
 
-        config = new JsonObject();
+        when(vertx.getOrCreateContext()).thenReturn(context);
+        when(context.config()).thenReturn(config);
 
-        options = new DefaultJerseyOptions();
-        options.init(config);
-
-    }
-
-    @Test
-    public void testInit_No_Config() throws Exception {
-
-        DefaultJerseyOptions options = new DefaultJerseyOptions();
-
-        try {
-            options.init(null);
-            fail();
-        } catch (IllegalStateException e) {
-            // Expected
-        }
-
-        try {
-            options.getMaxBodySize();
-            fail();
-        } catch (IllegalStateException e) {
-            // Expected
-        }
+        options = new DefaultJerseyOptions(vertx);
 
     }
 

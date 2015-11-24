@@ -1,6 +1,5 @@
 package com.englishtown.vertx.jersey.integration;
 
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.google.inject.AbstractModule;
@@ -46,29 +45,36 @@ public abstract class ContainerLifecycleListenerIntegrationTests extends VertxTe
     @Test
     public void testListener() throws Exception {
 
-        assertFalse(listener.started);
-        assertFalse(listener.shutdown);
+        vertx.runOnContext(aVoid -> {
 
-        JerseyServer server = locator.getService(JerseyServer.class);
-        JerseyOptions options = locator.getService(JerseyOptions.class);
+            vertx.getOrCreateContext()
+                    .config()
+                    .put("jersey", new JsonObject()
+                            .put(DefaultJerseyOptions.CONFIG_PORT, 8080)
+                            .put(DefaultJerseyOptions.CONFIG_PACKAGES, new JsonArray()
+                                    .add("com.englishtown.vertx.jersey.resources")));
 
-        JsonObject config = new JsonObject()
-                .put(DefaultJerseyOptions.CONFIG_PACKAGES, new JsonArray()
-                        .add("com.englishtown.vertx.jersey.resources"));
+            assertFalse(listener.started);
+            assertFalse(listener.shutdown);
 
-        options.init(config);
+            JerseyServer server = locator.getService(JerseyServer.class);
 
-        assertFalse(listener.started);
-        assertFalse(listener.shutdown);
+            assertFalse(listener.started);
+            assertFalse(listener.shutdown);
 
-        server.init(options);
+            server.start();
 
-        assertTrue(listener.started);
-        assertFalse(listener.shutdown);
+            assertTrue(listener.started);
+            assertFalse(listener.shutdown);
 
-        server.close();
-        assertTrue(listener.shutdown);
+            server.close();
+            assertTrue(listener.shutdown);
 
+            testComplete();
+
+        });
+
+        await();
     }
 
     @Override

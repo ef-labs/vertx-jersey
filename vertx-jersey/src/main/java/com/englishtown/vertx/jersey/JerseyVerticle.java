@@ -25,7 +25,6 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 
@@ -50,11 +49,7 @@ public class JerseyVerticle extends AbstractVerticle {
     public void start(final Future<Void> startedResult) throws Exception {
         this.start();
 
-        JsonObject config = getVertx().getOrCreateContext().config();
-        config = config.getJsonObject("jersey", config);
-        options.init(config);
-
-        jerseyServer.init(options, ar -> {
+        jerseyServer.start(ar -> {
             if (ar.succeeded()) {
                 startedResult.complete();
             } else {

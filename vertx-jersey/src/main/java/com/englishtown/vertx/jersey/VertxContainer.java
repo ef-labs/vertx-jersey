@@ -8,7 +8,14 @@ import org.glassfish.jersey.server.spi.Container;
  */
 public interface VertxContainer extends Container {
 
-    void init(JerseyOptions options);
+    /**
+     * @param options
+     * @deprecated Perform initialization at construction time
+     */
+    @Deprecated
+    default void init(JerseyOptions options) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * Returns the current vertx instance

@@ -30,19 +30,11 @@ public class DefaultVertxContainer implements VertxContainer {
     private ApplicationHandlerDelegate applicationHandlerDelegate;
 
     @Inject
-    public DefaultVertxContainer(Vertx vertx, @Optional @Nullable ServiceLocator locator, @Optional @Nullable ApplicationConfigurator configurator) {
+    public DefaultVertxContainer(Vertx vertx, JerseyOptions options, @Optional @Nullable ServiceLocator locator, @Optional @Nullable ApplicationConfigurator configurator) {
         this.vertx = vertx;
+        this.options = options;
         this.locator = locator;
         this.configurator = configurator;
-    }
-
-    @Override
-    public void init(JerseyOptions options) {
-        this.options = options;
-        ResourceConfig rc = createConfiguration();
-        ApplicationHandler applicationHandler = new ApplicationHandler(rc, null, locator);
-        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
-        applicationHandler.onStartup(this);
     }
 
     /**
@@ -62,6 +54,11 @@ public class DefaultVertxContainer implements VertxContainer {
 
     @Override
     public ApplicationHandlerDelegate getApplicationHandlerDelegate() {
+        if (applicationHandlerDelegate == null) {
+            ResourceConfig rc = createConfiguration();
+            ApplicationHandler applicationHandler = new ApplicationHandler(rc, null, locator);
+            applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
+        }
         return applicationHandlerDelegate;
     }
 
@@ -84,7 +81,7 @@ public class DefaultVertxContainer implements VertxContainer {
      */
     @Override
     public ApplicationHandler getApplicationHandler() {
-        return applicationHandlerDelegate == null ? null : applicationHandlerDelegate.getApplicationHandler();
+        return getApplicationHandlerDelegate().getApplicationHandler();
     }
 
     /**

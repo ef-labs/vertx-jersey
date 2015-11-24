@@ -70,29 +70,15 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     @Inject
     public DefaultJerseyHandler(
+            VertxContainer container,
             ContainerResponseWriterProvider responseWriterProvider,
             List<VertxRequestProcessor> requestProcessors) {
+        this.container = container;
         this.responseWriterProvider = responseWriterProvider;
         this.requestProcessors = requestProcessors;
-    }
 
-    /**
-     * @param options
-     * @deprecated Use overload with {@link VertxContainer} instead.
-     */
-    @Deprecated
-    @Override
-    public void init(JerseyOptions options) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public void init(VertxContainer container) {
-        this.container = container;
         baseUri = container.getOptions().getBaseUri();
         maxBodySize = container.getOptions().getMaxBodySize();
-
-        logger.debug("DefaultJerseyHandler - initialized");
     }
 
     @Override

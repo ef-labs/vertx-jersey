@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -32,6 +33,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
+import org.glassfish.jersey.server.ApplicationHandler;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -69,7 +71,9 @@ public class DefaultJerseyServerTest {
     @Mock
     Handler<AsyncResult<HttpServer>> doneHandler;
     @Mock
-    JerseyOptions options;
+    JerseyServerOptions options;
+    @Mock
+    HttpServerOptions serverOptions;
     @Mock
     VertxContainer container;
     @Mock
@@ -86,16 +90,17 @@ public class DefaultJerseyServerTest {
 
         when(vertx.createHttpServer(any(HttpServerOptions.class))).thenReturn(httpServer);
         when(container.getVertx()).thenReturn(vertx);
+        when(container.getApplicationHandler()).thenReturn(new ApplicationHandler());
+        when(options.getServerOptions()).thenReturn(serverOptions);
 
         when(jerseyHandler.getBaseUri()).thenReturn(baseUri);
-        jerseyServer = new DefaultJerseyServer(jerseyHandler, container);
+        jerseyServer = new DefaultJerseyServer(jerseyHandler, container, options);
 
     }
 
     private void verifyResults(int port, String host) {
 
         verify(vertx).createHttpServer(optionsCaptor.capture());
-        verify(jerseyHandler).init(any(VertxContainer.class));
 
         verify(httpServer).requestHandler(requestHandlerCaptor.capture());
         Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
@@ -111,9 +116,9 @@ public class DefaultJerseyServerTest {
 
     @Test
     public void testInit_Default_Config() throws Exception {
-        when(options.getHost()).thenReturn("0.0.0.0");
-        when(options.getPort()).thenReturn(80);
-        jerseyServer.init(options);
+        when(serverOptions.getHost()).thenReturn("0.0.0.0");
+        when(serverOptions.getPort()).thenReturn(80);
+        jerseyServer.start();
         verifyResults(80, "0.0.0.0");
     }
 
@@ -126,14 +131,13 @@ public class DefaultJerseyServerTest {
         boolean ssl = true;
         boolean compressionSupported = true;
 
-        when(container.getVertx()).thenReturn(vertx);
-        when(options.getHost()).thenReturn(host);
-        when(options.getPort()).thenReturn(port);
-        when(options.getReceiveBufferSize()).thenReturn(bufferSize);
-        when(options.getSSL()).thenReturn(ssl);
-        when(options.getCompressionSupported()).thenReturn(compressionSupported);
+        when(serverOptions.getHost()).thenReturn(host);
+        when(serverOptions.getPort()).thenReturn(port);
+        when(serverOptions.getReceiveBufferSize()).thenReturn(bufferSize);
+        when(serverOptions.isSsl()).thenReturn(ssl);
+        when(serverOptions.isCompressionSupported()).thenReturn(compressionSupported);
 
-        jerseyServer.init(options);
+        jerseyServer.start();
         verifyResults(port, host);
 
         verify(vertx).createHttpServer(optionsCaptor.capture());
@@ -151,7 +155,7 @@ public class DefaultJerseyServerTest {
     @Test
     public void testInit_Listen_Result() throws Exception {
 
-        jerseyServer.init(options, doneHandler);
+        jerseyServer.start(doneHandler);
 
         verify(httpServer).listen(handlerCaptor.capture());
         Handler<AsyncResult<HttpServer>> handler = handlerCaptor.getValue();
@@ -171,7 +175,7 @@ public class DefaultJerseyServerTest {
 
     @Test
     public void testGetHandler() throws Exception {
-        jerseyServer.init(options);
+        jerseyServer.start();
         JerseyHandler handler = jerseyServer.getHandler();
         assertEquals(jerseyHandler, handler);
     }
@@ -179,7 +183,7 @@ public class DefaultJerseyServerTest {
     @Test
     public void testSetupHandler() throws Exception {
         jerseyServer.setupHandler(setupHandler);
-        jerseyServer.init(options);
+        jerseyServer.start();
         verify(setupHandler).handle(eq(httpServer));
 
         Handler<HttpServerRequest> requestHandler = jerseyServer.getHandler();
@@ -193,7 +197,7 @@ public class DefaultJerseyServerTest {
 
     @Test
     public void testGetHttpServer() throws Exception {
-        jerseyServer.init(options);
+        jerseyServer.start();
         HttpServer server = jerseyServer.getHttpServer();
         assertEquals(httpServer, server);
     }

@@ -48,6 +48,7 @@ public class GuiceJerseyBinder extends AbstractModule {
         bind(JerseyServer.class).to(GuiceJerseyServer.class);
         bind(JerseyHandler.class).to(DefaultJerseyHandler.class);
         bind(JerseyOptions.class).to(DefaultJerseyOptions.class);
+        bind(JerseyServerOptions.class).to(DefaultJerseyOptions.class);
         bind(ContainerResponseWriterProvider.class).to(VertxResponseWriterProvider.class);
         bind(MessageBodyWriter.class).to(WriteStreamBodyWriter.class).in(Singleton.class);
         bind(ApplicationConfigurator.class).toProvider(Providers.of(null));
