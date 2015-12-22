@@ -46,10 +46,10 @@ public class SwaggerIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private void runTest(String additionalPath, Consumer<Buffer> assertMethod) throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH + additionalPath, new RequestOptions().setPauseResponse(true))
+        getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH + additionalPath, new RequestOptions().setPauseResponse(true))
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     assertMethod.accept(body);

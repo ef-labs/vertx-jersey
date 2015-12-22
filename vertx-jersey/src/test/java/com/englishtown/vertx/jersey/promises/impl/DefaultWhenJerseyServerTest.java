@@ -41,6 +41,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.inject.Provider;
+
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +58,10 @@ public class DefaultWhenJerseyServerTest {
     private Done<JerseyServer> done = new Done<>();
 
     @Mock
+    Provider<JerseyOptions> optionsProvider;
+    @Mock
+    Provider<JerseyServer> serverProvider;
+    @Mock
     JerseyServer server;
     @Mock
     JerseyOptions options;
@@ -69,7 +75,9 @@ public class DefaultWhenJerseyServerTest {
     @Before
     public void setUp() {
         When when = WhenFactory.createSync();
-        whenJerseyServer = new DefaultWhenJerseyServer(vertx, server, options, when);
+        when(optionsProvider.get()).thenReturn(options);
+        when(serverProvider.get()).thenReturn(server);
+        whenJerseyServer = new DefaultWhenJerseyServer(vertx, serverProvider, optionsProvider, when);
     }
 
     @Test

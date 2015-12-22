@@ -50,8 +50,8 @@ public class GuiceJerseyBinderTest {
         // 8 types are explicitly bound
         verify(builder, times(8)).bind((Class<?>) any(Class.class));
 
-        // 8 multi-bindings are installed
-        verify(builder, times(8)).install(any(Module.class));
+        // 9 multi-bindings are installed
+        verify(builder, times(9)).install(any(Module.class));
 
     }
 

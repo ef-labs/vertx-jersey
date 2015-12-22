@@ -11,7 +11,7 @@ public class GuiceIntegrationTest extends JerseyGuiceIntegrationTestBase {
     @Test
     public void testGet() throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH)
+        getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
 

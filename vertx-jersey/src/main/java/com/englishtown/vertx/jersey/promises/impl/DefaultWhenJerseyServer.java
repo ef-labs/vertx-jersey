@@ -33,6 +33,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Default implementation of {@link WhenJerseyServer}
@@ -40,15 +41,15 @@ import javax.inject.Inject;
 public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
     private final Vertx vertx;
-    private final JerseyServer jerseyServer;
-    private final JerseyOptions options;
+    private final Provider<JerseyServer> jerseyServerProvider;
+    private final Provider<JerseyOptions> optionsProvider;
     private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, JerseyServer jerseyServer, JerseyOptions options, When when) {
+    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyOptions> optionsProvider, When when) {
         this.vertx = vertx;
-        this.jerseyServer = jerseyServer;
-        this.options = options;
+        this.jerseyServerProvider = jerseyServerProvider;
+        this.optionsProvider = optionsProvider;
         this.when = when;
     }
 
@@ -57,6 +58,9 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
+            JerseyOptions options = optionsProvider.get();
+            JerseyServer jerseyServer = jerseyServerProvider.get();
+
             options.init(config);
 
             jerseyServer.init(options, result -> {

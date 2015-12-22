@@ -17,6 +17,7 @@ import com.google.inject.util.Providers;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.jersey.server.model.ModelProcessor;
+import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
 import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -60,6 +61,7 @@ public class GuiceJerseyBinder extends AbstractModule {
         Multibinder.newSetBinder(binder(), ReaderInterceptor.class);
         Multibinder.newSetBinder(binder(), WriterInterceptor.class);
         Multibinder.newSetBinder(binder(), ModelProcessor.class);
+        Multibinder.newSetBinder(binder(), ContainerLifecycleListener.class);
 
     }
 

@@ -36,10 +36,14 @@ import javax.ws.rs.core.MediaType;
  *
  *
  */
-public class IntegrationTests extends JerseyHK2IntegrationTestBase {
+public abstract class IntegrationTests extends JerseyIntegrationTestBase {
 
     private String host = "localhost";
     private int port = 8080;
+
+    protected IntegrationTests(TestServiceLocator locator) {
+        super(locator);
+    }
 
     private void verifyResponse(HttpClientResponse response, int status, String contentType, final String expected) {
 
@@ -116,4 +120,15 @@ public class IntegrationTests extends JerseyHK2IntegrationTestBase {
         await();
     }
 
+    public static class HK2 extends IntegrationTests {
+        public HK2() {
+            super(new HK2TestServiceLocator());
+        }
+    }
+
+    public static class Guice extends IntegrationTests {
+        public Guice() {
+            super(new GuiceTestServiceLocator());
+        }
+    }
 }

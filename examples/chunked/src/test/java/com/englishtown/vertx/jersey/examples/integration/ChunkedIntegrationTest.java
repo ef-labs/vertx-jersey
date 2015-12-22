@@ -15,11 +15,11 @@ public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
         RequestOptions options = new RequestOptions()
                 .setPauseResponse(true);
 
-        whenHttpClient.requestAbs(HttpMethod.GET, path, options)
+        getWhenHttpClient().requestAbs(HttpMethod.GET, path, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     assertEquals("chunked", response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     String text = body.toString();
@@ -48,12 +48,12 @@ public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
 
         RequestOptions options = new RequestOptions().setPauseResponse(true);
 
-        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH + "/stream", options)
+        getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH + "/stream", options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
                     assertNull(response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
                     assertEquals("36", response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     String text = body.toString();

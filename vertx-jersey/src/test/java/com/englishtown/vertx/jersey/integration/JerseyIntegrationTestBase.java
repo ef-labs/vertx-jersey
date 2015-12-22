@@ -2,11 +2,8 @@ package com.englishtown.vertx.jersey.integration;
 
 import com.englishtown.promises.Promise;
 import com.englishtown.vertx.promises.WhenHttpClient;
-import com.englishtown.vertx.promises.WhenVertx;
-import io.vertx.core.DeploymentOptions;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
-import io.vertx.core.json.JsonObject;
 import io.vertx.test.core.VertxTestBase;
 
 import java.util.concurrent.CountDownLatch;
@@ -17,13 +14,13 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
-    protected JsonObject config;
-    protected WhenVertx whenVertx;
+    private final TestServiceLocator locator;
     protected HttpClient httpClient;
-    protected WhenHttpClient whenHttpClient;
     protected String deploymentID;
 
-    protected abstract <T> T getService(Class<T> clazz);
+    protected JerseyIntegrationTestBase(TestServiceLocator locator) {
+        this.locator = locator;
+    }
 
     @Override
     public void setUp() throws Exception {
@@ -33,9 +30,7 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
     protected void init() throws Exception {
 
-        config = loadConfig();
-        whenVertx = getService(WhenVertx.class);
-        whenHttpClient = getService(WhenHttpClient.class);
+        locator.init(vertx);
 
         HttpClientOptions clientOptions = new HttpClientOptions()
                 .setConnectTimeout(1000);
@@ -44,7 +39,7 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        deployJerseyVerticle()
+        locator.deployJerseyVerticle()
                 .then(id -> {
                     deploymentID = id;
                     return null;
@@ -65,27 +60,21 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
     }
 
-    protected abstract Promise<String> deployJerseyVerticle();
-
-    protected Promise<String> deployJerseyVerticle(String identifier) {
-        DeploymentOptions options = new DeploymentOptions().setConfig(config);
-        return whenVertx.deployVerticle(identifier, options);
-    }
-
     @Override
     protected void tearDown() throws Exception {
-        super.tearDown();
         httpClient.close();
-    }
-
-    protected JsonObject loadConfig() {
-        return ConfigUtils.loadConfig();
+        locator.tearDown();
+        super.tearDown();
     }
 
     protected Promise<Void> onRejected(Throwable t) {
         t.printStackTrace();
         fail();
         return null;
+    }
+
+    protected WhenHttpClient getWhenHttpClient() {
+        return locator.getWhenHttpClient();
     }
 
 }
