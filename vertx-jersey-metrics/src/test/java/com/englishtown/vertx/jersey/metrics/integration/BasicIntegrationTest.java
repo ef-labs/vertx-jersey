@@ -25,7 +25,8 @@ package com.englishtown.vertx.jersey.metrics.integration;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
+import com.englishtown.vertx.jersey.integration.HK2TestServiceLocator;
+import com.englishtown.vertx.jersey.integration.JerseyIntegrationTestBase;
 import com.englishtown.vertx.jersey.metrics.RequestProcessor;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonArray;
@@ -38,7 +39,19 @@ import java.util.SortedMap;
 /**
  * Integration tests for jersey metrics
  */
-public class BasicIntegrationTest extends JerseyHK2IntegrationTestBase {
+public class BasicIntegrationTest extends JerseyIntegrationTestBase {
+
+    public BasicIntegrationTest() {
+        super(new HK2TestServiceLocator() {
+            @Override
+            public JsonObject getConfig() {
+                return new JsonObject()
+                        .put("hk2_binder", "com.englishtown.vertx.jersey.metrics.integration.IntegrationTestBinder")
+                        .put("port", 8080)
+                        .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.resources"));
+            }
+        });
+    }
 
     // Had to mark this test as ignored now that SharedMetricRegistries is no longer used.
     // Not sure it is possible to get at the HK2 container's instance of MetricRegistry from here...
@@ -68,14 +81,6 @@ public class BasicIntegrationTest extends JerseyHK2IntegrationTestBase {
                 .end();
 
         await();
-    }
-
-    @Override
-    protected JsonObject loadConfig() {
-        return new JsonObject()
-                .put("hk2_binder", "com.englishtown.vertx.jersey.metrics.integration.IntegrationTestBinder")
-                .put("port", 8080)
-                .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.resources"));
     }
 
 }

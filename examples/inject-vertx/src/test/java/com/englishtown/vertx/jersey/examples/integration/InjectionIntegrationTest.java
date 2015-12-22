@@ -13,10 +13,10 @@ public class InjectionIntegrationTest extends JerseyHK2IntegrationTestBase {
     @Test
     public void testGet_OK() throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH, new RequestOptions().setPauseResponse(true))
+        getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH, new RequestOptions().setPauseResponse(true))
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     String str = body.toString();

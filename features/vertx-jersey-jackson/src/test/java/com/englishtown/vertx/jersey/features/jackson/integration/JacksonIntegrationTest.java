@@ -101,10 +101,10 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private void runTest(String path, int expectedStatus, RequestOptions options, Consumer<Buffer> bodyValidator) throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.POST, path, options)
+        getWhenHttpClient().requestAbs(HttpMethod.POST, path, options)
                 .then(response -> {
                     assertEquals(expectedStatus, response.statusCode());
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     if (bodyValidator != null) {
