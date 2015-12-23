@@ -1,8 +1,8 @@
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyOptions;
-import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
 import com.englishtown.vertx.jersey.inject.Nullable;
@@ -28,6 +28,7 @@ public class DefaultVertxContainer implements VertxContainer {
     private final ApplicationConfigurator configurator;
     private JerseyOptions options;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
+    private boolean started;
 
     @Inject
     public DefaultVertxContainer(Vertx vertx, JerseyOptions options, @Optional @Nullable ServiceLocator locator, @Optional @Nullable ApplicationConfigurator configurator) {
@@ -35,6 +36,35 @@ public class DefaultVertxContainer implements VertxContainer {
         this.options = options;
         this.locator = locator;
         this.configurator = configurator;
+    }
+
+    /**
+     * Starts the container
+     */
+    @Override
+    public void start() {
+        if (started) {
+            return;
+        }
+        ApplicationHandler handler = getApplicationHandler();
+        if (handler == null) {
+            throw new IllegalStateException("ApplicationHandler cannot be null");
+        }
+        handler.onStartup(this);
+        started = true;
+    }
+
+    /**
+     * Stops the container
+     */
+    @Override
+    public void stop() {
+        if (!started) {
+            return;
+        }
+        getApplicationHandler().onShutdown(this);
+        applicationHandlerDelegate = null;
+        started = false;
     }
 
     /**

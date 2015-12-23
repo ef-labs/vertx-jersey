@@ -18,6 +18,16 @@ public interface VertxContainer extends Container {
     }
 
     /**
+     * Starts the container
+     */
+    void start();
+
+    /**
+     * Stops the container
+     */
+    void stop();
+
+    /**
      * Returns the current vertx instance
      *
      * @return the {@link Vertx} instance

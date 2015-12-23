@@ -74,7 +74,7 @@ public class DefaultJerseyServer implements JerseyServer {
         }
 
         // Run container startup
-        container.getApplicationHandler().onStartup(container);
+        container.start();
 
         // Start listening and log success/failure
         server.listen(ar -> {
@@ -128,7 +128,7 @@ public class DefaultJerseyServer implements JerseyServer {
     public void stop() {
         // Run jersey shutdown lifecycle
         if (container != null) {
-            container.getApplicationHandler().onShutdown(container);
+            container.stop();
             container = null;
         }
         // Destroy the jersey service locator

@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -39,15 +41,30 @@ public class DefaultVertxContainerTest {
     }
 
     @Test
-    public void testInit() throws Exception {
+    public void testStart() throws Exception {
 
         packages.add("com.englishtown.vertx.jersey.resources");
         container = new DefaultVertxContainer(vertx, options, locator, null);
+        container.start();
 
         assertEquals(options, container.getOptions());
         assertNotNull(container.getConfiguration());
         assertNotNull(container.getApplicationHandler());
         assertNotNull(container.getApplicationHandlerDelegate());
+
+        // Can't mock applicationHandler so can't verify onStartup() was called
+
+    }
+
+    @Test
+    public void testStop() throws Exception {
+
+        packages.add("com.englishtown.vertx.jersey.resources");
+        container = new DefaultVertxContainer(vertx, options, locator, null);
+        container.start();
+
+        container.stop();
+        // Can't mock applicationHandler so can't verify onShutdown() was called
 
     }
 
@@ -63,7 +80,7 @@ public class DefaultVertxContainerTest {
 
         packages.add("com.englishtown.vertx.jersey.resources");
         container = new DefaultVertxContainer(vertx, options, locator, configurator);
-        container.getApplicationHandler();
+        container.start();
 
         assertTrue(b[0]);
 
@@ -74,7 +91,7 @@ public class DefaultVertxContainerTest {
 
         try {
             container = new DefaultVertxContainer(vertx, options, locator, null);
-            container.getApplicationHandler();
+            container.start();
             fail();
 
         } catch (IllegalStateException e) {
