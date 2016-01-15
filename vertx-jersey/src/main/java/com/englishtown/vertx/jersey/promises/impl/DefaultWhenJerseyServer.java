@@ -30,9 +30,9 @@ import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Default implementation of {@link WhenJerseyServer}
@@ -40,26 +40,23 @@ import javax.inject.Inject;
 public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
     private final Vertx vertx;
-    private final JerseyServer jerseyServer;
-    private final JerseyOptions options;
+    private final Provider<JerseyServer> jerseyServerProvider;
     private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, JerseyServer jerseyServer, JerseyOptions options, When when) {
+    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, When when) {
         this.vertx = vertx;
-        this.jerseyServer = jerseyServer;
-        this.options = options;
+        this.jerseyServerProvider = jerseyServerProvider;
         this.when = when;
     }
 
     @Override
-    public Promise<JerseyServer> createServer(JsonObject config) {
+    public Promise<JerseyServer> createServer() {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
-            options.init(config);
-
-            jerseyServer.init(options, result -> {
+            JerseyServer jerseyServer = jerseyServerProvider.get();
+            jerseyServer.start(result -> {
                 if (result.succeeded()) {
                     d.resolve(jerseyServer);
                 } else {
@@ -78,13 +75,12 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
      * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}.
      * The promise type matches the WhenContainer signature to facilitate parallel deployments.
      *
-     * @param config the jersey json configuration
      * @return a promise for an empty string
      */
     @Override
-    public Promise<String> createServerSimple(JsonObject config) {
+    public Promise<String> createServerSimple() {
 
-        return createServer(config).then(jerseyServer -> when.resolve(""));
+        return createServer().then(jerseyServer -> when.resolve(""));
 
     }
 

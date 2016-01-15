@@ -25,6 +25,7 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -77,7 +78,7 @@ public class JerseyVerticleTest {
         verify(startedResult, never()).complete();
         verify(startedResult, never()).fail(any(Throwable.class));
 
-        verify(jerseyServer).init(any(JerseyOptions.class), handlerCaptor.capture());
+        verify(jerseyServer).start(handlerCaptor.capture());
 
         when(asyncResult.succeeded()).thenReturn(true).thenReturn(false);
 

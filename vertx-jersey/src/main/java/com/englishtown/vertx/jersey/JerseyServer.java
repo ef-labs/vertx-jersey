@@ -36,9 +36,11 @@ public interface JerseyServer {
      * Creates a vert.x {@link HttpServer} with a jersey handler
      *
      * @param options http server and jersey configuration settings
+     * @deprecated Use start() instead
      */
+    @Deprecated
     default void init(JerseyOptions options) {
-        init(options, null);
+        start();
     }
 
     /**
@@ -46,8 +48,26 @@ public interface JerseyServer {
      *
      * @param options     http server and jersey configuration settings
      * @param doneHandler the optional callback for when initialization has completed
+     * @deprecated Use start(doneHandler) instead
      */
-    void init(JerseyOptions options, Handler<AsyncResult<HttpServer>> doneHandler);
+    @Deprecated
+    default void init(JerseyOptions options, Handler<AsyncResult<HttpServer>> doneHandler) {
+        start(doneHandler);
+    }
+
+    /**
+     * Creates a vert.x {@link HttpServer} with a jersey handler
+     */
+    default void start() {
+        start(null);
+    }
+
+    /**
+     * Creates a vert.x {@link HttpServer} with a jersey handler
+     *
+     * @param doneHandler the optional callback for when initialization has completed
+     */
+    void start(Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
      * Allows custom setup during initialization before the http server is listening (add custom routes, etc.)
@@ -71,8 +91,15 @@ public interface JerseyServer {
     HttpServer getHttpServer();
 
     /**
+     * Shutdown jersey server and release resources
+     */
+    void stop();
+
+    /**
      * Release resources
      */
-    void close();
+    default void close() {
+        stop();
+    }
 
 }

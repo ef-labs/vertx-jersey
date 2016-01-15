@@ -27,7 +27,6 @@ import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.spi.Container;
 
 /**
  * Default {@link com.englishtown.vertx.jersey.ApplicationHandlerDelegate} implementation

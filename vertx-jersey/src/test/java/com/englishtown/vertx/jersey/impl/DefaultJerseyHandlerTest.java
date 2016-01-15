@@ -112,7 +112,7 @@ public class DefaultJerseyHandlerTest {
         when(container.getApplicationHandlerDelegate()).thenReturn(applicationHandlerDelegate);
         when(applicationHandlerDelegate.getServiceLocator()).thenReturn(serviceLocator);
         when(options.getMaxBodySize()).thenReturn(1024);
-        when(options.getBaseUri()).thenReturn(URI.create("/test/"));
+        when(options.getBaseUri()).thenReturn(URI.create("/test"));
 
         when(request.absoluteURI()).thenReturn(URI.create("http://test.englishtown.com/test").toString());
         when(request.response()).thenReturn(response);
@@ -129,7 +129,7 @@ public class DefaultJerseyHandlerTest {
         when(serviceLocator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
         }).getType())).thenReturn(containerRef);
 
-        jerseyHandler = new DefaultJerseyHandler(provider, requestProcessors);
+        jerseyHandler = new DefaultJerseyHandler(container, provider, requestProcessors);
     }
 
     @Test
@@ -138,7 +138,6 @@ public class DefaultJerseyHandlerTest {
         when(request.method()).thenReturn(HttpMethod.GET);
         when(request.headers()).thenReturn(mock(MultiMap.class));
 
-        jerseyHandler.init(container);
         jerseyHandler.handle(request);
         verify(applicationHandlerDelegate).handle(any(ContainerRequest.class));
 
@@ -152,7 +151,6 @@ public class DefaultJerseyHandlerTest {
         when(request.method()).thenReturn(HttpMethod.POST);
         when(request.headers()).thenReturn(new HeadersAdaptor(headers));
 
-        jerseyHandler.init(container);
         jerseyHandler.handle(request);
 
         verify(request).handler(dataHandlerCaptor.capture());
@@ -179,7 +177,6 @@ public class DefaultJerseyHandlerTest {
         requestProcessors.add(rp1);
         requestProcessors.add(rp2);
 
-        jerseyHandler.init(container);
         jerseyHandler.handle(request, inputStream);
 
         verify(rp1).process(any(HttpServerRequest.class), any(ContainerRequest.class), endHandlerCaptor.capture());
@@ -206,7 +203,6 @@ public class DefaultJerseyHandlerTest {
         requestProcessors.add(rp1);
         requestProcessors.add(rp2);
 
-        jerseyHandler.init(container);
         jerseyHandler.handle(request, inputStream);
 
         verify(rp1).process(any(), any(), endHandlerCaptor.capture());
@@ -281,8 +277,6 @@ public class DefaultJerseyHandlerTest {
         when(request.headers()).thenReturn(headers);
         when(headers.get(eq(HttpHeaders.HOST))).thenReturn(host);
 
-        jerseyHandler.init(container);
-
         uri = jerseyHandler.getAbsoluteURI(request);
         assertEquals("http://test.englishtown.com/test", uri.toString());
 
@@ -293,9 +287,8 @@ public class DefaultJerseyHandlerTest {
 
     @Test
     public void testGetBaseURI() throws Exception {
-        URI baseUri = URI.create("http://test.englishtown.com");
+        URI baseUri = URI.create("/test");
         when(options.getBaseUri()).thenReturn(baseUri);
-        jerseyHandler.init(container);
 
         URI result = jerseyHandler.getBaseUri();
         assertEquals(baseUri, result);

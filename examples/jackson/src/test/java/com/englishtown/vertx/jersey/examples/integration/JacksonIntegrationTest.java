@@ -64,10 +64,10 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
                 })
                 .setData(new JsonObject().put("name", "Andy").encode());
 
-        whenHttpClient.requestAbs(HttpMethod.POST, path, options)
+        getWhenHttpClient().requestAbs(HttpMethod.POST, path, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     JsonObject json = new JsonObject(body.toString());
@@ -83,10 +83,10 @@ public class JacksonIntegrationTest extends JerseyHK2IntegrationTestBase {
 
     private void runTest(String additionalPath, Consumer<Buffer> assertMethod) throws Exception {
 
-        whenHttpClient.requestAbs(HttpMethod.GET, BASE_PATH + additionalPath, new RequestOptions().setPauseResponse(true))
+        getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH + additionalPath, new RequestOptions().setPauseResponse(true))
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    return whenHttpClient.body(response);
+                    return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
                     assertMethod.accept(body);

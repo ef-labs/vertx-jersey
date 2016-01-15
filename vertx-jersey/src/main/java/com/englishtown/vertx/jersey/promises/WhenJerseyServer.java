@@ -35,18 +35,41 @@ public interface WhenJerseyServer {
     /**
      * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}
      *
-     * @param config the jersey json configuration
      * @return a promise for the server
      */
-    Promise<JerseyServer> createServer(JsonObject config);
+    Promise<JerseyServer> createServer();
+
+
+    /**
+     * Deprecated
+     *
+     * @param config the jersey json configuration
+     * @return a promise for the server
+     * @deprecated Use overload without config
+     */
+    @Deprecated
+    default Promise<JerseyServer> createServer(JsonObject config) {
+        return createServer();
+    }
 
     /**
      * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}.
      * The promise type matches the WhenContainer signature to facilitate parallel deployments.
      *
-     * @param config the jersey json configuration
      * @return a promise for an empty string
      */
-    Promise<String> createServerSimple(JsonObject config);
+    Promise<String> createServerSimple();
+
+    /**
+     * Deprecated
+     *
+     * @param config the jersey json configuration
+     * @return a promise for an empty string
+     * @deprecated Use overload without config
+     */
+    @Deprecated
+    default Promise<String> createServerSimple(JsonObject config) {
+        return createServerSimple();
+    }
 
 }

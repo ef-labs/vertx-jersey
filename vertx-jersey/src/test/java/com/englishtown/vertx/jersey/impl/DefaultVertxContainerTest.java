@@ -1,6 +1,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import io.vertx.core.Vertx;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -33,29 +36,53 @@ public class DefaultVertxContainerTest {
 
     @Before
     public void setUp() throws Exception {
-
         when(options.getPackages()).thenReturn(packages);
-
         locator = ServiceLocatorFactory.getInstance().create(null);
-        container = new DefaultVertxContainer(vertx, locator);
     }
 
     @Test
-    public void testInit() throws Exception {
+    public void testStart() throws Exception {
 
         packages.add("com.englishtown.vertx.jersey.resources");
-
-        assertNull(container.getOptions());
-        assertNull(container.getConfiguration());
-        assertNull(container.getApplicationHandler());
-        assertNull(container.getApplicationHandlerDelegate());
-
-        container.init(options);
+        container = new DefaultVertxContainer(vertx, options, locator, null);
+        container.start();
 
         assertEquals(options, container.getOptions());
         assertNotNull(container.getConfiguration());
         assertNotNull(container.getApplicationHandler());
         assertNotNull(container.getApplicationHandlerDelegate());
+
+        // Can't mock applicationHandler so can't verify onStartup() was called
+
+    }
+
+    @Test
+    public void testStop() throws Exception {
+
+        packages.add("com.englishtown.vertx.jersey.resources");
+        container = new DefaultVertxContainer(vertx, options, locator, null);
+        container.start();
+
+        container.stop();
+        // Can't mock applicationHandler so can't verify onShutdown() was called
+
+    }
+
+    @Test
+    public void testResourceConfigModifier() throws Exception {
+
+        boolean[] b = {false};
+
+        ApplicationConfigurator configurator = rc -> {
+            b[0] = true;
+            return rc;
+        };
+
+        packages.add("com.englishtown.vertx.jersey.resources");
+        container = new DefaultVertxContainer(vertx, options, locator, configurator);
+        container.start();
+
+        assertTrue(b[0]);
 
     }
 
@@ -63,7 +90,8 @@ public class DefaultVertxContainerTest {
     public void testInit_Missing_Resources() throws Exception {
 
         try {
-            container.init(options);
+            container = new DefaultVertxContainer(vertx, options, locator, null);
+            container.start();
             fail();
 
         } catch (IllegalStateException e) {

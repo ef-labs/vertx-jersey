@@ -20,7 +20,7 @@ public class SecurityContextIntegrationTest extends JerseyHK2IntegrationTestBase
 
     private void runTest(String role, int status) {
 
-        whenHttpClient.request(HttpMethod.GET, 8080, "localhost", BASE_PATH + role)
+        getWhenHttpClient().request(HttpMethod.GET, 8080, "localhost", BASE_PATH + role)
                 .then(response -> {
                     assertEquals(status, response.statusCode());
                     testComplete();

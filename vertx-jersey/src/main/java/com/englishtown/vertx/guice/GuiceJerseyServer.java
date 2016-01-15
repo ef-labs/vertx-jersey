@@ -1,6 +1,7 @@
 package com.englishtown.vertx.guice;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.google.inject.Injector;
@@ -11,6 +12,7 @@ import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.model.ModelProcessor;
+import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceScope;
@@ -31,8 +33,8 @@ import java.util.Set;
 public class GuiceJerseyServer extends DefaultJerseyServer {
 
     @Inject
-    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, ServiceLocator locator, Injector injector) {
-        super(jerseyHandler, container);
+    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, JerseyServerOptions options, ServiceLocator locator, Injector injector) {
+        super(jerseyHandler, container, options);
         initBridge(locator, injector);
     }
 
@@ -78,6 +80,8 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
         }, WriterInterceptor.class);
         injectMultiBindings(locator, injector, new Key<Set<ModelProcessor>>() {
         }, ModelProcessor.class);
+        injectMultiBindings(locator, injector, new Key<Set<ContainerLifecycleListener>>() {
+        }, ContainerLifecycleListener.class);
 
     }
 

@@ -1,9 +1,6 @@
 package com.englishtown.vertx.guice;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyOptions;
-import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.VertxContainer;
+import com.englishtown.vertx.jersey.*;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyOptions;
 import com.englishtown.vertx.jersey.impl.DefaultVertxContainer;
@@ -16,9 +13,11 @@ import com.englishtown.vertx.jersey.inject.impl.VertxResponseWriterProvider;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.multibindings.Multibinder;
+import com.google.inject.util.Providers;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.glassfish.jersey.server.model.ModelProcessor;
+import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 
 import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -49,8 +48,10 @@ public class GuiceJerseyBinder extends AbstractModule {
         bind(JerseyServer.class).to(GuiceJerseyServer.class);
         bind(JerseyHandler.class).to(DefaultJerseyHandler.class);
         bind(JerseyOptions.class).to(DefaultJerseyOptions.class);
+        bind(JerseyServerOptions.class).to(DefaultJerseyOptions.class);
         bind(ContainerResponseWriterProvider.class).to(VertxResponseWriterProvider.class);
         bind(MessageBodyWriter.class).to(WriteStreamBodyWriter.class).in(Singleton.class);
+        bind(ApplicationConfigurator.class).toProvider(Providers.of(null));
 
         Multibinder.newSetBinder(binder(), VertxRequestProcessor.class);
         Multibinder.newSetBinder(binder(), VertxResponseProcessor.class);
@@ -61,6 +62,7 @@ public class GuiceJerseyBinder extends AbstractModule {
         Multibinder.newSetBinder(binder(), ReaderInterceptor.class);
         Multibinder.newSetBinder(binder(), WriterInterceptor.class);
         Multibinder.newSetBinder(binder(), ModelProcessor.class);
+        Multibinder.newSetBinder(binder(), ContainerLifecycleListener.class);
 
     }
 

@@ -41,6 +41,8 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.inject.Provider;
+
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,6 +58,8 @@ public class DefaultWhenJerseyServerTest {
     private Done<JerseyServer> done = new Done<>();
 
     @Mock
+    Provider<JerseyServer> serverProvider;
+    @Mock
     JerseyServer server;
     @Mock
     JerseyOptions options;
@@ -69,7 +73,8 @@ public class DefaultWhenJerseyServerTest {
     @Before
     public void setUp() {
         When when = WhenFactory.createSync();
-        whenJerseyServer = new DefaultWhenJerseyServer(vertx, server, options, when);
+        when(serverProvider.get()).thenReturn(server);
+        whenJerseyServer = new DefaultWhenJerseyServer(vertx, serverProvider, when);
     }
 
     @Test
@@ -77,11 +82,10 @@ public class DefaultWhenJerseyServerTest {
 
         when(result.succeeded()).thenReturn(true);
 
-        whenJerseyServer.createServer(config)
+        whenJerseyServer.createServer()
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(options).init(eq(config));
-        verify(server).init(eq(options), handlerCaptor.capture());
+        verify(server).start(handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
         done.assertFulfilled();
@@ -93,11 +97,10 @@ public class DefaultWhenJerseyServerTest {
 
         when(result.succeeded()).thenReturn(false);
 
-        whenJerseyServer.createServer(config)
+        whenJerseyServer.createServer()
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(options).init(eq(config));
-        verify(server).init(eq(options), handlerCaptor.capture());
+        verify(server).start(handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
         done.assertRejected();

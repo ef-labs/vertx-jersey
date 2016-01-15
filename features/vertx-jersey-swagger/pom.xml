@@ -7,12 +7,12 @@
     <parent>
         <artifactId>vertx-jersey-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <properties>
-        <swagger.version>1.5.3</swagger.version>
+        <swagger.version>1.5.6</swagger.version>
         <javax.servlet.version>3.1.0</javax.servlet.version>
     </properties>
 

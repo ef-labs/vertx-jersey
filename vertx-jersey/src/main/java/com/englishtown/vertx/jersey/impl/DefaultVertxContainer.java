@@ -1,9 +1,11 @@
 package com.englishtown.vertx.jersey.impl;
 
+import com.englishtown.vertx.jersey.ApplicationConfigurator;
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.InternalVertxJerseyBinder;
+import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.Vertx;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.jersey.server.ApplicationHandler;
@@ -23,22 +25,46 @@ public class DefaultVertxContainer implements VertxContainer {
 
     private final Vertx vertx;
     private final ServiceLocator locator;
+    private final ApplicationConfigurator configurator;
     private JerseyOptions options;
     private ApplicationHandlerDelegate applicationHandlerDelegate;
+    private boolean started;
 
     @Inject
-    public DefaultVertxContainer(Vertx vertx, @Optional ServiceLocator locator) {
+    public DefaultVertxContainer(Vertx vertx, JerseyOptions options, @Optional @Nullable ServiceLocator locator, @Optional @Nullable ApplicationConfigurator configurator) {
         this.vertx = vertx;
+        this.options = options;
         this.locator = locator;
+        this.configurator = configurator;
     }
 
+    /**
+     * Starts the container
+     */
     @Override
-    public void init(JerseyOptions options) {
-        this.options = options;
-        ResourceConfig rc = createConfiguration();
-        ApplicationHandler applicationHandler = new ApplicationHandler(rc, null, locator);
-        applicationHandler.onStartup(this);
-        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
+    public void start() {
+        if (started) {
+            return;
+        }
+        ApplicationHandler handler = getApplicationHandler();
+        if (handler == null) {
+            throw new IllegalStateException("ApplicationHandler cannot be null");
+        }
+        handler.onStartup(this);
+        started = true;
+    }
+
+    /**
+     * Stops the container
+     */
+    @Override
+    public void stop() {
+        if (!started) {
+            return;
+        }
+        getApplicationHandler().onShutdown(this);
+        applicationHandlerDelegate = null;
+        started = false;
     }
 
     /**
@@ -58,6 +84,11 @@ public class DefaultVertxContainer implements VertxContainer {
 
     @Override
     public ApplicationHandlerDelegate getApplicationHandlerDelegate() {
+        if (applicationHandlerDelegate == null) {
+            ResourceConfig rc = createConfiguration();
+            ApplicationHandler applicationHandler = new ApplicationHandler(rc, null, locator);
+            applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
+        }
         return applicationHandlerDelegate;
     }
 
@@ -80,7 +111,7 @@ public class DefaultVertxContainer implements VertxContainer {
      */
     @Override
     public ApplicationHandler getApplicationHandler() {
-        return applicationHandlerDelegate == null ? null : applicationHandlerDelegate.getApplicationHandler();
+        return getApplicationHandlerDelegate().getApplicationHandler();
     }
 
     /**
@@ -101,9 +132,9 @@ public class DefaultVertxContainer implements VertxContainer {
     @Override
     public void reload(ResourceConfig configuration) {
         ApplicationHandler applicationHandler = new ApplicationHandler(configuration, null, locator);
+        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
         getApplicationHandler().onReload(this);
         applicationHandler.onStartup(this);
-        applicationHandlerDelegate = new DefaultApplicationHandlerDelegate(applicationHandler);
     }
 
     protected ResourceConfig createConfiguration() {
@@ -133,6 +164,10 @@ public class DefaultVertxContainer implements VertxContainer {
         Map<String, Object> properties = options.getProperties();
         if (properties != null) {
             rc.addProperties(properties);
+        }
+
+        if (configurator != null) {
+            rc = configurator.configure(rc);
         }
 
         return rc;
