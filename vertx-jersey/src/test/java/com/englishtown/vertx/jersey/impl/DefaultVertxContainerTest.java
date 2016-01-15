@@ -95,7 +95,7 @@ public class DefaultVertxContainerTest {
             fail();
 
         } catch (IllegalStateException e) {
-            assertEquals("At least one resource package name must be specified", e.getMessage());
+            assertEquals("At least one resource package name or component must be specified", e.getMessage());
 
         }
 

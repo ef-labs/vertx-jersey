@@ -154,13 +154,18 @@ public class DefaultVertxContainer implements VertxContainer {
         ResourceConfig rc = new ResourceConfig();
 
         List<String> packages = options.getPackages();
-        if (packages == null || packages.size() == 0) {
-            throw new IllegalStateException("At least one resource package name must be specified");
-        }
-        rc.packages(packages.toArray(new String[packages.size()]));
-
         Set<Class<?>> components = options.getComponents();
-        if (components != null) {
+        boolean hasPackages = (packages != null && !packages.isEmpty());
+        boolean hasComponents = (components != null && !components.isEmpty());
+
+        if (!hasComponents && !hasPackages) {
+            throw new IllegalStateException("At least one resource package name or component must be specified");
+        }
+
+        if (hasPackages) {
+            rc.packages(packages.toArray(new String[packages.size()]));
+        }
+        if (hasComponents) {
             rc.registerClasses(components);
         }
 
