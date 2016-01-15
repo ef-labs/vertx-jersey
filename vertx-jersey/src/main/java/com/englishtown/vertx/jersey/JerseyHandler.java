@@ -35,17 +35,21 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
 
     /**
      * @param options
-     * @deprecated Use overload with {@link VertxContainer} instead.
+     * @deprecated Perform initialization at construction time
      */
     @Deprecated
-    void init(JerseyOptions options);
+    default void init(JerseyOptions options) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
-     * Initialize the handler with the container instances
-     *
      * @param container contains configuration details
+     * @deprecated Perform initialization at construction time
      */
-    void init(VertxContainer container);
+    @Deprecated
+    default void init(VertxContainer container) {
+        throw new UnsupportedOperationException();
+    }
 
     URI getBaseUri();
 

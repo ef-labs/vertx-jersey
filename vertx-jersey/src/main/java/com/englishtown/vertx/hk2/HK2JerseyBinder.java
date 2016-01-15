@@ -137,7 +137,7 @@ public class HK2JerseyBinder extends AbstractBinder {
         bind(DefaultVertxContainer.class).to(VertxContainer.class);
         bind(DefaultJerseyServer.class).to(JerseyServer.class);
         bind(DefaultJerseyHandler.class).to(JerseyHandler.class);
-        bind(DefaultJerseyOptions.class).to(JerseyOptions.class);
+        bind(DefaultJerseyOptions.class).to(JerseyOptions.class).to(JerseyServerOptions.class);
         bind(VertxResponseWriterProvider.class).to(ContainerResponseWriterProvider.class);
         bind(WriteStreamBodyWriter.class).to(MessageBodyWriter.class).in(Singleton.class);
 

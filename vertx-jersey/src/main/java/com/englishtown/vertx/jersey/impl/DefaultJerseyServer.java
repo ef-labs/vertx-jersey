@@ -23,10 +23,7 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyOptions;
-import com.englishtown.vertx.jersey.JerseyServer;
-import com.englishtown.vertx.jersey.VertxContainer;
+import com.englishtown.vertx.jersey.*;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
@@ -46,47 +43,27 @@ public class DefaultJerseyServer implements JerseyServer {
 
     private JerseyHandler jerseyHandler;
     private VertxContainer container;
+    private JerseyServerOptions options;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
-    public DefaultJerseyServer(JerseyHandler jerseyHandler, VertxContainer container) {
+    public DefaultJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, JerseyServerOptions options) {
         this.jerseyHandler = jerseyHandler;
         this.container = container;
+        this.options = options;
     }
 
     @Override
-    public void init(
-            JerseyOptions options,
-            Handler<AsyncResult<HttpServer>> doneHandler) {
+    public void start(Handler<AsyncResult<HttpServer>> doneHandler) {
 
-        // Setup the http server options
-        HttpServerOptions serverOptions = new HttpServerOptions()
-                .setHost(options.getHost())
-                .setPort(options.getPort())
-                .setAcceptBacklog(options.getAcceptBacklog()) // Performance tweak
-                .setCompressionSupported(options.getCompressionSupported());
-
-        // Enable https
-        if (options.getSSL()) {
-            serverOptions.setSsl(true);
-        }
-        if (options.getKeyStoreOptions() != null) {
-            serverOptions.setKeyStoreOptions(options.getKeyStoreOptions());
-        }
-
-        Integer receiveBufferSize = options.getReceiveBufferSize();
-        if (receiveBufferSize != null && receiveBufferSize > 0) {
-            // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
-            serverOptions.setReceiveBufferSize(receiveBufferSize);
+        HttpServerOptions serverOptions = options.getServerOptions();
+        if (serverOptions == null) {
+            throw new IllegalArgumentException("http server options cannot be null");
         }
 
         // Create the http server
         server = container.getVertx().createHttpServer(serverOptions);
-
-        // Init container and handler
-        container.init(options);
-        jerseyHandler.init(container);
 
         // Set request handler for the baseUri
         server.requestHandler(jerseyHandler::handle);
@@ -96,9 +73,12 @@ public class DefaultJerseyServer implements JerseyServer {
             setupHandler.handle(server);
         }
 
+        // Run container startup
+        container.start();
+
         // Start listening and log success/failure
         server.listen(ar -> {
-            final String listenPath = (options.getSSL() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
+            final String listenPath = (serverOptions.isSsl() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
             if (ar.succeeded()) {
                 logger.info("Http server listening for " + listenPath);
             } else {
@@ -142,13 +122,13 @@ public class DefaultJerseyServer implements JerseyServer {
     }
 
     /**
-     * Releases resources
+     * Shutdown jersey server and release resources
      */
     @Override
-    public void close() {
+    public void stop() {
         // Run jersey shutdown lifecycle
         if (container != null) {
-            container.getApplicationHandler().onShutdown(container);
+            container.stop();
             container = null;
         }
         // Destroy the jersey service locator

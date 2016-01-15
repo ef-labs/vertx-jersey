@@ -1,6 +1,7 @@
 package com.englishtown.vertx.guice;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -38,6 +39,8 @@ public class GuiceJerseyServerTest {
     @Mock
     VertxContainer container;
     @Mock
+    JerseyServerOptions options;
+    @Mock
     ServiceLocator locator;
     @Mock
     DynamicConfigurationService dcs;
@@ -62,7 +65,7 @@ public class GuiceJerseyServerTest {
 
         when(injector.getInstance(Matchers.any(key.getClass()))).thenReturn(set);
 
-        server = new GuiceJerseyServer(handler, container, locator, injector);
+        server = new GuiceJerseyServer(handler, container, options, locator, injector);
     }
 
     @Test

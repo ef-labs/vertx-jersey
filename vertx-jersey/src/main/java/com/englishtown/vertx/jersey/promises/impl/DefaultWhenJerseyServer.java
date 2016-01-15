@@ -30,7 +30,6 @@ import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -42,28 +41,22 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
 
     private final Vertx vertx;
     private final Provider<JerseyServer> jerseyServerProvider;
-    private final Provider<JerseyOptions> optionsProvider;
     private final When when;
 
     @Inject
-    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, Provider<JerseyOptions> optionsProvider, When when) {
+    public DefaultWhenJerseyServer(Vertx vertx, Provider<JerseyServer> jerseyServerProvider, When when) {
         this.vertx = vertx;
         this.jerseyServerProvider = jerseyServerProvider;
-        this.optionsProvider = optionsProvider;
         this.when = when;
     }
 
     @Override
-    public Promise<JerseyServer> createServer(JsonObject config) {
+    public Promise<JerseyServer> createServer() {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
-            JerseyOptions options = optionsProvider.get();
             JerseyServer jerseyServer = jerseyServerProvider.get();
-
-            options.init(config);
-
-            jerseyServer.init(options, result -> {
+            jerseyServer.start(result -> {
                 if (result.succeeded()) {
                     d.resolve(jerseyServer);
                 } else {
@@ -82,13 +75,12 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
      * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}.
      * The promise type matches the WhenContainer signature to facilitate parallel deployments.
      *
-     * @param config the jersey json configuration
      * @return a promise for an empty string
      */
     @Override
-    public Promise<String> createServerSimple(JsonObject config) {
+    public Promise<String> createServerSimple() {
 
-        return createServer(config).then(jerseyServer -> when.resolve(""));
+        return createServer().then(jerseyServer -> when.resolve(""));
 
     }
 

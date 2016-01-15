@@ -23,12 +23,15 @@
 
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyOptions;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
+import io.vertx.core.Vertx;
+import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.net.JksOptions;
 
+import javax.inject.Inject;
 import java.net.URI;
 import java.util.*;
 import java.util.function.Consumer;
@@ -36,16 +39,16 @@ import java.util.function.Consumer;
 /**
  * Default {@link com.englishtown.vertx.jersey.JerseyOptions} implementation
  */
-public class DefaultJerseyOptions implements JerseyOptions {
+public class DefaultJerseyOptions implements JerseyOptions, JerseyServerOptions {
 
-    final static String CONFIG_HOST = "host";
-    final static String CONFIG_PORT = "port";
-    final static String CONFIG_SSL = "ssl";
-    final static String CONFIG_JKS_OPTIONS = "jks_options";
-    final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
-    final static String CONFIG_BACKLOG_SIZE = "backlog_size";
-    final static String CONFIG_RESOURCE_CONFIG = "resource_config";
-    final static String CONFIG_COMPRESSION_SUPPORTED = "compression_supported";
+    public final static String CONFIG_HOST = "host";
+    public final static String CONFIG_PORT = "port";
+    public final static String CONFIG_SSL = "ssl";
+    public final static String CONFIG_JKS_OPTIONS = "jks_options";
+    public final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
+    public final static String CONFIG_BACKLOG_SIZE = "backlog_size";
+    public final static String CONFIG_RESOURCE_CONFIG = "resource_config";
+    public final static String CONFIG_COMPRESSION_SUPPORTED = "compression_supported";
 
     public static final String CONFIG_BASE_PATH = "base_path";
     public static final String CONFIG_MAX_BODY_SIZE = "max_body_size";
@@ -58,13 +61,12 @@ public class DefaultJerseyOptions implements JerseyOptions {
     public static final int DEFAULT_MAX_BODY_SIZE = 1024 * 1000; // Default max body size to 1MB
 
     private JsonObject config;
+    private HttpServerOptions serverOptions;
 
-    @Override
-    public void init(JsonObject config) {
-        if (config == null) {
-            throw new IllegalStateException("The provided configuration was null");
-        }
-        this.config = config;
+    @Inject
+    public DefaultJerseyOptions(Vertx vertx) {
+        config = vertx.getOrCreateContext().config();
+        config = config.getJsonObject("jersey", config);
     }
 
     /**
@@ -74,7 +76,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      */
     @Override
     public List<String> getPackages() {
-        checkState();
         List<String> list = new ArrayList<>();
 
         Consumer<JsonArray> reader = array -> {
@@ -101,7 +102,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      */
     @Override
     public Map<String, Object> getProperties() {
-        checkState();
         JsonObject json = config.getJsonObject(CONFIG_RESOURCE_CONFIG);
         return json == null ? null : json.getMap();
     }
@@ -113,7 +113,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      */
     @Override
     public Set<Class<?>> getComponents() {
-        checkState();
         Set<Class<?>> set = new HashSet<>();
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
@@ -175,9 +174,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return the http web server host to listen to
      */
-    @Override
     public String getHost() {
-        checkState();
         return config.getString(CONFIG_HOST, "0.0.0.0");
     }
 
@@ -186,9 +183,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return the http web server port to listen to
      */
-    @Override
     public int getPort() {
-        checkState();
         return config.getInteger(CONFIG_PORT, 80);
     }
 
@@ -197,7 +192,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return whether the web server should be https.
      */
-    @Override
     public boolean getSSL() {
         return config.getBoolean(CONFIG_SSL, false);
     }
@@ -207,7 +201,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return Java key store options
      */
-    @Override
     public JksOptions getKeyStoreOptions() {
         JsonObject json = config.getJsonObject(CONFIG_JKS_OPTIONS);
         return json == null ? null : new JksOptions(json);
@@ -218,9 +211,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return buffer size in bytes
      */
-    @Override
     public Integer getReceiveBufferSize() {
-        checkState();
         return config.getInteger(CONFIG_RECEIVE_BUFFER_SIZE);
     }
 
@@ -229,9 +220,7 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return the accept backlog
      */
-    @Override
     public int getAcceptBacklog() {
-        checkState();
         return config.getInteger(CONFIG_BACKLOG_SIZE, 10000);
     }
 
@@ -242,24 +231,11 @@ public class DefaultJerseyOptions implements JerseyOptions {
      */
     @Override
     public URI getBaseUri() {
-        checkState();
         String basePath = config.getString(CONFIG_BASE_PATH, "/");
         if (!basePath.endsWith("/")) {
             basePath += "/";
         }
         return URI.create(basePath);
-    }
-
-    /**
-     * Returns the Jersey {@link org.glassfish.jersey.server.ApplicationHandler} instance
-     *
-     * @return the application handler instance
-     * @deprecated
-     */
-    @Deprecated
-    @Override
-    public ApplicationHandlerDelegate getApplicationHandler() {
-        throw new UnsupportedOperationException("getApplicatinoHandler is deprecated");
     }
 
     /**
@@ -269,7 +245,6 @@ public class DefaultJerseyOptions implements JerseyOptions {
      */
     @Override
     public int getMaxBodySize() {
-        checkState();
         return config.getInteger(CONFIG_MAX_BODY_SIZE, DEFAULT_MAX_BODY_SIZE);
     }
 
@@ -278,16 +253,47 @@ public class DefaultJerseyOptions implements JerseyOptions {
      *
      * @return whether compression is supported
      */
-    @Override
     public boolean getCompressionSupported() {
-        checkState();
         return config.getBoolean(CONFIG_COMPRESSION_SUPPORTED, false);
     }
 
-    private void checkState() {
-        if (config == null) {
-            throw new IllegalStateException("The jersey options have not been initialized.");
+    /**
+     * Gets the {@link HttpServerOptions} used to set up the vert.x http server
+     *
+     * @return
+     */
+    @Override
+    public HttpServerOptions getServerOptions() {
+        if (serverOptions == null) {
+            serverOptions = createServerOptions();
         }
+
+        return serverOptions;
+    }
+
+    protected HttpServerOptions createServerOptions() {
+        // Setup the http server options
+        HttpServerOptions serverOptions = new HttpServerOptions()
+                .setHost(getHost())
+                .setPort(getPort())
+                .setAcceptBacklog(getAcceptBacklog()) // Performance tweak
+                .setCompressionSupported(getCompressionSupported());
+
+        // Enable https
+        if (getSSL()) {
+            serverOptions.setSsl(true);
+        }
+        if (getKeyStoreOptions() != null) {
+            serverOptions.setKeyStoreOptions(getKeyStoreOptions());
+        }
+
+        Integer receiveBufferSize = getReceiveBufferSize();
+        if (receiveBufferSize != null && receiveBufferSize > 0) {
+            // TODO: This doesn't seem to actually affect buffer size for dataHandler.  Is this being used correctly or is it a Vertx bug?
+            serverOptions.setReceiveBufferSize(receiveBufferSize);
+        }
+
+        return serverOptions;
     }
 
 }

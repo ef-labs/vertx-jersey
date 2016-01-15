@@ -1,6 +1,7 @@
 package com.englishtown.vertx.guice;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyServer;
 import com.google.inject.Injector;
@@ -32,8 +33,8 @@ import java.util.Set;
 public class GuiceJerseyServer extends DefaultJerseyServer {
 
     @Inject
-    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, ServiceLocator locator, Injector injector) {
-        super(jerseyHandler, container);
+    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, JerseyServerOptions options, ServiceLocator locator, Injector injector) {
+        super(jerseyHandler, container, options);
         initBridge(locator, injector);
     }
 

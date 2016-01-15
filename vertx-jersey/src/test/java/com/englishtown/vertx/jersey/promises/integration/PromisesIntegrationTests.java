@@ -30,7 +30,6 @@ import com.englishtown.vertx.guice.WhenGuiceJerseyBinder;
 import com.englishtown.vertx.hk2.HK2VertxBinder;
 import com.englishtown.vertx.hk2.WhenHK2JerseyBinder;
 import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.impl.DefaultJerseyHandler;
@@ -83,25 +82,31 @@ public abstract class PromisesIntegrationTests extends VertxTestBase {
 
     private void createServer(String host, int port) throws Exception {
 
-        JsonObject config = new JsonObject()
-                .put("host", host)
-                .put("port", port)
-                .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.promises.integration.resources"));
 
         CountDownLatch latch = new CountDownLatch(1);
 
-        getWhenJerseyServer().createServer(config)
-                .then(value -> {
-                    jerseyServer = value;
-                    latch.countDown();
-                    return null;
-                })
-                .otherwise(t -> {
-                    latch.countDown();
-                    t.printStackTrace();
-                    fail();
-                    return null;
-                });
+        vertx.runOnContext(aVoid -> {
+            vertx.getOrCreateContext()
+                    .config()
+                    .put("jersey", new JsonObject()
+                            .put("host", host)
+                            .put("port", port)
+                            .put("resources", new JsonArray().add("com.englishtown.vertx.jersey.promises.integration.resources")));
+
+            getWhenJerseyServer().createServer()
+                    .then(value -> {
+                        jerseyServer = value;
+                        latch.countDown();
+                        return null;
+                    })
+                    .otherwise(t -> {
+                        latch.countDown();
+                        t.printStackTrace();
+                        fail();
+                        return null;
+                    });
+
+        });
 
         latch.await(10, TimeUnit.SECONDS);
     }
@@ -199,13 +204,13 @@ public abstract class PromisesIntegrationTests extends VertxTestBase {
                     new ArrayList<>(),
                     new ArrayList<>());
 
-            VertxContainer container = new DefaultVertxContainer(vertx, null, null);
-            JerseyHandler handler = new DefaultJerseyHandler(provider, new ArrayList<>());
-            JerseyServer server = new DefaultJerseyServer(handler, container);
-            JerseyOptions options = new DefaultJerseyOptions();
+            DefaultJerseyOptions options = new DefaultJerseyOptions(vertx);
+            VertxContainer container = new DefaultVertxContainer(vertx, options, null, null);
+            JerseyHandler handler = new DefaultJerseyHandler(container, provider, new ArrayList<>());
+            JerseyServer server = new DefaultJerseyServer(handler, container, options);
             When when = WhenFactory.createSync();
 
-            return new DefaultWhenJerseyServer(vertx, () -> server, () -> options, when);
+            return new DefaultWhenJerseyServer(vertx, () -> server, when);
 
         }
 
