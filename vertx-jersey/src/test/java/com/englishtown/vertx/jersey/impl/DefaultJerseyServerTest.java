@@ -94,7 +94,7 @@ public class DefaultJerseyServerTest {
         when(options.getServerOptions()).thenReturn(serverOptions);
 
         when(jerseyHandler.getBaseUri()).thenReturn(baseUri);
-        jerseyServer = new DefaultJerseyServer(jerseyHandler, container, options);
+        jerseyServer = new DefaultJerseyServer(jerseyHandler, container, () -> options);
 
     }
 

@@ -129,7 +129,7 @@ public class DefaultJerseyHandlerTest {
         when(serviceLocator.<Ref<Container>>getService((new TypeLiteral<Ref<Container>>() {
         }).getType())).thenReturn(containerRef);
 
-        jerseyHandler = new DefaultJerseyHandler(container, provider, requestProcessors);
+        jerseyHandler = new DefaultJerseyHandler(() -> container, provider, requestProcessors);
     }
 
     @Test

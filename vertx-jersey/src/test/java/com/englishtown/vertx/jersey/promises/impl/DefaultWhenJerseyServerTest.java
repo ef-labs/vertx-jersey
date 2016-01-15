@@ -43,6 +43,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Provider;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -85,7 +86,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer()
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(server).start(handlerCaptor.capture());
+        verify(server).start(any(), any(), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
         done.assertFulfilled();
@@ -100,7 +101,7 @@ public class DefaultWhenJerseyServerTest {
         whenJerseyServer.createServer()
                 .then(done.onFulfilled, done.onRejected);
 
-        verify(server).start(handlerCaptor.capture());
+        verify(server).start(any(), any(), handlerCaptor.capture());
 
         handlerCaptor.getValue().handle(result);
         done.assertRejected();

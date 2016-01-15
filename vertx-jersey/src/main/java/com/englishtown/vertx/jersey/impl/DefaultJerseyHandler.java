@@ -25,7 +25,6 @@ package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.ApplicationHandlerDelegate;
 import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import com.englishtown.vertx.jersey.inject.ContainerResponseWriterProvider;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
@@ -45,6 +44,7 @@ import org.glassfish.jersey.internal.util.collection.Ref;
 import org.glassfish.jersey.server.ContainerRequest;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriBuilder;
@@ -60,9 +60,10 @@ import java.util.Map;
  */
 public class DefaultJerseyHandler implements JerseyHandler {
 
+    private Provider<VertxContainer> containerProvider;
     private VertxContainer container;
     private URI baseUri;
-    private int maxBodySize;
+    private Integer maxBodySize;
 
     private final ContainerResponseWriterProvider responseWriterProvider;
     private final List<VertxRequestProcessor> requestProcessors;
@@ -70,33 +71,52 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
     @Inject
     public DefaultJerseyHandler(
-            VertxContainer container,
+            Provider<VertxContainer> containerProvider,
             ContainerResponseWriterProvider responseWriterProvider,
             List<VertxRequestProcessor> requestProcessors) {
-        this.container = container;
+        this.containerProvider = containerProvider;
         this.responseWriterProvider = responseWriterProvider;
         this.requestProcessors = requestProcessors;
-
-        baseUri = container.getOptions().getBaseUri();
-        maxBodySize = container.getOptions().getMaxBodySize();
     }
 
     @Override
     public URI getBaseUri() {
         if (baseUri == null) {
-            throw new IllegalStateException("baseUri is null, have you called init() first?");
+            baseUri = getContainer().getOptions().getBaseUri();
+            if (baseUri == null) {
+                throw new IllegalStateException("baseUri is null, have you called init() first?");
+            }
         }
         return baseUri;
     }
 
+    public int getMaxBodySize() {
+        if (maxBodySize == null) {
+            maxBodySize = getContainer().getOptions().getMaxBodySize();
+            if (maxBodySize <= 0) {
+                maxBodySize = DefaultJerseyOptions.DEFAULT_MAX_BODY_SIZE;
+            }
+        }
+        return maxBodySize;
+    }
+
     @Override
     public ApplicationHandlerDelegate getDelegate() {
-        return container.getApplicationHandlerDelegate();
+        return getContainer().getApplicationHandlerDelegate();
     }
 
     @Override
     public VertxContainer getContainer() {
+        if (container == null) {
+            container = containerProvider.get();
+        }
         return container;
+    }
+
+    @Override
+    public JerseyHandler setContainer(VertxContainer container) {
+        this.container = container;
+        return this;
     }
 
     /**
@@ -114,9 +134,9 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
             vertxRequest.handler(buffer -> {
                 body.appendBuffer(buffer);
-                if (body.length() > maxBodySize) {
+                if (body.length() > getMaxBodySize()) {
                     throw new RuntimeException("The input stream has exceeded the max allowed body size "
-                            + maxBodySize + ".");
+                            + getMaxBodySize() + ".");
                 }
             });
             vertxRequest.endHandler(aVoid -> {
@@ -142,7 +162,7 @@ public class DefaultJerseyHandler implements JerseyHandler {
         boolean isSecure = "https".equalsIgnoreCase(uri.getScheme());
 
         UriBuilder baseUriBuilder = UriBuilder.fromUri(uri)
-                .replacePath(baseUri.getPath())
+                .replacePath(getBaseUri().getPath())
                 .replaceQuery(null);
 
         // Create the jersey request

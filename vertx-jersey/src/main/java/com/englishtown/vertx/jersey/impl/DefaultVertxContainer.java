@@ -82,6 +82,18 @@ public class DefaultVertxContainer implements VertxContainer {
         return options;
     }
 
+    /**
+     * Set the jersey configuration options
+     *
+     * @param options
+     * @return
+     */
+    @Override
+    public VertxContainer setOptions(JerseyOptions options) {
+        this.options = options;
+        return this;
+    }
+
     @Override
     public ApplicationHandlerDelegate getApplicationHandlerDelegate() {
         if (applicationHandlerDelegate == null) {

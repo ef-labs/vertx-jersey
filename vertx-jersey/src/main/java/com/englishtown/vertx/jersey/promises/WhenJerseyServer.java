@@ -24,7 +24,10 @@
 package com.englishtown.vertx.jersey.promises;
 
 import com.englishtown.promises.Promise;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
+import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -37,8 +40,16 @@ public interface WhenJerseyServer {
      *
      * @return a promise for the server
      */
-    Promise<JerseyServer> createServer();
+    default Promise<JerseyServer> createServer() {
+        return createServer(null, null);
+    }
 
+    /**
+     * Returns a promise for asynchronously creating a {@link com.englishtown.vertx.jersey.JerseyServer}
+     *
+     * @return a promise for the server
+     */
+    Promise<JerseyServer> createServer(@Nullable JerseyServerOptions options, @Nullable JerseyOptions jerseyOptions);
 
     /**
      * Deprecated

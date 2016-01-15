@@ -41,6 +41,14 @@ public interface VertxContainer extends Container {
      */
     JerseyOptions getOptions();
 
+    /**
+     * Set the jersey configuration options
+     *
+     * @param options
+     * @return
+     */
+    VertxContainer setOptions(JerseyOptions options);
+
     ApplicationHandlerDelegate getApplicationHandlerDelegate();
 
 }

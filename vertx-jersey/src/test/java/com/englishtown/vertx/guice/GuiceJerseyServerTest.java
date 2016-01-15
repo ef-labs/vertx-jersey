@@ -65,7 +65,7 @@ public class GuiceJerseyServerTest {
 
         when(injector.getInstance(Matchers.any(key.getClass()))).thenReturn(set);
 
-        server = new GuiceJerseyServer(handler, container, options, locator, injector);
+        server = new GuiceJerseyServer(handler, container, () -> options, locator, injector);
     }
 
     @Test
