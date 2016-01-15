@@ -19,6 +19,7 @@ import org.jvnet.hk2.guice.bridge.api.GuiceScope;
 import org.jvnet.hk2.guice.bridge.internal.GuiceScopeContext;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
@@ -33,8 +34,8 @@ import java.util.Set;
 public class GuiceJerseyServer extends DefaultJerseyServer {
 
     @Inject
-    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, JerseyServerOptions options, ServiceLocator locator, Injector injector) {
-        super(jerseyHandler, container, options);
+    public GuiceJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, Provider<JerseyServerOptions> optionsProvider, ServiceLocator locator, Injector injector) {
+        super(jerseyHandler, container, optionsProvider);
         initBridge(locator, injector);
     }
 

@@ -57,4 +57,6 @@ public interface JerseyHandler extends Handler<HttpServerRequest> {
 
     VertxContainer getContainer();
 
+    JerseyHandler setContainer(VertxContainer container);
+
 }

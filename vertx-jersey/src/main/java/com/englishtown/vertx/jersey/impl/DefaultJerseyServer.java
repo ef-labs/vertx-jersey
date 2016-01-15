@@ -24,6 +24,7 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.*;
+import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
@@ -33,6 +34,7 @@ import io.vertx.core.logging.LoggerFactory;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 
 import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Default implementation of {@link JerseyServer}
@@ -43,24 +45,36 @@ public class DefaultJerseyServer implements JerseyServer {
 
     private JerseyHandler jerseyHandler;
     private VertxContainer container;
-    private JerseyServerOptions options;
+    private final Provider<JerseyServerOptions> optionsProvider;
     private Handler<HttpServer> setupHandler;
     private HttpServer server;
 
     @Inject
-    public DefaultJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, JerseyServerOptions options) {
+    public DefaultJerseyServer(JerseyHandler jerseyHandler, VertxContainer container, Provider<JerseyServerOptions> optionsProvider) {
         this.jerseyHandler = jerseyHandler;
         this.container = container;
-        this.options = options;
+        this.optionsProvider = optionsProvider;
     }
 
     @Override
-    public void start(Handler<AsyncResult<HttpServer>> doneHandler) {
+    public void start(@Nullable JerseyServerOptions options, @Nullable JerseyOptions jerseyOptions, @Nullable Handler<AsyncResult<HttpServer>> doneHandler) {
+
+        if (options == null) {
+            options = optionsProvider.get();
+        }
 
         HttpServerOptions serverOptions = options.getServerOptions();
         if (serverOptions == null) {
             throw new IllegalArgumentException("http server options cannot be null");
         }
+
+        // Create container and set options if provided
+        if (jerseyOptions != null) {
+            container.setOptions(jerseyOptions);
+        }
+
+        // Create handler and set container
+        jerseyHandler.setContainer(container);
 
         // Create the http server
         server = container.getVertx().createHttpServer(serverOptions);

@@ -28,6 +28,8 @@ import com.englishtown.promises.Promise;
 import com.englishtown.promises.When;
 import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
+import com.englishtown.vertx.jersey.JerseyServerOptions;
+import com.englishtown.vertx.jersey.inject.Nullable;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import io.vertx.core.Vertx;
 
@@ -50,13 +52,20 @@ public class DefaultWhenJerseyServer implements WhenJerseyServer {
         this.when = when;
     }
 
+    /**
+     * Returns a promise for asynchronously creating a {@link JerseyServer}
+     *
+     * @param options
+     * @param jerseyOptions
+     * @return a promise for the server
+     */
     @Override
-    public Promise<JerseyServer> createServer() {
+    public Promise<JerseyServer> createServer(@Nullable JerseyServerOptions options, @Nullable JerseyOptions jerseyOptions) {
         final Deferred<JerseyServer> d = when.defer();
 
         try {
             JerseyServer jerseyServer = jerseyServerProvider.get();
-            jerseyServer.start(result -> {
+            jerseyServer.start(options, jerseyOptions, result -> {
                 if (result.succeeded()) {
                     d.resolve(jerseyServer);
                 } else {

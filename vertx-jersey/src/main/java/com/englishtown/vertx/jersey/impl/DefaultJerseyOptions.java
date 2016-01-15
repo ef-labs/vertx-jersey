@@ -65,8 +65,16 @@ public class DefaultJerseyOptions implements JerseyOptions, JerseyServerOptions 
 
     @Inject
     public DefaultJerseyOptions(Vertx vertx) {
-        config = vertx.getOrCreateContext().config();
-        config = config.getJsonObject("jersey", config);
+        this(getConfig(vertx));
+    }
+
+    public DefaultJerseyOptions(JsonObject config) {
+        this.config = config;
+    }
+
+    private static JsonObject getConfig(Vertx vertx) {
+        JsonObject config = vertx.getOrCreateContext().config();
+        return config.getJsonObject("jersey", config);
     }
 
     /**

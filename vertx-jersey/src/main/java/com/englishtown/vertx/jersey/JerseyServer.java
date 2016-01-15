@@ -23,6 +23,7 @@
 
 package com.englishtown.vertx.jersey;
 
+import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
@@ -67,7 +68,18 @@ public interface JerseyServer {
      *
      * @param doneHandler the optional callback for when initialization has completed
      */
-    void start(Handler<AsyncResult<HttpServer>> doneHandler);
+    default void start(@Nullable Handler<AsyncResult<HttpServer>> doneHandler) {
+        start(null, null, doneHandler);
+    }
+
+    /**
+     * Creates a vert.x {@link HttpServer} with a jersey handler with options
+     *
+     * @param options
+     * @param jerseyOptions
+     * @param doneHandler
+     */
+    void start(@Nullable JerseyServerOptions options, @Nullable JerseyOptions jerseyOptions, @Nullable Handler<AsyncResult<HttpServer>> doneHandler);
 
     /**
      * Allows custom setup during initialization before the http server is listening (add custom routes, etc.)

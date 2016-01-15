@@ -206,8 +206,8 @@ public abstract class PromisesIntegrationTests extends VertxTestBase {
 
             DefaultJerseyOptions options = new DefaultJerseyOptions(vertx);
             VertxContainer container = new DefaultVertxContainer(vertx, options, null, null);
-            JerseyHandler handler = new DefaultJerseyHandler(container, provider, new ArrayList<>());
-            JerseyServer server = new DefaultJerseyServer(handler, container, options);
+            JerseyHandler handler = new DefaultJerseyHandler(() -> container, provider, new ArrayList<>());
+            JerseyServer server = new DefaultJerseyServer(handler, container, () -> options);
             When when = WhenFactory.createSync();
 
             return new DefaultWhenJerseyServer(vertx, () -> server, when);
