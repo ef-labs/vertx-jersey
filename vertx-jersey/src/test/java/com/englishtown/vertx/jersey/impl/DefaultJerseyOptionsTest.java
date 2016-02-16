@@ -38,6 +38,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -176,6 +177,39 @@ public class DefaultJerseyOptionsTest {
 
     @Test
     public void testGetProperties() throws Exception {
+
+        JsonObject props = new JsonObject().put("prop1", "a");
+        config.put(DefaultJerseyOptions.CONFIG_PROPERTIES, props);
+        assertEquals(props.getMap(), options.getProperties());
+
+    }
+
+    @Test
+    public void testGetProperties_Resource_Config() throws Exception {
+
+        JsonObject rc = new JsonObject().put("prop1", "a");
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCE_CONFIG, rc);
+        assertEquals(rc.getMap(), options.getProperties());
+
+    }
+
+    @Test
+    public void testGetProperties_Both() throws Exception {
+
+        JsonObject props = new JsonObject().put("prop1", "a");
+        JsonObject rc = new JsonObject().put("prop2", "b");
+        config.put(DefaultJerseyOptions.CONFIG_PROPERTIES, props);
+        config.put(DefaultJerseyOptions.CONFIG_RESOURCE_CONFIG, rc);
+
+        Map<String, Object> map = options.getProperties();
+        assertEquals(2, map.size());
+        assertEquals("a", map.get("prop1"));
+        assertEquals("b", map.get("prop2"));
+
+    }
+
+    @Test
+    public void testGetProperties_Null() throws Exception {
 
         JsonObject rc = new JsonObject().put("prop1", "a");
         config.put(DefaultJerseyOptions.CONFIG_RESOURCE_CONFIG, rc);
