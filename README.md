@@ -84,16 +84,16 @@ The vertx-jersey configuration is as follows:
     "host": "<host>",
     "port": <port>,
     "ssl": <ssl>,
+    "base_path": "<base_path>",
+    "packages": ["<packages>"],
+    "components": ["<components>"],
+    "instances": ["<instances>"],
+    "properties": {"<properties>"},
     "compression_supported": <compression_supported>,
     "jks_options": <jks_options>,
     "receive_buffer_size": <receive_buffer_size>,
     "max_body_size": <max_body_size>,
-    "base_path": "<base_path>",
-    "resources": ["<resources>"],
-    "features": ["<features>"],
-    "binders": ["<binders>"],
-    "backlog_size": <backlog_sze>,
-    "resource_config": {"<resource_config>"}
+    "backlog_size": <backlog_sze>
 }
 ````
 
@@ -101,18 +101,30 @@ The vertx-jersey configuration is as follows:
 Default is `0.0.0.0`
 * `port` -  The port to listen at for connections. Default is `80`.
 * `ssl` - Should the server use `https` as a protocol? Default is `false`.
+* `base_path` - The base path jersey responds to.  Default is `/`.
+* `packages` - An array of package names to inspect for resources.  Can also use json field `resources`.
+* `components` - An array of components class names to inject (features, etc.).  For example: `"org.glassfish.jersey.jackson.JacksonFeature"`.  Can also use json field `features`.
+* `instances` - An array of singleton instances to be created and registered (HK2 binders etc.).  Can also use json field `binders`.
+* `properties` - An object with additional properties to be set on the ResourceConfig.  Can also use json field `resource_config`.
 * `compression_supported` - A boolean whether the server supports compression. Default is `false`.
 * `jks_options` - A JSON object to create the io.vertx.core.net.JksOptions. Only used if `ssl` is `true`.
 * `receive_buffer_size` - The int receive buffer size.  The value is optional.
 * `max_body_size` - The int max body size allowed.  The default value is 1MB.
-* `base_path` - The base path jersey responds to.  Default is `/`.
-* `resources` - An array of package names to inspect for resources.
-* `features` - An array of feature classes to inject.  For example: `"org.glassfish.jersey.jackson.JacksonFeature"`
-* `binders` - An array of HK2 binder classes to configure injection bindings.
 * `backlog_size` - An int that sets the http server backlog size.  The default value is 10,000
-* `resource_config` - An object with additional properties to be set on the ResourceConfig
 
-The only required field is `resources`.
+You must configure at least one package or component.
+
+You can also group the jersey configuration under a `jersey` json field:
+
+```
+{
+    "jersey": {
+        "host": "<host>",
+        "packages": "<packages>"
+        ....
+    }
+}
+```
 
 #### Examples
 ##### Simple

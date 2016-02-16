@@ -1,11 +1,14 @@
 package com.englishtown.vertx.jersey.features.swagger;
 
+import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerCorsFilter;
 import io.swagger.config.ScannerFactory;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
+import org.glassfish.jersey.internal.util.PropertiesHelper;
 
 import javax.inject.Inject;
+import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
 
@@ -14,12 +17,8 @@ import javax.ws.rs.core.FeatureContext;
  */
 public class SwaggerFeature implements Feature {
 
-    private final SwaggerFeatureConfig config;
-
-    @Inject
-    public SwaggerFeature(SwaggerFeatureConfig config) {
-        this.config = config;
-    }
+    public static final String PROPERTY_DISABLE = "vertx.jersey.swagger.disable";
+    public static final String PROPERTY_CORS_DISABLE = "vertx.jersey.swagger.cors.disable";
 
     /**
      * {@inheritDoc}
@@ -27,13 +26,19 @@ public class SwaggerFeature implements Feature {
     @Override
     public boolean configure(FeatureContext context) {
 
-        if (config != null && !config.enabled()) {
+        Configuration config = context.getConfiguration();
+
+        if (PropertiesHelper.isProperty(config.getProperties(), PROPERTY_DISABLE)){
             return false;
         }
 
-        if (!context.getConfiguration().isRegistered(ApiListingResource.class)) {
-            context.register(new ApiListingResource());
-            context.register(new SwaggerSerializers());
+        if (!PropertiesHelper.isProperty(config.getProperties(), PROPERTY_CORS_DISABLE)){
+            context.register(SwaggerCorsFilter.class);
+        }
+
+        if (!config.isRegistered(ApiListingResource.class)) {
+            context.register(ApiListingResource.class);
+            context.register(SwaggerSerializers.class);
         }
 
         if (ScannerFactory.getScanner() == null) {

@@ -1,7 +1,6 @@
 package com.englishtown.vertx.jersey.features.swagger.internal;
 
 import com.englishtown.vertx.jersey.features.swagger.SwaggerFeature;
-import com.englishtown.vertx.jersey.features.swagger.SwaggerFeatureConfig;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.spi.AutoDiscoverable;
 
@@ -38,7 +37,6 @@ public class SwaggerAutoDiscoverable implements AutoDiscoverable {
         @Override
         protected void configure() {
             bind(SwaggerServletContext.class).to(ServletContext.class).in(Singleton.class);
-            bind(JsonSwaggerFeatureConfig.class).to(SwaggerFeatureConfig.class).in(Singleton.class);
         }
 
     }

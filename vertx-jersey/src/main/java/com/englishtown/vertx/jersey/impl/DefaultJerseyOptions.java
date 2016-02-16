@@ -48,6 +48,7 @@ public class DefaultJerseyOptions implements JerseyOptions, JerseyServerOptions 
     public final static String CONFIG_RECEIVE_BUFFER_SIZE = "receive_buffer_size";
     public final static String CONFIG_BACKLOG_SIZE = "backlog_size";
     public final static String CONFIG_RESOURCE_CONFIG = "resource_config";
+    public final static String CONFIG_PROPERTIES = "properties";
     public final static String CONFIG_COMPRESSION_SUPPORTED = "compression_supported";
 
     public static final String CONFIG_BASE_PATH = "base_path";
@@ -110,7 +111,23 @@ public class DefaultJerseyOptions implements JerseyOptions, JerseyServerOptions 
      */
     @Override
     public Map<String, Object> getProperties() {
-        JsonObject json = config.getJsonObject(CONFIG_RESOURCE_CONFIG);
+        JsonObject json = null;
+        JsonObject tmp;
+
+        tmp = config.getJsonObject(CONFIG_PROPERTIES);
+        if (tmp != null) {
+            json = tmp;
+        }
+
+        tmp = config.getJsonObject(CONFIG_RESOURCE_CONFIG);
+        if (tmp != null) {
+            if (json == null) {
+                json = tmp;
+            } else {
+                json.mergeIn(tmp);
+            }
+        }
+
         return json == null ? null : json.getMap();
     }
 
