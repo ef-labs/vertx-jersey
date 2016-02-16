@@ -28,7 +28,7 @@
         <asm.version>3.3.1</asm.version>
         <hk2.version>2.4.0-b31</hk2.version>
 
-        <vertx.version>3.2.0</vertx.version>
+        <vertx.version>3.2.1</vertx.version>
         <vertx.hk2.version>2.1.0</vertx.hk2.version>
         <vertx.guice.version>2.1.0</vertx.guice.version>
         <vertx.when.version>4.1.0</vertx.when.version>
