@@ -1,12 +1,8 @@
 package com.englishtown.vertx.jersey.features.jackson.internal;
 
 import com.englishtown.vertx.jersey.features.jackson.ObjectMapperConfigurator;
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.databind.Module;
+import com.englishtown.vertx.jersey.features.jackson.VertxSerializerModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import io.vertx.core.json.JsonArray;
-import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,20 +18,27 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
     private final ObjectMapper mapper;
 
-    @Inject
+    /**
+     * @param configurator
+     * @deprecated Use overload with injected {@link ObjectMapper}
+     */
+    @Deprecated
     public ObjectMapperProvider(ObjectMapperConfigurator configurator) {
+        this(configurator, new ObjectMapper());
+    }
 
-        mapper = new ObjectMapper();
+    /**
+     * DI constructor
+     *
+     * @param configurator
+     * @param mapper
+     */
+    @Inject
+    public ObjectMapperProvider(ObjectMapperConfigurator configurator, ObjectMapper mapper) {
+        this.mapper = mapper;
 
-        Module module = new SimpleModule("et.vertx.serializers", Version.unknownVersion())
-                .addSerializer(JsonObject.class, new JsonObjectSerializer())
-                .addSerializer(JsonArray.class, new JsonArraySerializer())
-                .addDeserializer(JsonObject.class, new JsonObjectDeserializer())
-                .addDeserializer(JsonArray.class, new JsonArrayDeserializer());
-
-        mapper.registerModule(module);
+        mapper.registerModule(new VertxSerializerModule());
         configurator.configure(mapper);
-
     }
 
     /**
@@ -48,7 +51,7 @@ public class ObjectMapperProvider implements ContextResolver<ObjectMapper> {
      */
     @Override
     public ObjectMapper getContext(Class<?> type) {
-            return mapper;
+        return mapper;
     }
 
 }

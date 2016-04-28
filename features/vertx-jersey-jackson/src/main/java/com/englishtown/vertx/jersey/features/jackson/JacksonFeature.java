@@ -2,6 +2,7 @@ package com.englishtown.vertx.jersey.features.jackson;
 
 import com.englishtown.vertx.jersey.features.jackson.internal.JsonConfigObjectMapperConfigurator;
 import com.englishtown.vertx.jersey.features.jackson.internal.ObjectMapperProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.util.PropertiesHelper;
 
@@ -42,8 +43,10 @@ public class JacksonFeature implements Feature {
 
         @Override
         protected void configure() {
+            bind(new ObjectMapper()).to(ObjectMapper.class).ranked(-10);
             bind(JsonConfigObjectMapperConfigurator.class).to(ObjectMapperConfigurator.class).in(Singleton.class);
         }
+
     }
 
 }
