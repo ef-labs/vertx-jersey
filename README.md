@@ -13,7 +13,7 @@ Add the vertx-jersey dependency to your project
 <dependency>
     <groupId>com.englishtown.vertx</groupId>
     <artifactId>vertx-jersey</artifactId>
-    <version>4.0.0</version>
+    <version>4.4.2</version>
 </dependency>
 ```
 
@@ -23,6 +23,9 @@ Version Matrix
 
 vert.x    | vertx-jersey
 --------- | ------------
+3.2.1     | 4.4.2
+3.2.0     | 4.3.0
+3.1.0     | 4.2.0
 3.0.0     | 4.0.0
 2.x       | 3.0.1 (vertx-mod-jersey)
 
