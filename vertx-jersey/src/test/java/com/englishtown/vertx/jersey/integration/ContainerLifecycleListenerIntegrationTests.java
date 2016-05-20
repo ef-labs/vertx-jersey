@@ -62,16 +62,18 @@ public abstract class ContainerLifecycleListenerIntegrationTests extends VertxTe
             assertFalse(listener.started);
             assertFalse(listener.shutdown);
 
-            server.start();
+            server.start(result -> {
+                assertTrue(result.succeeded());
 
-            assertTrue(listener.started);
-            assertFalse(listener.shutdown);
+                assertTrue(listener.started);
+                assertFalse(listener.shutdown);
 
-            server.close();
-            assertTrue(listener.shutdown);
+                server.close();
+                assertTrue(listener.shutdown);
 
-            testComplete();
+                testComplete();
 
+            });
         });
 
         await();

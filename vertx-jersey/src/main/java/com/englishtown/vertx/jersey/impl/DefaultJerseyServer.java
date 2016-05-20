@@ -26,6 +26,7 @@ package com.englishtown.vertx.jersey.impl;
 import com.englishtown.vertx.jersey.*;
 import com.englishtown.vertx.jersey.inject.Nullable;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
@@ -87,21 +88,34 @@ public class DefaultJerseyServer implements JerseyServer {
             setupHandler.handle(server);
         }
 
-        // Run container startup
-        container.start();
+        container.getVertx().executeBlocking(
+                future -> {
+                    // Run container startup
+                    container.start();
+                    future.complete();
+                },
+                result -> {
+                    if (result.failed()) {
+                        logger.error("Failed to start the jersey container", result.cause());
+                        if (doneHandler != null) {
+                            doneHandler.handle(Future.failedFuture(result.cause()));
+                        }
+                        return;
+                    }
 
-        // Start listening and log success/failure
-        server.listen(ar -> {
-            final String listenPath = (serverOptions.isSsl() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
-            if (ar.succeeded()) {
-                logger.info("Http server listening for " + listenPath);
-            } else {
-                logger.error("Failed to start http server listening for " + listenPath, ar.cause());
-            }
-            if (doneHandler != null) {
-                doneHandler.handle(ar);
-            }
-        });
+                    // Start listening and log success/failure
+                    server.listen(ar -> {
+                        final String listenPath = (serverOptions.isSsl() ? "https" : "http") + "://" + serverOptions.getHost() + ":" + serverOptions.getPort();
+                        if (ar.succeeded()) {
+                            logger.info("Http server listening for " + listenPath);
+                        } else {
+                            logger.error("Failed to start http server listening for " + listenPath, ar.cause());
+                        }
+                        if (doneHandler != null) {
+                            doneHandler.handle(ar);
+                        }
+                    });
+                });
 
     }
 
