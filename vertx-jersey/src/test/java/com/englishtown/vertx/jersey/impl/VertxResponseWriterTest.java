@@ -107,12 +107,12 @@ public class VertxResponseWriterTest {
         assertNotNull(outputStream);
         verify(response, times(1)).setStatusCode(anyInt());
         verify(response, times(1)).setStatusMessage(anyString());
-        verify(response, times(2)).putHeader(anyString(), anyString());
+        verify(response, times(1)).putHeader(anyString(), anyListOf(String.class));
         verify(processor1).process(eq(response), eq(cr));
         verify(processor2).process(eq(response), eq(cr));
 
         writer.writeResponseStatusAndHeaders(-1, cr);
-        verify(response, times(3)).putHeader(anyString(), anyString());
+        verify(response, times(2)).putHeader(anyString(), anyListOf(String.class));
 
     }
 
@@ -135,12 +135,12 @@ public class VertxResponseWriterTest {
         assertNotNull(outputStream);
         verify(response, times(1)).setStatusCode(anyInt());
         verify(response, times(1)).setStatusMessage(anyString());
-        verify(response, times(2)).putHeader(anyString(), anyString());
+        verify(response, times(1)).putHeader(anyString(), anyListOf(String.class));
         verify(processor1).process(eq(response), eq(cr));
         verify(processor2).process(eq(response), eq(cr));
 
         writer.writeResponseStatusAndHeaders(-1, cr);
-        verify(response, times(3)).putHeader(anyString(), anyString());
+        verify(response, times(2)).putHeader(anyString(), anyListOf(String.class));
 
     }
 

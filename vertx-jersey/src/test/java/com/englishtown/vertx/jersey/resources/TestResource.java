@@ -44,6 +44,9 @@ import java.net.URI;
 @Path("test")
 public class TestResource {
 
+    public static final String HEADER_TEST1 = "x-test-1";
+    public static final String HEADER_TEST2 = "x-test-2";
+
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String getHelloWorld() {
@@ -113,6 +116,20 @@ public class TestResource {
                 }
             });
         });
+
+    }
+
+    @GET
+    @Path("headers")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getHeaders() {
+
+        return Response.ok()
+                .entity("OK")
+                .header(HEADER_TEST1, "a")
+                .header(HEADER_TEST1, "b")
+                .header(HEADER_TEST2, "c")
+                .build();
 
     }
 

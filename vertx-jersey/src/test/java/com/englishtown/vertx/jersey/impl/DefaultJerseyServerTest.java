@@ -28,6 +28,7 @@ import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
@@ -78,12 +79,18 @@ public class DefaultJerseyServerTest {
     VertxContainer container;
     @Mock
     Handler<HttpServer> setupHandler;
+    @Mock
+    Future<Object> future;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
     @Captor
     ArgumentCaptor<Handler<HttpServerRequest>> requestHandlerCaptor;
     @Captor
     ArgumentCaptor<HttpServerOptions> optionsCaptor;
+    @Captor
+    ArgumentCaptor<Handler<Future<Object>>> futureHandlerCaptor;
+    @Captor
+    ArgumentCaptor<Handler<AsyncResult<Object>>> resultHandlerCaptor;
 
     @Before
     public void setUp() {
@@ -119,6 +126,7 @@ public class DefaultJerseyServerTest {
         when(serverOptions.getHost()).thenReturn("0.0.0.0");
         when(serverOptions.getPort()).thenReturn(80);
         jerseyServer.start();
+        verifyExecuteBlocking();
         verifyResults(80, "0.0.0.0");
     }
 
@@ -138,6 +146,7 @@ public class DefaultJerseyServerTest {
         when(serverOptions.isCompressionSupported()).thenReturn(compressionSupported);
 
         jerseyServer.start();
+        verifyExecuteBlocking();
         verifyResults(port, host);
 
         verify(vertx).createHttpServer(optionsCaptor.capture());
@@ -156,6 +165,7 @@ public class DefaultJerseyServerTest {
     public void testInit_Listen_Result() throws Exception {
 
         jerseyServer.start(doneHandler);
+        verifyExecuteBlocking();
 
         verify(httpServer).listen(handlerCaptor.capture());
         Handler<AsyncResult<HttpServer>> handler = handlerCaptor.getValue();
@@ -200,6 +210,17 @@ public class DefaultJerseyServerTest {
         jerseyServer.start();
         HttpServer server = jerseyServer.getHttpServer();
         assertEquals(httpServer, server);
+    }
+
+    private void verifyExecuteBlocking() {
+
+        verify(vertx).executeBlocking(futureHandlerCaptor.capture(), resultHandlerCaptor.capture());
+
+        futureHandlerCaptor.getValue().handle(future);
+        verify(future).complete();
+
+        resultHandlerCaptor.getValue().handle(future);
+
     }
 
 }

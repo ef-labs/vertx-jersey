@@ -23,6 +23,8 @@
 
 package com.englishtown.vertx.jersey.integration;
 
+import com.englishtown.vertx.jersey.resources.TestResource;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
@@ -31,6 +33,7 @@ import org.junit.Test;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import java.util.List;
 
 /**
  *
@@ -118,6 +121,32 @@ public abstract class IntegrationTests extends JerseyIntegrationTestBase {
 
         request.end();
         await();
+    }
+
+    @Test
+    public void test_getHeaders() throws Exception {
+
+        HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/headers", response -> {
+            assertEquals(HttpResponseStatus.OK.code(), response.statusCode());
+
+            List<String> headers = response.headers().getAll(TestResource.HEADER_TEST1);
+            assertEquals(2, headers.size());
+            assertEquals("a", headers.get(0));
+            assertEquals("b", headers.get(1));
+
+            headers = response.headers().getAll(TestResource.HEADER_TEST2);
+            assertEquals(1, headers.size());
+            assertEquals("c", headers.get(0));
+
+            assertEquals("a", response.getHeader(TestResource.HEADER_TEST1));
+            assertEquals("c", response.getHeader(TestResource.HEADER_TEST2));
+
+            testComplete();
+        });
+
+        request.end();
+        await();
+
     }
 
     public static class HK2 extends IntegrationTests {
