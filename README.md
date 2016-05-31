@@ -21,13 +21,13 @@ See the [example modules](examples) for more details.
 
 Version Matrix
 
-vert.x    | vertx-jersey
---------- | ------------
-3.2.1     | 4.4.2
-3.2.0     | 4.3.0
-3.1.0     | 4.2.0
-3.0.0     | 4.0.0
-2.x       | 3.0.1 (vertx-mod-jersey)
+vertx-jersey             | jersey  | vert.x 
+------------------------ | ------- |--------
+4.4.2                    | 2.23    | 3.2.1
+4.3.0                    | 2.22.1  | 3.2.0
+4.2.0                    | 2.22    | 3.1.0
+4.0.0                    | 2.18    | 3.0.0
+3.0.1 (vertx-mod-jersey) | 2.11    | 2.x
 
 
 
