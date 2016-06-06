@@ -21,6 +21,7 @@
         <module>inject-vertxrequestprocessor</module>
         <module>jackson</module>
         <module>maven-service</module>
+        <module>maven-simplest</module>
         <module>when.java</module>
         <module>swagger</module>
     </modules>
