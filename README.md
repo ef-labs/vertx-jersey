@@ -2,9 +2,8 @@
 
 Allows creating JAX-RS [Jersey](https://jersey.java.net/) resources in vert.x.
 
-[![Build Status](http://img.shields.io/travis/ef-labs/vertx-jersey/master.svg?style=flat-square)](https://travis-ci.org/ef-labs/vertx-jersey)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/)
-
+[![Build Status](http://img.shields.io/travis/ef-labs/vertx-jersey.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/ef-labs/vertx-jersey)
+[![Maven Central](https://img.shields.io/maven-central/v/com.englishtown.vertx/vertx-jersey.svg?maxAge=2592000&style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/)
 
 ## Getting started
 
