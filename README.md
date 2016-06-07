@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-jersey.png)](https://travis-ci.org/englishtown/vertx-jersey)
+[![Build Status](https://travis-ci.org/ef-labs/vertx-jersey.png)](https://travis-ci.org/ef-labs/vertx-jersey)
 
 # vertx-jersey
 
