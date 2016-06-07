@@ -1,8 +1,9 @@
-[![Build Status](https://travis-ci.org/ef-labs/vertx-jersey.png)](https://travis-ci.org/ef-labs/vertx-jersey)
-
 # vertx-jersey
 
 Allows creating JAX-RS [Jersey](https://jersey.java.net/) resources in vert.x.
+
+[![Build Status](http://img.shields.io/travis/ef-labs/vertx-jersey/master.svg?style=flat-square)](https://travis-ci.org/ef-labs/vertx-jersey)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/badge.svg?style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/)
 
 
 ## Getting started
