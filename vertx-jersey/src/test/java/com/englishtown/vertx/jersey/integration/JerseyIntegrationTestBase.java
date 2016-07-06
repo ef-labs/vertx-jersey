@@ -6,6 +6,7 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.test.core.VertxTestBase;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -37,26 +38,19 @@ public abstract class JerseyIntegrationTestBase extends VertxTestBase {
 
         httpClient = vertx.createHttpClient(clientOptions);
 
-        CountDownLatch latch = new CountDownLatch(1);
+        CompletableFuture<String> future = new CompletableFuture<>();
 
         locator.deployJerseyVerticle()
                 .then(id -> {
-                    deploymentID = id;
+                    future.complete(id);
                     return null;
                 })
                 .otherwise(t -> {
-                    try {
-                        t.printStackTrace();
-                        fail(t.getMessage());
-                    } catch (Throwable t2) {
-                        t2.printStackTrace();
-                        fail(t2.getMessage());
-                    }
+                    future.completeExceptionally(t);
                     return null;
-                })
-                .ensure(latch::countDown);
+                });
 
-        latch.await(10, TimeUnit.SECONDS);
+        deploymentID = future.get(10, TimeUnit.SECONDS);
 
     }
 

@@ -2,11 +2,13 @@ package com.englishtown.vertx.jersey.features.jackson.internal;
 
 import com.englishtown.vertx.jersey.features.jackson.ObjectMapperConfigurator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy.*;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
+
+import static com.fasterxml.jackson.databind.PropertyNamingStrategy.*;
 
 /**
  * Vert.x json config implementation of {@link ObjectMapperConfigurator}
@@ -38,20 +40,29 @@ public class JsonConfigObjectMapperConfigurator implements ObjectMapperConfigura
             return;
         }
 
-        if (PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES.getClass().getSimpleName().equalsIgnoreCase(s)) {
-            mapper.setPropertyNamingStrategy(PropertyNamingStrategy.CAMEL_CASE_TO_LOWER_CASE_WITH_UNDERSCORES);
+        if (SnakeCaseStrategy.class.getSimpleName().equalsIgnoreCase(s)
+                || LowerCaseWithUnderscoresStrategy.class.getSimpleName().equalsIgnoreCase(s)) {
+            mapper.setPropertyNamingStrategy(SNAKE_CASE);
             return;
         }
 
-        if (PropertyNamingStrategy.LOWER_CASE.getClass().getSimpleName().equalsIgnoreCase(s)) {
-            mapper.setPropertyNamingStrategy(PropertyNamingStrategy.LOWER_CASE);
+        if (LowerCaseStrategy.class.getSimpleName().equalsIgnoreCase(s)) {
+            mapper.setPropertyNamingStrategy(LOWER_CASE);
             return;
         }
 
-        if (PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE.getClass().getSimpleName().equalsIgnoreCase(s)) {
-            mapper.setPropertyNamingStrategy(PropertyNamingStrategy.PASCAL_CASE_TO_CAMEL_CASE);
+        if (UpperCamelCaseStrategy.class.getSimpleName().equalsIgnoreCase(s)
+                || PascalCaseStrategy.class.getSimpleName().equalsIgnoreCase(s)) {
+            mapper.setPropertyNamingStrategy(UPPER_CAMEL_CASE);
             return;
         }
+
+        if (KebabCaseStrategy.class.getSimpleName().equalsIgnoreCase(s)) {
+            mapper.setPropertyNamingStrategy(KEBAB_CASE);
+            return;
+        }
+
+        throw new IllegalArgumentException("Property naming strategy " + s + " is not supported");
 
     }
 
