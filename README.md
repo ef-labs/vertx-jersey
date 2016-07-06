@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/englishtown/vertx-jersey.png)](https://travis-ci.org/englishtown/vertx-jersey)
-
 # vertx-jersey
 
 Allows creating JAX-RS [Jersey](https://jersey.java.net/) resources in vert.x.
 
+[![Build Status](http://img.shields.io/travis/ef-labs/vertx-jersey.svg?maxAge=2592000&style=flat-square)](https://travis-ci.org/ef-labs/vertx-jersey)
+[![Maven Central](https://img.shields.io/maven-central/v/com.englishtown.vertx/vertx-jersey.svg?maxAge=2592000&style=flat-square)](https://maven-badges.herokuapp.com/maven-central/com.englishtown.vertx/vertx-jersey/)
 
 ## Getting started
 
@@ -13,7 +13,7 @@ Add the vertx-jersey dependency to your project
 <dependency>
     <groupId>com.englishtown.vertx</groupId>
     <artifactId>vertx-jersey</artifactId>
-    <version>4.0.0</version>
+    <version>4.4.2</version>
 </dependency>
 ```
 
@@ -21,10 +21,14 @@ See the [example modules](examples) for more details.
 
 Version Matrix
 
-vert.x    | vertx-jersey
---------- | ------------
-3.0.0     | 4.0.0
-2.x       | 3.0.1 (vertx-mod-jersey)
+vertx-jersey             | jersey  | vert.x 
+------------------------ | ------- |--------
+4.5.0                    | 2.23.1  | 3.3.0
+4.4.2                    | 2.23    | 3.2.1
+4.3.0                    | 2.22.1  | 3.2.0
+4.2.0                    | 2.22    | 3.1.0
+4.0.0                    | 2.18    | 3.0.0
+3.0.1 (vertx-mod-jersey) | 2.11    | 2.x
 
 
 

@@ -9,7 +9,7 @@
     <parent>
         <groupId>com.englishtown.vertx</groupId>
         <artifactId>vertx-jersey-parent</artifactId>
-        <version>4.4.2</version>
+        <version>4.5.0</version>
     </parent>
 
     <modules>
@@ -21,6 +21,7 @@
         <module>inject-vertxrequestprocessor</module>
         <module>jackson</module>
         <module>maven-service</module>
+        <module>maven-simplest</module>
         <module>when.java</module>
         <module>swagger</module>
     </modules>
@@ -50,7 +51,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
-                <version>${maven.deploy.plugin.version}</version>
                 <configuration>
                     <skip>true</skip>
                 </configuration>
