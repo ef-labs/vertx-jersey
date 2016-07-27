@@ -12,6 +12,7 @@ import org.glassfish.hk2.api.TypeLiteral;
 import org.glassfish.hk2.utilities.ServiceLocatorUtilities;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.server.model.ModelProcessor;
+import org.glassfish.jersey.server.monitoring.ApplicationEventListener;
 import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.jvnet.hk2.guice.bridge.api.GuiceBridge;
 import org.jvnet.hk2.guice.bridge.api.GuiceIntoHK2Bridge;
@@ -83,6 +84,8 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
         }, ModelProcessor.class);
         injectMultiBindings(locator, injector, new Key<Set<ContainerLifecycleListener>>() {
         }, ContainerLifecycleListener.class);
+        injectMultiBindings(locator, injector, new Key<Set<ApplicationEventListener>>() {
+        }, ApplicationEventListener.class);
 
     }
 
