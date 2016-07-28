@@ -17,7 +17,8 @@ Add the vertx-jersey dependency to your project
 </dependency>
 ```
 
-See the [example modules](examples) for more details.
+See [maven-simplest](examples/maven-simplest) for getting started.  There are additional [example modules](examples) covering: injection, filters, serialization, swagger etc.
+
 
 Version Matrix
 
