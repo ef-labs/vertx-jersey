@@ -23,6 +23,7 @@ import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
@@ -65,6 +66,7 @@ public class GuiceJerseyBinder extends AbstractModule {
         Multibinder.newSetBinder(binder(), ModelProcessor.class);
         Multibinder.newSetBinder(binder(), ContainerLifecycleListener.class);
         Multibinder.newSetBinder(binder(), ApplicationEventListener.class);
+        Multibinder.newSetBinder(binder(), ExceptionMapper.class);
 
     }
 

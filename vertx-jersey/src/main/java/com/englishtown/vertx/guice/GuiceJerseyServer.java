@@ -24,6 +24,7 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.ReaderInterceptor;
 import javax.ws.rs.ext.WriterInterceptor;
 import java.lang.reflect.Type;
@@ -86,6 +87,8 @@ public class GuiceJerseyServer extends DefaultJerseyServer {
         }, ContainerLifecycleListener.class);
         injectMultiBindings(locator, injector, new Key<Set<ApplicationEventListener>>() {
         }, ApplicationEventListener.class);
+        injectMultiBindings(locator, injector, new Key<Set<ExceptionMapper>>() {
+        }, ExceptionMapper.class);
 
     }
 
