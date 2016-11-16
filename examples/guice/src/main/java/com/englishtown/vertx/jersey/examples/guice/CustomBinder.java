@@ -11,6 +11,7 @@ import com.google.inject.multibindings.Multibinder;
 
 import javax.ws.rs.container.ContainerRequestFilter;
 import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.ext.ExceptionMapper;
 
 /**
  * Custom guice binder
@@ -35,6 +36,8 @@ public class CustomBinder extends AbstractModule {
         // Jersey interfaces
         Multibinder.newSetBinder(binder(), ContainerRequestFilter.class).addBinding().to(GuiceRequestFilter.class);
         Multibinder.newSetBinder(binder(), ContainerResponseFilter.class).addBinding().to(GuiceResponseFilter.class);
+
+        Multibinder.newSetBinder(binder(), ExceptionMapper.class).addBinding().to(GuiceExceptionMapper.class);
 
     }
 
