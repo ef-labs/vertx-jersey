@@ -261,6 +261,31 @@ public class DefaultJerseyHandlerTest {
         result = jerseyHandler.shouldReadData(request);
         assertTrue(result);
 
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED);
+        when(request.method()).thenReturn(HttpMethod.PATCH);
+
+        result = jerseyHandler.shouldReadData(request);
+        assertTrue(result);
+
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON);
+
+        result = jerseyHandler.shouldReadData(request);
+        assertTrue(result);
+
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML);
+
+        result = jerseyHandler.shouldReadData(request);
+        assertTrue(result);
+
+        headers.clear();
+        headers.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED + "; charset=UTF-8");
+
+        result = jerseyHandler.shouldReadData(request);
+        assertTrue(result);
+
     }
 
     @Test
