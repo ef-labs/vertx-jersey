@@ -3,7 +3,7 @@
     <parent>
         <artifactId>vertx-jersey-examples</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.5.2</version>
+        <version>4.5.3</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
