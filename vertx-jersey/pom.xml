@@ -7,7 +7,7 @@
     <parent>
         <artifactId>vertx-jersey-parent</artifactId>
         <groupId>com.englishtown.vertx</groupId>
-        <version>4.5.3-SNAPSHOT</version>
+        <version>4.5.3</version>
     </parent>
 
     <description>Allows creating JAX-RS jersey resources that will handle incoming http requests to vert.x</description>
