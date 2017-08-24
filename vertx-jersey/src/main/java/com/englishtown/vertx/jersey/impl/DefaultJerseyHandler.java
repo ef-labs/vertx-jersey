@@ -308,8 +308,8 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         HttpMethod method = vertxRequest.method();
 
-        // Only read input stream data for post/put methods
-        if (!(HttpMethod.POST == method || HttpMethod.PUT == method)) {
+        // Only read input stream data for post/put/patch methods
+        if (!(HttpMethod.POST == method || HttpMethod.PUT == method || HttpMethod.PATCH == method)) {
             return false;
         }
 
