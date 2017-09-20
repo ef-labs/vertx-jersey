@@ -92,6 +92,40 @@ public class TestResource {
         });
     }
 
+    @POST
+    @Path("text")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public void postText(
+            String body,
+            @Suspended final AsyncResponse response,
+            @Context Vertx vertx) {
+
+        vertx.runOnContext((aVoid) -> {
+            if (body == null) {
+                throw new RuntimeException();
+            }
+            response.resume(body);
+        });
+    }
+
+    @POST
+    @Path("xml")
+    @Consumes({MediaType.TEXT_XML, MediaType.APPLICATION_XML})
+    @Produces(MediaType.TEXT_PLAIN)
+    public void postXml(
+            String body,
+            @Suspended final AsyncResponse response,
+            @Context Vertx vertx) {
+
+        vertx.runOnContext((aVoid) -> {
+            if (body == null) {
+                throw new RuntimeException();
+            }
+            response.resume(body);
+        });
+    }
+
     @GET
     @Path("chunked")
     @Produces(MediaType.TEXT_PLAIN)

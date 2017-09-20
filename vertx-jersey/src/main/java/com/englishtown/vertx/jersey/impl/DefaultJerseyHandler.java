@@ -323,9 +323,8 @@ public class DefaultJerseyHandler implements JerseyHandler {
 
         MediaType mediaType = MediaType.valueOf(contentType);
 
-        // Allow text/plain
-        if (MediaType.TEXT_PLAIN_TYPE.getType().equals(mediaType.getType())
-                && MediaType.TEXT_PLAIN_TYPE.getSubtype().equals(mediaType.getSubtype())) {
+        // Allow text/*
+        if (MediaType.TEXT_PLAIN_TYPE.getType().equals(mediaType.getType())) {
             return true;
         }
 
