@@ -1,13 +1,15 @@
 package com.englishtown.vertx.jersey.features.swagger;
 
 import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerCorsFilter;
+import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerFeatureBinder;
 import io.swagger.config.ScannerFactory;
+import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.glassfish.jersey.internal.util.PropertiesHelper;
 
-import javax.inject.Inject;
+import javax.servlet.ServletContext;
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.Feature;
 import javax.ws.rs.core.FeatureContext;
@@ -28,11 +30,11 @@ public class SwaggerFeature implements Feature {
 
         Configuration config = context.getConfiguration();
 
-        if (PropertiesHelper.isProperty(config.getProperties(), PROPERTY_DISABLE)){
+        if (PropertiesHelper.isProperty(config.getProperties(), PROPERTY_DISABLE)) {
             return false;
         }
 
-        if (!PropertiesHelper.isProperty(config.getProperties(), PROPERTY_CORS_DISABLE)){
+        if (!PropertiesHelper.isProperty(config.getProperties(), PROPERTY_CORS_DISABLE)) {
             context.register(SwaggerCorsFilter.class);
         }
 
@@ -45,6 +47,11 @@ public class SwaggerFeature implements Feature {
             ScannerFactory.setScanner(new DefaultJaxrsScanner());
         }
 
+        if (!config.isRegistered(ServletContext.class)) {
+            context.register(new SwaggerFeatureBinder());
+        }
+
         return true;
     }
+
 }

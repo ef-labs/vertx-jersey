@@ -2,7 +2,7 @@
     "jersey": {
         "host": "localhost",
         "port": 8080,
-        "base_path": "/",
+        "base_path": "/rest",
         "resources": [
             "com.englishtown.vertx.jersey.examples.resources"
         ]

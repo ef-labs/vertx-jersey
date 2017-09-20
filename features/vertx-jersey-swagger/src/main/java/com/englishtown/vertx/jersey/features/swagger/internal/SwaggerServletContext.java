@@ -1,5 +1,9 @@
 package com.englishtown.vertx.jersey.features.swagger.internal;
 
+import com.englishtown.vertx.jersey.JerseyOptions;
+import io.swagger.jaxrs.config.SwaggerContextService;
+
+import javax.inject.Inject;
 import javax.servlet.*;
 import javax.servlet.descriptor.JspConfigDescriptor;
 import java.io.InputStream;
@@ -12,14 +16,20 @@ import java.util.*;
  */
 class SwaggerServletContext implements ServletContext {
 
+    private String contextPath;
     private final Map<String, Object> attributes = new HashMap<>();
+
+    @Inject
+    public SwaggerServletContext(JerseyOptions options) {
+        contextPath = options.getBaseUri().toString();
+    }
 
     /**
      * {@inheritDoc}
      */
     @Override
     public String getContextPath() {
-        return null;
+        return contextPath;
     }
 
     /**
