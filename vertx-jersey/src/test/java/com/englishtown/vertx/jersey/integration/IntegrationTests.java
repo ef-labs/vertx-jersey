@@ -113,6 +113,32 @@ public abstract class IntegrationTests extends JerseyIntegrationTestBase {
     }
 
     @Test
+    public void test_postText() throws Exception {
+
+        String body = "Hello world!";
+        HttpClientRequest request = httpClient.request(HttpMethod.POST, port, host, "/rest/test/text", response -> {
+            verifyResponse(response, 200, MediaType.TEXT_PLAIN, body);
+        });
+
+        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+        request.end(body);
+        await();
+    }
+
+    @Test
+    public void test_postXml() throws Exception {
+
+        String body = "<a></a>";
+        HttpClientRequest request = httpClient.request(HttpMethod.POST, port, host, "/rest/test/xml", response -> {
+            verifyResponse(response, 200, MediaType.TEXT_XML, body);
+        });
+
+        request.headers().add(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN);
+        request.end(body);
+        await();
+    }
+
+    @Test
     public void test_getChunked() throws Exception {
 
         HttpClientRequest request = httpClient.request(HttpMethod.GET, port, host, "/rest/test/chunked", response -> {

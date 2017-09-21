@@ -13,14 +13,14 @@ import java.util.function.Consumer;
 
 public class SwaggerIntegrationTest extends JerseyHK2IntegrationTestBase {
 
-    private String BASE_PATH = "http://localhost:8080/";
+    private String BASE_PATH = "http://localhost:8080/rest/";
 
     @Override
     public void setUp() throws Exception {
         super.setUp();
 
         // Need to reset the static initialized flag
-        Field field = ApiListingResource.class.getDeclaredField("initialized");
+        Field field = ApiListingResource.class.getSuperclass().getDeclaredField("initialized");
         field.setAccessible(true);
         field.set(null, false);
 
@@ -32,6 +32,7 @@ public class SwaggerIntegrationTest extends JerseyHK2IntegrationTestBase {
         runTest("swagger.json", body -> {
             JsonObject json = new JsonObject(body.toString());
 
+            assertEquals("/rest", json.getString("basePath"));
             JsonObject paths = json.getJsonObject("paths");
             assertNotNull(paths);
             JsonObject path = paths.getJsonObject("/swagger-test");

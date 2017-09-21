@@ -27,7 +27,7 @@ public class SwaggerFeatureIntegrationTest extends JerseyHK2IntegrationTestBase 
     public void setUp() throws Exception {
 
         // Need to reset the static initialized flag
-        Field field = ApiListingResource.class.getDeclaredField("initialized");
+        Field field = ApiListingResource.class.getSuperclass().getDeclaredField("initialized");
         field.setAccessible(true);
         field.set(null, false);
 

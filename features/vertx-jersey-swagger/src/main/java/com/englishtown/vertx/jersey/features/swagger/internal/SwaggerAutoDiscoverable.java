@@ -1,11 +1,13 @@
 package com.englishtown.vertx.jersey.features.swagger.internal;
 
 import com.englishtown.vertx.jersey.features.swagger.SwaggerFeature;
+import io.swagger.jaxrs.config.BeanConfig;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.internal.spi.AutoDiscoverable;
 
 import javax.annotation.Priority;
 import javax.inject.Singleton;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.ws.rs.core.FeatureContext;
 
@@ -23,21 +25,8 @@ public class SwaggerAutoDiscoverable implements AutoDiscoverable {
 
         if (!context.getConfiguration().isRegistered(SwaggerFeature.class)) {
             context.register(SwaggerFeature.class);
-            context.register(new Binder());
         }
 
     }
 
-    private static class Binder extends AbstractBinder {
-
-        /**
-         * Implement to provide binding definitions using the exposed binding
-         * methods.
-         */
-        @Override
-        protected void configure() {
-            bind(SwaggerServletContext.class).to(ServletContext.class).in(Singleton.class);
-        }
-
-    }
 }
