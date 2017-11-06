@@ -3,7 +3,6 @@ package com.englishtown.vertx.jersey.features.swagger;
 import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerCorsFilter;
 import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerFeatureBinder;
 import io.swagger.config.ScannerFactory;
-import io.swagger.jaxrs.config.BeanConfig;
 import io.swagger.jaxrs.config.DefaultJaxrsScanner;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
