@@ -4,10 +4,11 @@ import com.englishtown.vertx.jersey.features.swagger.internal.SwaggerCorsFilter;
 import io.swagger.jaxrs.listing.ApiListingResource;
 import io.swagger.jaxrs.listing.SwaggerSerializers;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.FeatureContext;
@@ -23,7 +24,6 @@ import static org.mockito.Mockito.*;
 /**
  * Unit tests for {@link SwaggerFeature}
  */
-@RunWith(MockitoJUnitRunner.class)
 public class SwaggerFeatureTest {
 
     private SwaggerFeature feature = new SwaggerFeature();
@@ -33,6 +33,9 @@ public class SwaggerFeatureTest {
     private FeatureContext context;
     @Mock
     private Configuration configuration;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() throws Exception {
@@ -58,7 +61,7 @@ public class SwaggerFeatureTest {
     public void testConfigure_Disable() throws Exception {
 
         properties.put(SwaggerFeature.PROPERTY_DISABLE, true);
-        boolean result =feature.configure(context);
+        boolean result = feature.configure(context);
 
         assertFalse(result);
         verify(context, never()).register(any());

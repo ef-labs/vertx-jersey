@@ -1,28 +1,26 @@
 package com.englishtown.vertx.jersey.impl;
 
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.ApplicationConfigurator;
+import com.englishtown.vertx.jersey.JerseyOptions;
 import io.vertx.core.Vertx;
 import org.glassfish.hk2.api.ServiceLocator;
 import org.glassfish.hk2.api.ServiceLocatorFactory;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultVertxContainer}
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultVertxContainerTest {
 
     private DefaultVertxContainer container;
@@ -33,6 +31,9 @@ public class DefaultVertxContainerTest {
     Vertx vertx;
     @Mock
     JerseyOptions options;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() throws Exception {

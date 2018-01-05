@@ -33,14 +33,14 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.http.impl.HeadersAdaptor;
-import io.vertx.core.logging.Logger;
 import org.glassfish.jersey.server.ContainerResponse;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedHashMap;
@@ -57,13 +57,13 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.anyListOf;
 import static org.mockito.Mockito.*;
 
 /**
  * {@link VertxResponseWriter} unit tests
  */
 @SuppressWarnings("unchecked")
-@RunWith(MockitoJUnitRunner.class)
 public class VertxResponseWriterTest {
 
     VertxResponseWriter writer;
@@ -74,11 +74,12 @@ public class VertxResponseWriterTest {
     @Mock
     Vertx vertx;
     @Mock
-    Logger logger;
-    @Mock
     HttpServerRequest request;
     @Mock
     HttpServerResponse response;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {

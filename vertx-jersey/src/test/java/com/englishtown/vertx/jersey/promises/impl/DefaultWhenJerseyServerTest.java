@@ -26,7 +26,6 @@ package com.englishtown.vertx.jersey.promises.impl;
 import com.englishtown.promises.Done;
 import com.englishtown.promises.When;
 import com.englishtown.promises.WhenFactory;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServer;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -34,28 +33,26 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Provider;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
  * Unit tests for {@link DefaultWhenJerseyServer}
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultWhenJerseyServerTest {
 
     private DefaultWhenJerseyServer whenJerseyServer;
-    JsonObject config = new JsonObject();
     private Done<JerseyServer> done = new Done<>();
 
     @Mock
@@ -63,13 +60,14 @@ public class DefaultWhenJerseyServerTest {
     @Mock
     JerseyServer server;
     @Mock
-    JerseyOptions options;
-    @Mock
     Vertx vertx;
     @Mock
     AsyncResult<HttpServer> result;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {

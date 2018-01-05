@@ -25,15 +25,15 @@ package com.englishtown.vertx.jersey;
 
 import io.vertx.core.*;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -41,7 +41,6 @@ import static org.mockito.Mockito.*;
 /**
  * {@link JerseyVerticle} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class JerseyVerticleTest {
 
     JerseyVerticle jerseyVerticle;
@@ -61,6 +60,9 @@ public class JerseyVerticleTest {
     AsyncResult<HttpServer> asyncResult;
     @Captor
     ArgumentCaptor<Handler<AsyncResult<HttpServer>>> handlerCaptor;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {

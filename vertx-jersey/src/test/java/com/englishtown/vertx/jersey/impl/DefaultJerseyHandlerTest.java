@@ -48,12 +48,13 @@ import org.glassfish.jersey.server.ContainerRequest;
 import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -70,7 +71,6 @@ import static org.mockito.Mockito.*;
 /**
  * {@link DefaultJerseyHandler} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultJerseyHandlerTest {
 
     DefaultJerseyHandler jerseyHandler;
@@ -103,6 +103,9 @@ public class DefaultJerseyHandlerTest {
     ArgumentCaptor<Handler<Buffer>> dataHandlerCaptor;
     @Captor
     ArgumentCaptor<Handler<Void>> endHandlerCaptor;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {

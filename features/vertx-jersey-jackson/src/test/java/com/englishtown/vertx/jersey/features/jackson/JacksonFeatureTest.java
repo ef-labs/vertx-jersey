@@ -2,11 +2,12 @@ package com.englishtown.vertx.jersey.features.jackson;
 
 import com.englishtown.vertx.jersey.features.jackson.internal.ObjectMapperProvider;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.ws.rs.core.Configuration;
 import javax.ws.rs.core.FeatureContext;
@@ -17,12 +18,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.never;
 
 /**
  * Unit tests for {@link JacksonFeature}
  */
-@RunWith(MockitoJUnitRunner.class)
 public class JacksonFeatureTest {
 
     private JacksonFeature feature = new JacksonFeature();
@@ -32,6 +31,9 @@ public class JacksonFeatureTest {
     private FeatureContext context;
     @Mock
     private Configuration configuration;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() throws Exception {
