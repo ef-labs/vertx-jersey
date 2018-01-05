@@ -55,6 +55,7 @@ public class GuiceJerseyServerTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
+    @SuppressWarnings("unchecked")
     public void setUp() throws Exception {
 
         when(locator.getService(eq(GuiceIntoHK2Bridge.class))).thenReturn(bridge);

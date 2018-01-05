@@ -115,7 +115,7 @@ public class DefaultJerseyServerTest {
         Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
         assertNotNull(handler);
 
-        verify(httpServer).listen(Mockito.<Handler<AsyncResult<HttpServer>>>any());
+        verify(httpServer).listen(Mockito.any());
 
         HttpServerOptions options = optionsCaptor.getValue();
         assertEquals(port, options.getPort());

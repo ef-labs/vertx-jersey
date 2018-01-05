@@ -31,7 +31,6 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServer;
-import io.vertx.core.json.JsonObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

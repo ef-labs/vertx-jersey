@@ -7,14 +7,10 @@ import io.swagger.jaxrs.listing.ApiListingResource;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.test.core.VertxTestBase;
-import org.junit.Before;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
 import java.util.function.Consumer;
-
-import static org.junit.Assert.*;
 
 /**
  * Swagger feature integration test
@@ -78,4 +74,5 @@ public class SwaggerFeatureIntegrationTest extends JerseyHK2IntegrationTestBase 
 
         await();
 
-    }}
+    }
+}

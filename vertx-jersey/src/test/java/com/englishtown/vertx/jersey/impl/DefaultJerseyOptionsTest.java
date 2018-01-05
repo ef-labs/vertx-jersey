@@ -159,8 +159,7 @@ public class DefaultJerseyOptionsTest {
         assertNotNull(instances);
         assertEquals(2, instances.size());
 
-        List<Object> list = new ArrayList<>();
-        list.addAll(instances);
+        List<Object> list = new ArrayList<>(instances);
         assertThat(list.get(0), instanceOf(MyObj.class));
         assertThat(list.get(1), instanceOf(MyBinder.class));
 

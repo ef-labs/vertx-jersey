@@ -7,7 +7,6 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.test.core.VertxTestBase;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 /**

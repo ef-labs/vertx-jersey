@@ -3,7 +3,6 @@ package com.englishtown.vertx.jersey.examples;
 import com.englishtown.vertx.jersey.promises.WhenJerseyServer;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
 
 import javax.inject.Inject;
 

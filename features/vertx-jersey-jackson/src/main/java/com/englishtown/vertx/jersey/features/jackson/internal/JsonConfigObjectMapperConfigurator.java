@@ -32,6 +32,7 @@ public class JsonConfigObjectMapperConfigurator implements ObjectMapperConfigura
 
     }
 
+    @SuppressWarnings("deprecation")
     protected void setPropertyNamingStrategy(ObjectMapper mapper) {
 
         String s = config.getString(CONFIG_PROPERTY_NAMING_STRATEGY);

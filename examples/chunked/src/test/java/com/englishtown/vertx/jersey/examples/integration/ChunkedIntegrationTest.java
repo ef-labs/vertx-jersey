@@ -2,7 +2,7 @@ package com.englishtown.vertx.jersey.examples.integration;
 
 import com.englishtown.vertx.jersey.integration.JerseyHK2IntegrationTestBase;
 import com.englishtown.vertx.promises.RequestOptions;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import io.vertx.core.http.HttpMethod;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
         getWhenHttpClient().requestAbs(HttpMethod.GET, path, options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    assertEquals("chunked", response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
+                    assertEquals("chunked", response.headers().get(HttpHeaderNames.TRANSFER_ENCODING));
                     return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
@@ -51,8 +51,8 @@ public class ChunkedIntegrationTest extends JerseyHK2IntegrationTestBase {
         getWhenHttpClient().requestAbs(HttpMethod.GET, BASE_PATH + "/stream", options)
                 .then(response -> {
                     assertEquals(200, response.statusCode());
-                    assertNull(response.headers().get(HttpHeaders.Names.TRANSFER_ENCODING));
-                    assertEquals("36", response.headers().get(HttpHeaders.Names.CONTENT_LENGTH));
+                    assertNull(response.headers().get(HttpHeaderNames.TRANSFER_ENCODING));
+                    assertEquals("36", response.headers().get(HttpHeaderNames.CONTENT_LENGTH));
                     return getWhenHttpClient().body(response);
                 })
                 .then(body -> {
