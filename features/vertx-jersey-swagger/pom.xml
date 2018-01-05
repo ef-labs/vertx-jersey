@@ -11,11 +11,6 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <properties>
-        <swagger.version>1.5.16</swagger.version>
-        <javax.servlet.version>3.1.0</javax.servlet.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>com.englishtown.vertx</groupId>

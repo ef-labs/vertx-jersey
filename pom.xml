@@ -34,6 +34,10 @@
         <vertx.hk2.version>2.5.0</vertx.hk2.version>
         <vertx.guice.version>2.3.0</vertx.guice.version>
         <vertx.when.version>4.2.0</vertx.when.version>
+
+        <swagger.version>1.5.17</swagger.version>
+        <javax.servlet.version>3.1.0</javax.servlet.version>
+
     </properties>
 
     <dependencyManagement>
