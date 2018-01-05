@@ -13,7 +13,7 @@ Add the vertx-jersey dependency to your project
 <dependency>
     <groupId>com.englishtown.vertx</groupId>
     <artifactId>vertx-jersey</artifactId>
-    <version>4.6.0</version>
+    <version>4.7.0</version>
 </dependency>
 ```
 
@@ -24,6 +24,7 @@ Version Matrix
 
 vertx-jersey             | jersey  | vert.x 
 ------------------------ | ------- |--------
+4.7.0                    | 2.25.1  | 3.5.0
 4.6.0                    | 2.25.1  | 3.4.2
 4.5.0                    | 2.23.1  | 3.3.0
 4.4.2                    | 2.23    | 3.2.1
@@ -44,13 +45,13 @@ Running as a service is probably the easiest way to get started.
 From the command line:
 
 ```
-vertx run service:com.englishtown.vertx:vertx-jersey:4.6.0 -conf config.json
+vertx run service:com.englishtown.vertx:vertx-jersey:4.7.0 -conf config.json
 ```
 
 Programmatically:
 
 ```java
-vertx.deployVerticle("service:com.englishtown.vertx:vertx-jersey:4.6.0", config);
+vertx.deployVerticle("service:com.englishtown.vertx:vertx-jersey:4.7.0", config);
 ```
 
 See the [maven-service](https://github.com/englishtown/vertx-jersey/tree/develop/examples/maven-service) example.  

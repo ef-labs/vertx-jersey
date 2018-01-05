@@ -24,7 +24,6 @@
 package com.englishtown.vertx.jersey.impl;
 
 import com.englishtown.vertx.jersey.JerseyHandler;
-import com.englishtown.vertx.jersey.JerseyOptions;
 import com.englishtown.vertx.jersey.JerseyServerOptions;
 import com.englishtown.vertx.jersey.VertxContainer;
 import io.vertx.core.AsyncResult;
@@ -36,13 +35,14 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.http.HttpServerRequest;
 import org.glassfish.jersey.server.ApplicationHandler;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 
@@ -55,7 +55,6 @@ import static org.mockito.Mockito.*;
 /**
  * {@link com.englishtown.vertx.jersey.JerseyVerticle} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultJerseyServerTest {
 
     DefaultJerseyServer jerseyServer;
@@ -92,6 +91,9 @@ public class DefaultJerseyServerTest {
     @Captor
     ArgumentCaptor<Handler<AsyncResult<Object>>> resultHandlerCaptor;
 
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     @Before
     public void setUp() {
 
@@ -113,7 +115,7 @@ public class DefaultJerseyServerTest {
         Handler<HttpServerRequest> handler = requestHandlerCaptor.getValue();
         assertNotNull(handler);
 
-        verify(httpServer).listen(Mockito.<Handler<AsyncResult<HttpServer>>>any());
+        verify(httpServer).listen(Mockito.any());
 
         HttpServerOptions options = optionsCaptor.getValue();
         assertEquals(port, options.getPort());

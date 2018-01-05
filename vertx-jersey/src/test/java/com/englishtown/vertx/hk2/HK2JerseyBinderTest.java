@@ -27,10 +27,11 @@ import com.englishtown.vertx.jersey.inject.VertxPostResponseProcessor;
 import com.englishtown.vertx.jersey.inject.VertxRequestProcessor;
 import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import org.glassfish.hk2.api.IterableProvider;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,7 +44,6 @@ import static org.mockito.Mockito.when;
 /**
  * {@link com.englishtown.vertx.hk2.HK2JerseyBinder} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class HK2JerseyBinderTest {
 
     @Mock
@@ -52,6 +52,9 @@ public class HK2JerseyBinderTest {
     IterableProvider<VertxResponseProcessor> responseProcessorProviders;
     @Mock
     IterableProvider<VertxPostResponseProcessor> postResponseProcessorProviders;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Test
     public void testVertxRequestProcessorFactory() {

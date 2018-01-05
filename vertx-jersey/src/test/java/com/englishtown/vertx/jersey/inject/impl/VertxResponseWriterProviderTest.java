@@ -28,13 +28,13 @@ import com.englishtown.vertx.jersey.inject.VertxResponseProcessor;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpServerRequest;
 import org.glassfish.jersey.server.ContainerRequest;
-import org.glassfish.jersey.server.spi.Container;
 import org.glassfish.jersey.server.spi.ContainerResponseWriter;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,6 @@ import static org.junit.Assert.assertNotNull;
 /**
  * {@link VertxResponseWriterProvider} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class VertxResponseWriterProviderTest {
 
     VertxResponseWriterProvider provider;
@@ -54,8 +53,6 @@ public class VertxResponseWriterProviderTest {
     @Mock
     Vertx vertx;
     @Mock
-    Container container;
-    @Mock
     HttpServerRequest vertxRequest;
     @Mock
     ContainerRequest jerseyRequest;
@@ -63,6 +60,9 @@ public class VertxResponseWriterProviderTest {
     VertxResponseProcessor responseProcessor;
     @Mock
     VertxPostResponseProcessor postResponseProcessor;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {

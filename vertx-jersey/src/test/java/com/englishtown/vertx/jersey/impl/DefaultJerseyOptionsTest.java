@@ -27,13 +27,13 @@ import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -48,15 +48,15 @@ import static org.mockito.Mockito.when;
 /**
  * {@link DefaultJerseyOptions} unit tests
  */
-@RunWith(MockitoJUnitRunner.class)
 public class DefaultJerseyOptionsTest {
 
     @Mock
     private Vertx vertx;
     @Mock
     private Context context;
-    @Mock
-    private Logger logger;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private JsonObject config = new JsonObject();
     private DefaultJerseyOptions options;
@@ -159,8 +159,7 @@ public class DefaultJerseyOptionsTest {
         assertNotNull(instances);
         assertEquals(2, instances.size());
 
-        List<Object> list = new ArrayList<>();
-        list.addAll(instances);
+        List<Object> list = new ArrayList<>(instances);
         assertThat(list.get(0), instanceOf(MyObj.class));
         assertThat(list.get(1), instanceOf(MyBinder.class));
 

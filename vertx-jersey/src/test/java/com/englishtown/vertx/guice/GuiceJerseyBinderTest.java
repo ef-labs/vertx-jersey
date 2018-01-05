@@ -9,11 +9,12 @@ import com.google.inject.binder.AnnotatedBindingBuilder;
 import com.google.inject.binder.ScopedBindingBuilder;
 import jersey.repackaged.com.google.common.collect.Sets;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.List;
 
@@ -21,7 +22,6 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
-@RunWith(MockitoJUnitRunner.class)
 public class GuiceJerseyBinderTest {
 
     GuiceJerseyBinder binder;
@@ -30,6 +30,9 @@ public class GuiceJerseyBinderTest {
     Binder builder;
     @Mock
     AnnotatedBindingBuilder annotatedBindingBuilder;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Before
     @SuppressWarnings("unchecked")
