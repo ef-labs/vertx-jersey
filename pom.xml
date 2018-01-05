@@ -24,13 +24,13 @@
     <properties>
         <!--Dependency versions-->
         <jersey.version>2.25.1</jersey.version>
-        <jackson.version>2.7.4</jackson.version>
+        <jackson.version>2.9.1</jackson.version>
         <asm.version>3.3.1</asm.version>
         <hk2.version>2.5.0-b32</hk2.version>
         <guice.version>4.1.0</guice.version>
         <when.java.version>3.1.0</when.java.version>
 
-        <vertx.version>3.4.2</vertx.version>
+        <vertx.version>3.5.0</vertx.version>
         <vertx.hk2.version>2.5.0</vertx.hk2.version>
         <vertx.guice.version>2.3.0</vertx.guice.version>
         <vertx.when.version>4.2.0</vertx.when.version>
@@ -51,6 +51,11 @@
                 <groupId>asm</groupId>
                 <artifactId>asm</artifactId>
                 <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.vertx</groupId>
+                <artifactId>vertx-core</artifactId>
+                <version>${vertx.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.englishtown.vertx</groupId>
@@ -106,6 +111,11 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
             <dependency>
