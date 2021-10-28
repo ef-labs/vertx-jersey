@@ -11,15 +11,8 @@
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-jersey-jackson</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-hk2</artifactId>
-        </dependency>
+        
+        
     </dependencies>
 
 </project>

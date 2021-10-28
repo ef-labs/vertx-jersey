@@ -16,18 +16,8 @@
             <artifactId>vertx-jersey</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-dropwizard-metrics</artifactId>
-            <version>${vertx.version}</version>
-        </dependency>
-
-        <!--Test dependencies-->
-        <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <scope>test</scope>
-        </dependency>
+        
+        
         <dependency>
             <groupId>com.englishtown.vertx</groupId>
             <artifactId>vertx-jersey</artifactId>
@@ -35,10 +25,6 @@
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-when</artifactId>
-            <scope>test</scope>
-        </dependency>
+        
     </dependencies>
 </project>

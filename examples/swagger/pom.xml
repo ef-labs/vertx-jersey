@@ -10,20 +10,9 @@
     <artifactId>vertx-jersey-examples-swagger</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-jersey-swagger</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>${jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-hk2</artifactId>
-        </dependency>
+        
+        
+        
     </dependencies>
 
 
