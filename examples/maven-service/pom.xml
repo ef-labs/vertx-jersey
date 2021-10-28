@@ -11,16 +11,8 @@
     </parent>
 
     <dependencies>
-        <dependency>
-            <groupId>io.vertx</groupId>
-            <artifactId>vertx-maven-service-factory</artifactId>
-            <version>${vertx.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-hk2</artifactId>
-            <scope>test</scope>
-        </dependency>
+        
+        
     </dependencies>
 
     <build>

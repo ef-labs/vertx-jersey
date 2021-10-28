@@ -10,20 +10,13 @@
     <artifactId>vertx-jersey-examples-guice</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId>com.englishtown.vertx</groupId>
-            <artifactId>vertx-guice</artifactId>
-        </dependency>
+        
         <dependency>
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-multibindings</artifactId>
             <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.glassfish.hk2</groupId>
-            <artifactId>guice-bridge</artifactId>
-            <scope>compile</scope>
-        </dependency>
+        
     </dependencies>
 
     <profiles>
